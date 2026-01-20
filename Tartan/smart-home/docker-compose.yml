@@ -1,0 +1,30 @@
+version: '3'
+services:
+  house-cmu: 
+    build: HouseSimulator/
+    ports:
+     - "5051:5050"
+  house-mse: 
+    build: HouseSimulator/
+    ports:
+     - "5050:5050"
+  platform:
+    build:
+      context: Platform/
+      no_cache: true
+    depends_on:
+     - "mysql-container"
+     - "house-cmu"
+     - "house-mse"
+    ports:
+     - "8080:8080"
+  mysql-container:
+    build: Database/
+    ports:
+     - "3306:3306"
+    volumes:
+     - mysql-storage:/var/lib/mysql
+
+
+volumes:
+  mysql-storage:

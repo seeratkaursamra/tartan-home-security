@@ -1,0 +1,67 @@
+plugins {
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
+}
+group 'Tartan'
+version '1.0-SNAPSHOT'
+apply plugin: 'java'
+apply plugin: 'application'
+application {
+    mainClass = 'tartan.smarthome.TartanHomeApplication'
+}
+sourceCompatibility = 21
+targetCompatibility = 21
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+dependencies {
+    implementation "javax.xml.bind:jaxb-api:2.3.1"
+    implementation "com.sun.xml.bind:jaxb-core:4.0.4"
+    implementation "com.sun.xml.bind:jaxb-impl:4.0.4"
+    implementation "javax.activation:activation:1.1.1"
+    implementation 'io.dropwizard:dropwizard-bom:4.0.7'
+    implementation 'io.dropwizard:dropwizard-core:4.0.7'
+    implementation 'io.dropwizard:dropwizard-views-freemarker:4.0.7'
+    implementation 'io.dropwizard:dropwizard-auth:4.0.7'
+    implementation 'io.dropwizard:dropwizard-hibernate:4.0.7'
+    implementation 'io.dropwizard:dropwizard-assets:4.0.7'
+    implementation 'mysql:mysql-connector-java:8.0.33'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
+}
+run {
+    args = ['server', 'config.yml']
+}
+shadowJar {
+    mergeServiceFiles()
+    manifest {
+        attributes(
+                'Implementation-Title': rootProject.name,
+                'Implementation-Version': rootProject.version,
+                'Implementation-Vendor-Id': rootProject.group,
+                'Created-By': 'Gradle ' + gradle.gradleVersion,
+                'Main-Class': 'tartan.smarthome.TartanHomeApplication'
+        )
+    }
+    archiveFileName.set(rootProject.name + '-' + rootProject.version + '.jar')
+}
+tasks.named('distZip').configure {
+    dependsOn tasks.named('shadowJar')
+}
+tasks.named('distTar').configure {
+    dependsOn tasks.named('shadowJar')
+}
+tasks.named('startScripts').configure {
+    dependsOn tasks.named('shadowJar')
+}
+tasks.named('startShadowScripts').configure {
+    dependsOn tasks.named('shadowJar')
+}
+tasks.named('jar').configure {
+    enabled = false
+}
+test {
+    useJUnitPlatform()
+    testLogging {
+        showStandardStreams = true
+    }
+}
