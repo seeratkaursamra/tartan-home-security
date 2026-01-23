@@ -1,0 +1,32 @@
+name: Tartan CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: Tartan/smart-home/Platform
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Build (skip tests)
+        run: |
+          chmod +x gradlew
+          ./gradlew build -x test
+
+      - name: Run tests
+        run: ./gradlew test
