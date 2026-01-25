@@ -234,7 +234,7 @@ public class TartanHouseSimulator implements Runnable {
                     if (count < keys.size()) {
                         newState.append(PARAM_DELIM);
                     }
-                } else if (key.equals(ALARM_STATE)) {
+                } else if (key.equals(ALARM_STATE)) { //potential error?
                     Boolean newHumidifierState = (Boolean) state.get(key);
                     newState.append(HUMIDIFIER_STATE);
                     newState.append(PARAM_EQ);
