@@ -147,6 +147,10 @@ public class StaticTartanStateEvaluator implements TartanStateEvaluator {
                 log.append(formatLogEntry("Turning on light"));
             }
             
+        } else {
+            // R12: If the house is empty, then start the away timer
+            awayTimerState = true;
+            log.append(formatLogEntry("House is vacant, starting away timer"));
         }
 
         // set the alarm
