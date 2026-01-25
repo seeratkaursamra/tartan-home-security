@@ -12,8 +12,9 @@ import tartan.smarthome.resources.iotcontroller.IoTValues;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * R12: If the house is empty, then start the away timer.
+ * R12: If the house is empty, then start away timer.
  */
+
 public class R12Test {
 
     private StaticTartanStateEvaluator evaluator;
