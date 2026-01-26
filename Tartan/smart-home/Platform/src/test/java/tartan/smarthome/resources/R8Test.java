@@ -12,6 +12,9 @@ import tartan.smarthome.resources.iotcontroller.IoTValues;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
+ * The following from Genarative AI, "How do I make a test for rule 8 which is The alarm must be disabled by the user
+ * in person by entering a user-defined passcode?"
+ *
  * R8: The alarm must be disabled by the user in person by entering a user-defined passcode.
  *
  * In the StaticTartanStateEvaluator implementation, "disabling" the alarm is
