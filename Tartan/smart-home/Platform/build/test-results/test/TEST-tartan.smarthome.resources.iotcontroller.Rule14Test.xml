@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="tartan.smarthome.resources.iotcontroller.Rule14Test" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-01-26T01:01:54" hostname="Abdulrahmans-MacBook-Air-2.local" time="0.005">
+  <properties/>
+  <testcase name="testR14_InvalidPassword_Null()" classname="tartan.smarthome.resources.iotcontroller.Rule14Test" time="0.001"/>
+  <testcase name="testR14_InvalidPassword_NoSymbol()" classname="tartan.smarthome.resources.iotcontroller.Rule14Test" time="0.0"/>
+  <testcase name="testR14_InvalidPassword_NoUppercase()" classname="tartan.smarthome.resources.iotcontroller.Rule14Test" time="0.0"/>
+  <testcase name="testR14_ValidPassword_MeetsAllRequirements()" classname="tartan.smarthome.resources.iotcontroller.Rule14Test" time="0.0"/>
+  <testcase name="testR14_InvalidPassword_TooShort()" classname="tartan.smarthome.resources.iotcontroller.Rule14Test" time="0.0"/>
+  <testcase name="testR14_strongValidPassword()" classname="tartan.smarthome.resources.iotcontroller.Rule14Test" time="0.0"/>
+  <testcase name="testR14_InvalidPassword_EmptyString()" classname="tartan.smarthome.resources.iotcontroller.Rule14Test" time="0.0"/>
+  <testcase name="testR14_InvalidPassword_NoNumber()" classname="tartan.smarthome.resources.iotcontroller.Rule14Test" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
