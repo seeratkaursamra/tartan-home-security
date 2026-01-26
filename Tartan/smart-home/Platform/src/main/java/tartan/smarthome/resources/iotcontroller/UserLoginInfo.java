@@ -8,8 +8,27 @@ public class UserLoginInfo {
     /** the user credentials */
     private String userName, password;
 
+    /**
+     * Create a new UserLoginInfo with password validation (for new users)
+     * @param userName the username
+     * @param password the password
+     */
     public UserLoginInfo(String userName, String password) {
-        if (!isValidPassword(password)) {  // needed for rule 14
+        this(userName, password, true);  // Default: validate password
+    }
+
+    /**
+     * Create a new UserLoginInfo with optional password validation
+     * Used for system initialization from config files
+     *
+     * done this way because the docker file was having problems
+     *
+     * @param userName the username
+     * @param password the password
+     * @param validate whether to validate the password (false for legacy/config users)
+     */
+    public UserLoginInfo(String userName, String password, boolean validate) {
+        if (validate && !isValidPassword(password)) {
             throw new IllegalArgumentException(
                     "Password must be 8+ chars with uppercase, number, and symbol"
             );
@@ -73,7 +92,7 @@ public class UserLoginInfo {
     }
 
     /**
-     * Set password
+     * Set password - validates for security regardless of 'grandfathering in'
      * @param password
      */
     public void setPassword(String password) {

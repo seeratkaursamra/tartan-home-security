@@ -55,7 +55,9 @@ public class IoTControlManager {
 
         settingsPath = null;
 
-        users.add(new UserLoginInfo(user, password));
+        //this was causing problems with docker as docker doesn't have strong password names
+        // added this as a way to 'grandfather' in the old users but still require the new users to have strong passwords
+        users.add(new UserLoginInfo(user, password, false)); // bypass validation for the config users
 
         this.stateEvaluator = evaluator;
 
@@ -82,7 +84,7 @@ public class IoTControlManager {
             String line;
             while ((line = br.readLine()) != null) {
                 String[] entry = line.split("=");
-                users.add(new UserLoginInfo(entry[0], entry[1]));
+                users.add(new UserLoginInfo(entry[0], entry[1], false)); //bypass validation for file loaded users
             }
         } catch (Exception e) {
             e.printStackTrace();
