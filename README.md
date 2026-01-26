@@ -5,7 +5,7 @@
 | **Group Number**      | w26-m007                                                        |
 | **Course**            | CMPUT 402                                                       |
 | **Project**           | Group Project – Tartan Smart Home System                        |
-| **GitHub Repository** |                                                                 |
+| **GitHub Repository** | https://github.com/cmput402/w26-tartan-m007                                                               |
 
 
 ## TEAM MEMBERS
