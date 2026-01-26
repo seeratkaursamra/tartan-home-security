@@ -1,0 +1,7 @@
+Manifest-Version: 1.0
+Implementation-Title: tartan
+Implementation-Version: 1.0-SNAPSHOT
+Implementation-Vendor-Id: Tartan
+Created-By: Gradle 8.6
+Main-Class: tartan.smarthome.TartanHomeApplication
+
