@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="tartan.smarthome.resources.R1Test" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-01-26T01:01:54" hostname="Abdulrahmans-MacBook-Air-2.local" time="0.001">
+<testsuite name="tartan.smarthome.resources.R1Test" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-02-09T18:06:29" hostname="MOOSELAPTOPTWO" time="0.007">
   <properties/>
-  <testcase name="R1: If the house is vacant, then the light cannot be turned on" classname="tartan.smarthome.resources.R1Test" time="0.001"/>
+  <testcase name="R1: If the house is vacant, then the light cannot be turned on" classname="tartan.smarthome.resources.R1Test" time="0.007"/>
   <system-out><![CDATA[Evaluating new state statically
 ]]></system-out>
   <system-err><![CDATA[]]></system-err>

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="tartan.smarthome.resources.Rule10Test" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-01-26T01:01:54" hostname="Abdulrahmans-MacBook-Air-2.local" time="0.003">
+<testsuite name="tartan.smarthome.resources.Rule10Test" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-02-09T18:06:29" hostname="MOOSELAPTOPTWO" time="0.021">
   <properties/>
-  <testcase name="testHeaterActivationDisablesHumidifier()" classname="tartan.smarthome.resources.Rule10Test" time="0.0"/>
-  <testcase name="testHeaterOnForcesDehumidifierOff()" classname="tartan.smarthome.resources.Rule10Test" time="0.0"/>
-  <testcase name="testDehumidifierCanRunWithChiller()" classname="tartan.smarthome.resources.Rule10Test" time="0.001"/>
-  <testcase name="testSwitchingToHeaterDisablesHumidifier()" classname="tartan.smarthome.resources.Rule10Test" time="0.001"/>
+  <testcase name="testHeaterActivationDisablesHumidifier()" classname="tartan.smarthome.resources.Rule10Test" time="0.004"/>
+  <testcase name="testHeaterOnForcesDehumidifierOff()" classname="tartan.smarthome.resources.Rule10Test" time="0.003"/>
+  <testcase name="testDehumidifierCanRunWithChiller()" classname="tartan.smarthome.resources.Rule10Test" time="0.003"/>
+  <testcase name="testSwitchingToHeaterDisablesHumidifier()" classname="tartan.smarthome.resources.Rule10Test" time="0.008"/>
   <system-out><![CDATA[Evaluating new state statically
 Evaluating new state statically
 Evaluating new state statically
