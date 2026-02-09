@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TartanHomeConfiguration.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">tartan</a> &gt; <a href="index.source.html" class="el_package">tartan.smarthome</a> &gt; <span class="el_source">TartanHomeConfiguration.java</span></div><h1>TartanHomeConfiguration.java</h1><pre class="source lang-java linenums">package tartan.smarthome;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import io.dropwizard.core.Configuration;
+import io.dropwizard.db.DataSourceFactory;
+import org.hibernate.validator.constraints.NotEmpty;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import java.util.List;
+
+/**
+ * Configuration settings read from YAML file config.yml. See that file for field definitions
+ * @see &lt;a href=&quot;https://www.dropwizard.io/1.0.0/docs/manual/core.html#configuration&quot;&gt;Dropwizard Configuration&lt;/a&gt;
+ *
+ */
+<span class="nc" id="L16">public class TartanHomeConfiguration extends Configuration {</span>
+
+    @NotEmpty
+    @JsonProperty
+    private List&lt;TartanHomeSettings&gt; houses;
+
+    @NotEmpty
+    @JsonProperty
+    private String historyTimer;
+
+<span class="nc" id="L26">    @Valid</span>
+    @NotNull
+    private DataSourceFactory database = new DataSourceFactory();
+
+    @JsonProperty
+    public List&lt;TartanHomeSettings&gt; getHouses() {
+<span class="nc" id="L32">        return houses;</span>
+    }
+
+    @JsonProperty
+    public void setHouses(List&lt;TartanHomeSettings&gt; houses) {
+<span class="nc" id="L37">        this.houses = houses;</span>
+<span class="nc" id="L38">    }</span>
+
+    @JsonProperty(&quot;database&quot;)
+    public DataSourceFactory getDataSourceFactory() {
+<span class="nc" id="L42">        return database;</span>
+    }
+
+    @JsonProperty(&quot;database&quot;)
+    public void setDataSourceFactory(DataSourceFactory dataSourceFactory) {
+<span class="nc" id="L47">        this.database = dataSourceFactory;</span>
+<span class="nc" id="L48">    }</span>
+
+    @JsonProperty
+    public String getHistoryTimer() {
+<span class="nc" id="L52">        return historyTimer;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

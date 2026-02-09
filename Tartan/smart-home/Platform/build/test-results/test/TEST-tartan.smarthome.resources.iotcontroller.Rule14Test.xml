@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="tartan.smarthome.resources.iotcontroller.Rule14Test" tests="11" skipped="0" failures="0" errors="0" timestamp="2026-02-09T17:45:04" hostname="MOOSELAPTOPTWO" time="0.057">
+  <properties/>
+  <testcase name="testR14_InvalidPassword_Null()" classname="tartan.smarthome.resources.iotcontroller.Rule14Test" time="0.008"/>
+  <testcase name="testR14_InvalidPassword_NoSymbol()" classname="tartan.smarthome.resources.iotcontroller.Rule14Test" time="0.002"/>
+  <testcase name="testR14_InvalidPassword_NoUppercase()" classname="tartan.smarthome.resources.iotcontroller.Rule14Test" time="0.003"/>
+  <testcase name="testR14_ValidPassword_MeetsAllRequirements()" classname="tartan.smarthome.resources.iotcontroller.Rule14Test" time="0.004"/>
+  <testcase name="testR14_BypassValidation_StrongPasswordStillWorks()" classname="tartan.smarthome.resources.iotcontroller.Rule14Test" time="0.002"/>
+  <testcase name="testR14_InvalidPassword_TooShort()" classname="tartan.smarthome.resources.iotcontroller.Rule14Test" time="0.004"/>
+  <testcase name="testR14_LegacyUser_WeakPasswordAllowed()" classname="tartan.smarthome.resources.iotcontroller.Rule14Test" time="0.002"/>
+  <testcase name="testR14_strongValidPassword()" classname="tartan.smarthome.resources.iotcontroller.Rule14Test" time="0.003"/>
+  <testcase name="testR14_ConfigUser_NoValidation()" classname="tartan.smarthome.resources.iotcontroller.Rule14Test" time="0.002"/>
+  <testcase name="R14: Invalid password - empty string" classname="tartan.smarthome.resources.iotcontroller.Rule14Test" time="0.003"/>
+  <testcase name="testR14_InvalidPassword_NoNumber()" classname="tartan.smarthome.resources.iotcontroller.Rule14Test" time="0.003"/>
+  <system-out><![CDATA[Testing password validation: null password
+Testing password validation: no symbol
+Testing password validation: no uppercase
+Testing valid password with all requirements
+un:Testing that bypass mode still accepts strong passwords
+Testing password validation: too short
+un:Testing legacy user creation with weak password (validation bypassed)
+Testing strong valid password
+un:Testing config user creation without validation
+Testing password validation: empty string
+Testing password validation: no number
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

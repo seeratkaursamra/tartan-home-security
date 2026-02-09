@@ -1,0 +1,527 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TartanHomeService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">tartan</a> &gt; <a href="index.source.html" class="el_package">tartan.smarthome.resources</a> &gt; <span class="el_source">TartanHomeService.java</span></div><h1>TartanHomeService.java</h1><pre class="source lang-java linenums">package tartan.smarthome.resources;
+
+import tartan.smarthome.resources.iotcontroller.IoTControlManager;
+import tartan.smarthome.resources.iotcontroller.IoTValues;
+import io.dropwizard.hibernate.UnitOfWork;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import tartan.smarthome.TartanHomeSettings;
+import tartan.smarthome.core.TartanHome;
+import tartan.smarthome.core.TartanHomeData;
+import tartan.smarthome.core.TartanHomeValues;
+import tartan.smarthome.db.HomeDAO;
+
+import java.util.Hashtable;
+import java.util.Map;
+import java.util.Set;
+
+/***
+ * The service layer for the Tartan Home System. Additional inputs and control mechanisms should be accessed here.
+ * Currently, this is mainly a proxy to make the existing hardware RESTful.
+ */
+public class TartanHomeService {
+
+    // the controller for the house
+    private IoTControlManager controller;
+
+    // a logging system
+<span class="nc" id="L28">    private static final Logger LOGGER = LoggerFactory.getLogger(TartanHomeService.class);</span>
+
+    // Home configuration parameters
+    private String name;
+    private String address;
+    private Integer port;
+    private String alarmDelay;
+    private String alarmPasscode;
+    private String targetTemp;
+    private String user;
+    private String password;
+
+    // status parameters
+    private HomeDAO homeDAO;
+    private boolean authenticated;
+
+    // historian parameters
+    private Boolean logHistory;
+<span class="nc" id="L46">    private int historyTimer = 60000;</span>
+
+    /**
+     * Create a new Tartan Home Service
+     * @param dao handle to a database
+     */
+<span class="nc" id="L52">    public TartanHomeService(HomeDAO dao) {</span>
+<span class="nc" id="L53">        this.homeDAO = dao;</span>
+<span class="nc" id="L54">    }</span>
+
+    /**
+     * Initialize the settings
+     * @param settings the house settings
+     * @param historyTimer historian delay
+     */
+    public void initializeSettings(TartanHomeSettings settings, Integer historyTimer) {
+
+<span class="nc" id="L63">        this.user = settings.getUser();</span>
+<span class="nc" id="L64">        this.password = settings.getPassword();</span>
+<span class="nc" id="L65">        this.name = settings.getName();</span>
+<span class="nc" id="L66">        this.address = settings.getAddress();</span>
+<span class="nc" id="L67">        this.port = settings.getPort();</span>
+<span class="nc" id="L68">        this.authenticated = false;</span>
+
+        // User configuration
+<span class="nc" id="L71">        this.targetTemp = settings.getTargetTemp();</span>
+<span class="nc" id="L72">        this.alarmDelay = settings.getAlarmDelay();</span>
+<span class="nc" id="L73">        this.alarmPasscode = settings.getAlarmPasscode();</span>
+
+<span class="nc" id="L75">        this.historyTimer = historyTimer*1000;</span>
+<span class="nc" id="L76">        this.logHistory = true;</span>
+
+        // Create and initialize the controller for this house
+<span class="nc" id="L79">        this.controller = new IoTControlManager(user, password, new StaticTartanStateEvaluator());</span>
+        
+<span class="nc" id="L81">        TartanHome temp = new TartanHome();</span>
+<span class="nc" id="L82">        temp.setAlarmDelay(alarmDelay);</span>
+
+<span class="nc" id="L84">        Map&lt;String, Object&gt; userSettings = new Hashtable&lt;String, Object&gt;();</span>
+<span class="nc" id="L85">        userSettings.put(IoTValues.ALARM_DELAY, Integer.parseInt(this.alarmDelay));</span>
+<span class="nc" id="L86">        userSettings.put(IoTValues.TARGET_TEMP, Integer.parseInt(this.targetTemp));</span>
+<span class="nc" id="L87">        userSettings.put(IoTValues.ALARM_PASSCODE, this.alarmPasscode);</span>
+<span class="nc" id="L88">        controller.updateSettings(userSettings);</span>
+
+<span class="nc" id="L90">        LOGGER.info(&quot;House &quot; + this.name + &quot; configured&quot;);</span>
+<span class="nc" id="L91">    }</span>
+
+    /**
+     * Stop logging history
+     */
+    public void stopHistorian() {
+<span class="nc" id="L97">        this.logHistory = false;</span>
+<span class="nc" id="L98">    }</span>
+
+    /**
+     * Start a thread to log house history on a delay
+     */
+    public void startHistorian() {
+
+<span class="nc" id="L105">        new Thread(new Runnable() {</span>
+            @Override
+            public void run() {
+<span class="nc bnc" id="L108" title="All 2 branches missed.">                while (logHistory) {</span>
+                    try {
+<span class="nc" id="L110">                        TartanHome state = getState();</span>
+<span class="nc bnc" id="L111" title="All 2 branches missed.">                        if (state != null) {</span>
+<span class="nc" id="L112">                            TartanHomeData home = new TartanHomeData(state);</span>
+<span class="nc" id="L113">                            LOGGER.info(&quot;Logging &quot; + name + &quot;@&quot; + address + &quot; state&quot;);</span>
+<span class="nc" id="L114">                            logHistory(home);</span>
+                        }
+
+<span class="nc" id="L117">                        Thread.sleep(historyTimer);</span>
+<span class="nc" id="L118">                    } catch (Exception x) {</span>
+<span class="nc" id="L119">                        LOGGER.error(&quot;Failed to save &quot; + name + &quot;@&quot; + address + &quot; state&quot;);</span>
+<span class="nc" id="L120">                    }</span>
+                }
+<span class="nc" id="L122">            }</span>
+<span class="nc" id="L123">        }).start();</span>
+<span class="nc" id="L124">    }</span>
+
+    /**
+     * Save the current state of the house
+     * @param tartanHomeData the current state in a Hibernate-aware format
+     */
+    @UnitOfWork
+    private void logHistory(TartanHomeData tartanHomeData) {
+<span class="nc" id="L132">        homeDAO.create(tartanHomeData);</span>
+<span class="nc" id="L133">    }</span>
+
+    /**
+     * Get the name for this house
+     * @return the house name
+     */
+    public String getName() {
+<span class="nc" id="L140">        return name;</span>
+    }
+
+    public Boolean authenticate(String user, String pass) {
+<span class="nc bnc" id="L144" title="All 4 branches missed.">        this.authenticated = (this.user.equals(user) &amp;&amp; this.password.equals(pass));</span>
+<span class="nc" id="L145">        return this.authenticated;</span>
+    }
+
+    /**
+     * Get the house address
+     * @return the address
+     */
+    public String getAddress() {
+<span class="nc" id="L153">        return address;</span>
+    }
+
+    /**
+     *  Get the house conncected state
+     * @return true if connected; false otherwise
+     */
+    public Boolean isConnected() {
+<span class="nc" id="L161">        return controller.isConnected();</span>
+    }
+
+    /**
+     * Convert humidifier state
+     * @param tartanHome the home
+     *  @return true if on; false if off; otherwise null
+     */
+    private Boolean toIoTHumdifierState(TartanHome tartanHome) {
+<span class="nc bnc" id="L170" title="All 2 branches missed.">        if (tartanHome.getHumidifier().equals(TartanHomeValues.OFF)) return false;</span>
+<span class="nc bnc" id="L171" title="All 2 branches missed.">        else if (tartanHome.getHumidifier().equals(TartanHomeValues.ON)) return true;</span>
+<span class="nc" id="L172">        return null;</span>
+    }
+
+    /**
+     * Convert light state
+     * @param tartanHome the home
+     * @return true if on; false if off; otherwise null
+     */
+    private Boolean toIoTLightState(TartanHome tartanHome) {
+<span class="nc bnc" id="L181" title="All 2 branches missed.">        if (tartanHome.getLight().equals(TartanHomeValues.OFF)) return false;</span>
+<span class="nc bnc" id="L182" title="All 2 branches missed.">        else if (tartanHome.getLight().equals(TartanHomeValues.ON)) return true;</span>
+<span class="nc" id="L183">        return null;</span>
+    }
+
+    /**
+     * Convert alarm armed state
+     * @param tartanHome the home
+     * @return true if armed; false if disarmed; otherwise null
+     */
+    private Boolean toIoTAlarmArmedState(TartanHome tartanHome) {
+<span class="nc bnc" id="L192" title="All 2 branches missed.">        if (tartanHome.getAlarmArmed().equals(TartanHomeValues.DISARMED)) return false;</span>
+<span class="nc bnc" id="L193" title="All 2 branches missed.">        else if (tartanHome.getAlarmArmed().equals(TartanHomeValues.ARMED)) return true;</span>
+<span class="nc" id="L194">        return null;</span>
+    }
+
+    /**
+     * Convert alarm delay
+     * @param tartanHome the home
+     * @return the converted delay
+     */
+    private Integer toIoTAlarmDelay(TartanHome tartanHome) {
+<span class="nc" id="L203">        return Integer.parseInt(tartanHome.getAlarmDelay());</span>
+    }
+
+    /**
+     * Convert alarm passcode
+     * @param tartanHome the home
+     * @return the passcode
+     */
+    private String toIoTPasscode(TartanHome tartanHome) {
+<span class="nc" id="L212">        return tartanHome.getAlarmPasscode();</span>
+    }
+
+    /**
+     * Convert door state
+     * @param tartanHome the home
+     * @return true if open; false if closed' otherwise null
+     */
+    private Boolean toIoTDoorState(TartanHome tartanHome) {
+<span class="nc bnc" id="L221" title="All 2 branches missed.">        if (tartanHome.getDoor().equals(TartanHomeValues.CLOSED)) return false;</span>
+<span class="nc bnc" id="L222" title="All 2 branches missed.">        else if (tartanHome.getDoor().equals(TartanHomeValues.OPEN)) return true;</span>
+<span class="nc" id="L223">        return null;</span>
+    }
+
+    /**
+     * Convert proximity state
+     * @param tartanHome the home
+     * @return true if occupied; false if empty; otherwise null
+     */
+    private Boolean toIoTProximityState(TartanHome tartanHome) {
+<span class="nc bnc" id="L232" title="All 2 branches missed.">        if (tartanHome.getProximity().equals(TartanHomeValues.OCCUPIED)) return true;</span>
+<span class="nc bnc" id="L233" title="All 2 branches missed.">        else if (tartanHome.getProximity().equals(TartanHomeValues.EMPTY)) return false;</span>
+<span class="nc" id="L234">        return null;</span>
+    }
+
+    /**
+     * Convert alarm active state
+     * @param tartanHome the home
+     * @return true if active; false if inactive; otherwise null
+     */
+    private Boolean toIoTAlarmActiveState(TartanHome tartanHome) {
+<span class="nc bnc" id="L243" title="All 2 branches missed.">        if (tartanHome.getAlarmActive().equals(TartanHomeValues.ACTIVE)) return true;</span>
+<span class="nc bnc" id="L244" title="All 2 branches missed.">        else if (tartanHome.getAlarmActive().equals(TartanHomeValues.INACTIVE)) return false;</span>
+<span class="nc" id="L245">        return null;</span>
+    }
+
+    /**
+     * Convert heater state
+     * @param tartanHome the home
+     * @return true if on; false if off; otherwise null
+     */
+    private Boolean toIoTHeaterState(TartanHome tartanHome) {
+<span class="nc bnc" id="L254" title="All 2 branches missed.">        if (tartanHome.getHvacMode().equals(TartanHomeValues.HEAT)) {</span>
+<span class="nc bnc" id="L255" title="All 2 branches missed.">            if (tartanHome.getHvacState().equals(TartanHomeValues.ON)) {</span>
+<span class="nc" id="L256">                return true;</span>
+<span class="nc bnc" id="L257" title="All 2 branches missed.">            } else if (tartanHome.getHvacState().equals(TartanHomeValues.OFF)) {</span>
+<span class="nc" id="L258">                return false;</span>
+            }
+        }
+<span class="nc" id="L261">        return null;</span>
+    }
+
+    /**
+     * Convert chiller state
+     * @param tartanHome the home
+     * @return true if on; false if off; otherwise null
+     */
+    private Boolean toIoTChillerState(TartanHome tartanHome) {
+<span class="nc bnc" id="L270" title="All 2 branches missed.">        if (tartanHome.getHvacMode().equals(TartanHomeValues.COOL)) {</span>
+<span class="nc bnc" id="L271" title="All 2 branches missed.">            if (tartanHome.getHvacState().equals(TartanHomeValues.ON)) {</span>
+<span class="nc" id="L272">                return true;</span>
+<span class="nc bnc" id="L273" title="All 2 branches missed.">            } else if (tartanHome.getHvacState().equals(TartanHomeValues.OFF)) {</span>
+<span class="nc" id="L274">                return false;</span>
+            }
+        }
+<span class="nc" id="L277">        return null;</span>
+    }
+
+    /**
+     * Convert target temperature state
+     * @param tartanHome the home
+     * @return converted target temperature
+     */
+    private Integer toIoTTargetTempState(TartanHome tartanHome) {
+<span class="nc" id="L286">        return Integer.parseInt(tartanHome.getTargetTemp());</span>
+    }
+
+    /**
+     * Convert HVAC mode state
+     * @param tartanHome the home
+     * @return Heater, Chiller; or null
+     */
+    private String toIoTHvacModeState(TartanHome tartanHome) {
+<span class="nc bnc" id="L295" title="All 2 branches missed.">        if (tartanHome.getHvacMode().equals(TartanHomeValues.HEAT)) return &quot;Heater&quot;;</span>
+<span class="nc bnc" id="L296" title="All 2 branches missed.">        else if (tartanHome.getHvacMode().equals(TartanHomeValues.COOL)) return &quot;Chiller&quot;;</span>
+<span class="nc" id="L297">        return null;</span>
+    }
+
+    /**
+     * Set the house state in the hardware
+     * @param h the new state
+     * @return true
+     */
+    public Boolean setState(TartanHome h) {
+<span class="nc" id="L306">        synchronized (controller) {</span>
+                        
+<span class="nc" id="L308">            Map&lt;String, Object&gt; userSettings = new Hashtable&lt;String, Object&gt;();</span>
+<span class="nc bnc" id="L309" title="All 2 branches missed.">            if (h.getAlarmDelay()!=null) {</span>
+<span class="nc" id="L310">                this.alarmDelay = h.getAlarmDelay();</span>
+<span class="nc" id="L311">                userSettings.put(IoTValues.ALARM_DELAY, Integer.parseInt(this.alarmDelay)); </span>
+
+            }
+<span class="nc bnc" id="L314" title="All 2 branches missed.">            if (h.getTargetTemp()!=null) {</span>
+<span class="nc" id="L315">                this.targetTemp = h.getTargetTemp();</span>
+<span class="nc" id="L316">                userSettings.put(IoTValues.TARGET_TEMP, Integer.parseInt(this.targetTemp)); </span>
+            }           
+<span class="nc" id="L318">            controller.updateSettings(userSettings);  </span>
+<span class="nc" id="L319">            controller.processStateUpdate(toIotState(h));  </span>
+<span class="nc" id="L320">        }</span>
+<span class="nc" id="L321">        return true;</span>
+    }
+
+    /**
+     * Fetch the current state of the house
+     * @return the current state
+     */
+    public TartanHome getState() {
+
+<span class="nc" id="L330">        TartanHome tartanHome = new TartanHome();</span>
+
+<span class="nc" id="L332">        tartanHome.setName(this.name);</span>
+<span class="nc" id="L333">        tartanHome.setAddress(this.address);</span>
+
+<span class="nc" id="L335">        tartanHome.setTargetTemp(this.targetTemp);</span>
+<span class="nc" id="L336">        tartanHome.setAlarmDelay(this.alarmDelay);</span>
+
+<span class="nc" id="L338">        tartanHome.setEventLog(controller.getLogMessages());</span>
+<span class="nc" id="L339">        tartanHome.setAuthenticated(String.valueOf(this.authenticated));</span>
+
+<span class="nc" id="L341">        Map&lt;String, Object&gt; state = null;</span>
+<span class="nc" id="L342">        synchronized (controller) {</span>
+<span class="nc" id="L343">            state = controller.getCurrentState();            </span>
+<span class="nc bnc" id="L344" title="All 2 branches missed.">            for (String l : controller.getLogMessages()) {</span>
+<span class="nc" id="L345">                LOGGER.info(l);</span>
+<span class="nc" id="L346">            }</span>
+<span class="nc" id="L347">        }</span>
+<span class="nc bnc" id="L348" title="All 2 branches missed.">        if (state == null) {</span>
+<span class="nc" id="L349">            LOGGER.info(&quot;zUsing default state&quot;);</span>
+            // There is no state, but something must be returned.
+
+<span class="nc" id="L352">            tartanHome.setTemperature(TartanHomeValues.UNKNOWN);</span>
+<span class="nc" id="L353">            tartanHome.setHumidity(TartanHomeValues.UNKNOWN);</span>
+<span class="nc" id="L354">            tartanHome.setTargetTemp(TartanHomeValues.UNKNOWN);</span>
+<span class="nc" id="L355">            tartanHome.setHumidifier(TartanHomeValues.UNKNOWN);</span>
+<span class="nc" id="L356">            tartanHome.setDoor(TartanHomeValues.UNKNOWN);</span>
+<span class="nc" id="L357">            tartanHome.setLight(TartanHomeValues.UNKNOWN);</span>
+<span class="nc" id="L358">            tartanHome.setProximity(TartanHomeValues.UNKNOWN);</span>
+<span class="nc" id="L359">            tartanHome.setAlarmArmed(TartanHomeValues.UNKNOWN);</span>
+<span class="nc" id="L360">            tartanHome.setAlarmActive(TartanHomeValues.UNKNOWN);</span>
+<span class="nc" id="L361">            tartanHome.setHvacMode(TartanHomeValues.UNKNOWN);</span>
+<span class="nc" id="L362">            tartanHome.setHvacState(TartanHomeValues.UNKNOWN);</span>
+
+<span class="nc" id="L364">            return tartanHome;</span>
+        }
+
+        // A valid state was found, so use it
+
+<span class="nc" id="L369">        Set&lt;String&gt; keys = state.keySet();</span>
+<span class="nc bnc" id="L370" title="All 2 branches missed.">        for (String key : keys) {</span>
+<span class="nc" id="L371">            LOGGER.info(&quot;State element: &quot; + key + &quot;=&quot; + state.get(key));</span>
+<span class="nc bnc" id="L372" title="All 2 branches missed.">            if (key.equals(IoTValues.TEMP_READING)) {</span>
+<span class="nc" id="L373">                tartanHome.setTemperature(String.valueOf(state.get(key)));</span>
+<span class="nc bnc" id="L374" title="All 2 branches missed.">            } else if (key.equals(IoTValues.HUMIDITY_READING)) {</span>
+<span class="nc" id="L375">                tartanHome.setHumidity(String.valueOf(state.get(key)));</span>
+            }
+<span class="nc bnc" id="L377" title="All 2 branches missed.">            else if (key.equals(IoTValues.TARGET_TEMP)) {</span>
+<span class="nc" id="L378">                tartanHome.setTargetTemp(String.valueOf(state.get(key)));</span>
+            }
+<span class="nc bnc" id="L380" title="All 2 branches missed.">            else if (key.equals(IoTValues.HUMIDIFIER_STATE)) {</span>
+<span class="nc" id="L381">                Boolean humidifierState = (Boolean)state.get(key);</span>
+<span class="nc bnc" id="L382" title="All 2 branches missed.">                if (humidifierState) {</span>
+<span class="nc" id="L383">                    tartanHome.setHumidifier(String.valueOf(TartanHomeValues.ON));</span>
+                } else {
+<span class="nc" id="L385">                    tartanHome.setHumidifier(String.valueOf(TartanHomeValues.OFF));</span>
+                }
+<span class="nc bnc" id="L387" title="All 2 branches missed.">            } else if (key.equals(IoTValues.DOOR_STATE)) {</span>
+<span class="nc" id="L388">                Boolean doorState = (Boolean)state.get(key);</span>
+<span class="nc bnc" id="L389" title="All 2 branches missed.">                if (doorState) {</span>
+<span class="nc" id="L390">                    tartanHome.setDoor(TartanHomeValues.OPEN);</span>
+                } else {
+<span class="nc" id="L392">                    tartanHome.setDoor(TartanHomeValues.CLOSED);</span>
+                }
+<span class="nc bnc" id="L394" title="All 2 branches missed.">            } else if (key.equals(IoTValues.LIGHT_STATE)) {</span>
+<span class="nc" id="L395">                Boolean lightState = (Boolean)state.get(key);</span>
+<span class="nc bnc" id="L396" title="All 2 branches missed.">                if (lightState) {</span>
+<span class="nc" id="L397">                    tartanHome.setLight(TartanHomeValues.ON);</span>
+                } else {
+<span class="nc" id="L399">                    tartanHome.setLight(TartanHomeValues.OFF);</span>
+                }
+<span class="nc bnc" id="L401" title="All 2 branches missed.">            } else if (key.equals(IoTValues.PROXIMITY_STATE)) {</span>
+<span class="nc" id="L402">                Boolean proxState = (Boolean)state.get(key);</span>
+<span class="nc bnc" id="L403" title="All 2 branches missed.">                if (proxState) {</span>
+<span class="nc" id="L404">                    tartanHome.setProximity(TartanHomeValues.OCCUPIED);</span>
+                } else {
+<span class="nc" id="L406">                    tartanHome.setProximity(TartanHomeValues.EMPTY);</span>
+                }
+<span class="nc bnc" id="L408" title="All 2 branches missed.">            } else if (key.equals(IoTValues.ALARM_STATE)) {</span>
+<span class="nc" id="L409">                Boolean alarmState = (Boolean)state.get(key);</span>
+<span class="nc bnc" id="L410" title="All 2 branches missed.">                if (alarmState) {</span>
+<span class="nc" id="L411">                    tartanHome.setAlarmArmed(TartanHomeValues.ARMED);</span>
+                } else {
+<span class="nc" id="L413">                    tartanHome.setAlarmArmed(TartanHomeValues.DISARMED);</span>
+                }
+<span class="nc" id="L415">            }</span>
+<span class="nc bnc" id="L416" title="All 2 branches missed.">            else if (key.equals(IoTValues.ALARM_ACTIVE)) {</span>
+<span class="nc" id="L417">                Boolean alarmActiveState = (Boolean)state.get(key);</span>
+<span class="nc bnc" id="L418" title="All 2 branches missed.">                if (alarmActiveState) {</span>
+<span class="nc" id="L419">                    tartanHome.setAlarmActive(TartanHomeValues.ACTIVE);</span>
+                } else {
+<span class="nc" id="L421">                    tartanHome.setAlarmActive(TartanHomeValues.INACTIVE);</span>
+                }
+
+<span class="nc bnc" id="L424" title="All 2 branches missed.">            } else if (key.equals(IoTValues.HVAC_MODE)) {</span>
+<span class="nc bnc" id="L425" title="All 2 branches missed.">                if (state.get(key).equals(&quot;Heater&quot;)) {</span>
+<span class="nc" id="L426">                    tartanHome.setHvacMode(TartanHomeValues.HEAT);</span>
+<span class="nc bnc" id="L427" title="All 2 branches missed.">                } else if (state.get(key).equals(&quot;Chiller&quot;)) {</span>
+<span class="nc" id="L428">                    tartanHome.setHvacMode(TartanHomeValues.COOL);</span>
+                }
+
+                // If either heat or chill is on then the hvac is on
+<span class="nc" id="L432">                String heaterState = String.valueOf(state.get(IoTValues.HEATER_STATE));</span>
+<span class="nc" id="L433">                String chillerState = String.valueOf(state.get(IoTValues.CHILLER_STATE));</span>
+
+<span class="nc bnc" id="L435" title="All 4 branches missed.">                if (heaterState.equals(&quot;true&quot;) || chillerState.equals(&quot;true&quot;)) {</span>
+<span class="nc" id="L436">                    tartanHome.setHvacState(TartanHomeValues.ON);</span>
+
+                } else {
+<span class="nc" id="L439">                    tartanHome.setHvacState(TartanHomeValues.OFF);</span>
+                }
+            }
+<span class="nc" id="L442">        }</span>
+        
+<span class="nc" id="L444">        return tartanHome;</span>
+    }
+
+    /**
+     * Convert the state to a format suitable for the hardware
+     * @param tartanHome the state
+     * @return a map of settings appropriate for the hardware
+     */
+    private Map&lt;String, Object&gt; toIotState(TartanHome tartanHome) {
+<span class="nc" id="L453">        Map&lt;String, Object&gt; state = new Hashtable&lt;&gt;();</span>
+        
+<span class="nc bnc" id="L455" title="All 2 branches missed.">        if (tartanHome.getProximity()!=null) {</span>
+<span class="nc" id="L456">            state.put(IoTValues.PROXIMITY_STATE, toIoTProximityState(tartanHome));</span>
+        }
+
+<span class="nc bnc" id="L459" title="All 2 branches missed.">        if (tartanHome.getDoor()!=null) {</span>
+<span class="nc" id="L460">            state.put(IoTValues.DOOR_STATE, toIoTDoorState(tartanHome));</span>
+        }
+<span class="nc bnc" id="L462" title="All 2 branches missed.">        if (tartanHome.getLight()!=null) {</span>
+<span class="nc" id="L463">            state.put(IoTValues.LIGHT_STATE, toIoTLightState(tartanHome));</span>
+        }
+<span class="nc bnc" id="L465" title="All 2 branches missed.">        if (tartanHome.getHumidifier()!=null) {</span>
+<span class="nc" id="L466">            state.put(IoTValues.HUMIDIFIER_STATE, toIoTHumdifierState(tartanHome));</span>
+        }
+<span class="nc bnc" id="L468" title="All 2 branches missed.">        if (tartanHome.getAlarmActive()!=null) {</span>
+<span class="nc" id="L469">            state.put(IoTValues.ALARM_ACTIVE, toIoTAlarmActiveState(tartanHome));</span>
+        }
+        // entering a passcode also disables the alarm
+<span class="nc bnc" id="L472" title="All 2 branches missed.">        if (tartanHome.getAlarmPasscode()!=null) {</span>
+<span class="nc" id="L473">            state.put(IoTValues.GIVEN_PASSCODE, toIoTPasscode(tartanHome));</span>
+<span class="nc" id="L474">            tartanHome.setAlarmArmed(TartanHomeValues.DISARMED);</span>
+<span class="nc" id="L475">            state.put(IoTValues.ALARM_STATE, toIoTAlarmArmedState(tartanHome));</span>
+        }
+        else {
+<span class="nc bnc" id="L478" title="All 2 branches missed.">            if (tartanHome.getAlarmArmed() != null) {</span>
+<span class="nc" id="L479">                state.put(IoTValues.ALARM_STATE, toIoTAlarmArmedState(tartanHome));</span>
+            }
+        }
+<span class="nc bnc" id="L482" title="All 2 branches missed.">        if (tartanHome.getAlarmDelay()!=null) {</span>
+<span class="nc" id="L483">            this.alarmDelay = tartanHome.getAlarmDelay();</span>
+
+<span class="nc" id="L485">            Hashtable&lt;String, Object&gt; ht = new Hashtable&lt;String, Object&gt;(){</span>
+<span class="nc" id="L486">                {put(IoTValues.ALARM_DELAY,Integer.parseInt(TartanHomeService.this.alarmDelay));}</span>
+            };
+<span class="nc" id="L488">            controller.updateSettings(ht);</span>
+        }
+
+<span class="nc bnc" id="L491" title="All 2 branches missed.">        if (tartanHome.getHvacMode()!=null) {</span>
+<span class="nc bnc" id="L492" title="All 2 branches missed.">            if (tartanHome.getHvacMode().equals(TartanHomeValues.HEAT)) {</span>
+<span class="nc" id="L493">                state.put(IoTValues.HVAC_MODE, &quot;Heater&quot;);</span>
+<span class="nc bnc" id="L494" title="All 2 branches missed.">                if (tartanHome.getHvacState()!=null) {</span>
+<span class="nc" id="L495">                    state.put(IoTValues.HEATER_STATE, toIoTHeaterState(tartanHome));</span>
+                }
+            }
+<span class="nc bnc" id="L498" title="All 2 branches missed.">            if (tartanHome.getHvacMode().equals(TartanHomeValues.COOL)) {</span>
+<span class="nc" id="L499">                state.put(IoTValues.HVAC_MODE, &quot;Chiller&quot;);</span>
+<span class="nc bnc" id="L500" title="All 2 branches missed.">                if (tartanHome.getHvacState()!=null) {</span>
+<span class="nc bnc" id="L501" title="All 2 branches missed.">                    if (tartanHome.getHvacState().equals(TartanHomeValues.ON)) {</span>
+<span class="nc" id="L502">                        state.put(IoTValues.CHILLER_ON, toIoTChillerState(tartanHome));</span>
+                    }
+                }
+            }
+        }
+        
+<span class="nc bnc" id="L508" title="All 2 branches missed.">        for (Map.Entry&lt;String,Object&gt; e : state.entrySet()) {</span>
+<span class="nc" id="L509">            LOGGER.info(&quot;State: &quot; + e.getKey() + &quot;=&quot; + e.getValue());</span>
+<span class="nc" id="L510">        }</span>
+
+<span class="nc" id="L512">        return state;</span>
+    }
+
+    /**
+     * Connect to the house
+     * @throws TartanHomeConnectException exception passed when connect fails
+     */
+    public void connect() throws TartanHomeConnectException {
+<span class="nc bnc" id="L520" title="All 2 branches missed.">        if (controller.isConnected() == false) {</span>
+<span class="nc bnc" id="L521" title="All 2 branches missed.">            if (!controller.connectToHouse(this.address, this.port, this.user, this.password)) {</span>
+<span class="nc" id="L522">                throw new TartanHomeConnectException();</span>
+            }
+        }
+<span class="nc" id="L525">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

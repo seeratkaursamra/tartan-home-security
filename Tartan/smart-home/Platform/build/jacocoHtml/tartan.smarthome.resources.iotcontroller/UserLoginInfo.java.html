@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UserLoginInfo.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">tartan</a> &gt; <a href="index.source.html" class="el_package">tartan.smarthome.resources.iotcontroller</a> &gt; <span class="el_source">UserLoginInfo.java</span></div><h1>UserLoginInfo.java</h1><pre class="source lang-java linenums">package tartan.smarthome.resources.iotcontroller;
+
+/**
+ * Represents user login information
+ */
+public class UserLoginInfo {
+
+    /** the user credentials */
+    private String userName, password;
+
+    /**
+     * Create a new UserLoginInfo with password validation (for new users)
+     * @param userName the username
+     * @param password the password
+     */
+    public UserLoginInfo(String userName, String password) {
+<span class="fc" id="L17">        this(userName, password, true);  // Default: validate password</span>
+<span class="fc" id="L18">    }</span>
+
+    /**
+     * Create a new UserLoginInfo with optional password validation
+     * Used for system initialization from config files
+     *
+     * done this way because the docker file was having problems
+     *
+     * @param userName the username
+     * @param password the password
+     * @param validate whether to validate the password (false for legacy/config users)
+     */
+<span class="fc" id="L30">    public UserLoginInfo(String userName, String password, boolean validate) {</span>
+<span class="fc bfc" id="L31" title="All 4 branches covered.">        if (validate &amp;&amp; !isValidPassword(password)) {</span>
+<span class="fc" id="L32">            throw new IllegalArgumentException(</span>
+                    &quot;Password must be 8+ chars with uppercase, number, and symbol&quot;
+            );
+        }
+<span class="fc" id="L36">        this.userName = userName;</span>
+<span class="fc" id="L37">        this.password = password;</span>
+<span class="fc" id="L38">    }</span>
+
+    //adding this as there doesn't seem to be a password verification anywhere
+    // I have checked the entire iotcontroller file, and more at this point I am confident this is a bug
+    // I also had openai, chatgpt 5.2, 2026-01-24, &quot;Check these files for password verification, I am unable to find any
+    // give your suggestion on where to put the verification, assuming it doesn't exist&quot;
+    /**
+     * verify that the users password is valid
+     *  longer than 8 chars
+     *  1 uppercase
+     *  1 symbol
+     *  1 letter
+     * @param password users password
+     * @return Boolean value if password fits requirements
+     */
+    public static boolean isValidPassword(String password) {
+<span class="fc bfc" id="L54" title="All 4 branches covered.">        if (password == null || password.length() &lt; 8) {</span>
+<span class="fc" id="L55">            return false;</span>
+        }
+
+<span class="fc" id="L58">        boolean hasUppercase = false;</span>
+<span class="fc" id="L59">        boolean hasNumber = false;</span>
+<span class="fc" id="L60">        boolean hasSymbol = false;</span>
+
+<span class="fc bfc" id="L62" title="All 2 branches covered.">        for (char c : password.toCharArray()) {</span>
+<span class="fc bfc" id="L63" title="All 2 branches covered.">            if (Character.isUpperCase(c)) hasUppercase = true;</span>
+<span class="fc bfc" id="L64" title="All 2 branches covered.">            if (Character.isDigit(c)) hasNumber = true;</span>
+<span class="fc bfc" id="L65" title="All 2 branches covered.">            if (!Character.isLetterOrDigit(c)) hasSymbol = true;</span>
+        }
+<span class="fc bfc" id="L67" title="All 6 branches covered.">        return hasUppercase &amp;&amp; hasNumber &amp;&amp; hasSymbol;</span>
+    }
+
+    /**
+     *  Get the username
+     * @return the user name
+     */
+    public String getUserName() {
+<span class="fc" id="L75">        return userName;</span>
+    }
+
+    /**
+     * Set the username
+     * @param userName
+     */
+    public void setUserName(String userName) {
+<span class="nc" id="L83">        this.userName = userName;</span>
+<span class="nc" id="L84">    }</span>
+
+    /**
+     * Get password
+     * @return
+     */
+    public String getPassword() {
+<span class="fc" id="L91">        return password;</span>
+    }
+
+    /**
+     * Set password - validates for security regardless of 'grandfathering in'
+     * @param password
+     */
+    public void setPassword(String password) {
+<span class="nc bnc" id="L99" title="All 2 branches missed.">        if (!isValidPassword(password)) { // again this is just for rule 14</span>
+<span class="nc" id="L100">            throw new IllegalArgumentException(</span>
+                    &quot;Password must be at least 8 characters and contain &quot; +
+                            &quot;at least one uppercase letter, one number, and one symbol&quot;
+            );
+        }
+<span class="nc" id="L105">        this.password = password;</span>
+<span class="nc" id="L106">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

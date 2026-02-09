@@ -1,4 +1,19 @@
 !Evaluating new state statically
-!Evaluating new state statically
-!Evaluating new state statically
-!Evaluating new state statically
+!Evaluating new state statically
+!Evaluating new state statically
+!Evaluating new state statically
+	!Evaluating new state statically
+
+!Evaluating new state statically
+!Evaluating new state statically
+,Testing password validation: null password
+(Testing password validation: no symbol
++Testing password validation: no uppercase
+.Testing valid password with all requirements
+<un:Testing that bypass mode still accepts strong passwords
+(Testing password validation: too short
+Jun:Testing legacy user creation with weak password (validation bypassed)
+Testing strong valid password
+4un:Testing config user creation without validation
++Testing password validation: empty string
+(Testing password validation: no number

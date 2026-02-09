@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TartanUser.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">tartan</a> &gt; <a href="index.source.html" class="el_package">tartan.smarthome.auth</a> &gt; <span class="el_source">TartanUser.java</span></div><h1>TartanUser.java</h1><pre class="source lang-java linenums">package tartan.smarthome.auth;
+
+import java.security.Principal;
+
+/**
+ * Simple class to represent an Authenticated users
+ */
+public class TartanUser implements Principal {
+    // Users are identified by name and house
+<span class="nc" id="L10">    private String name=null;</span>
+<span class="nc" id="L11">    private String house = null;</span>
+
+    /**
+     * Create a new TartanUser. Note that this is the only place to set name and house
+     * @param name The user name
+     * @param house The user house
+     */
+<span class="nc" id="L18">    public TartanUser(String name, String house) {</span>
+<span class="nc" id="L19">        this.name = name;</span>
+<span class="nc" id="L20">        this.house = house;</span>
+<span class="nc" id="L21">    }</span>
+
+    /**
+     * Get the user name
+     * @return the user name
+     */
+    @Override
+    public String getName() {
+<span class="nc" id="L29">        return name;</span>
+    }
+
+    /**
+     * Get the user house
+     * @return the user house
+     */
+    public String getHouse() {
+<span class="nc" id="L37">        return house;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

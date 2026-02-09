@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TartanResource.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">tartan</a> &gt; <a href="index.source.html" class="el_package">tartan.smarthome.resources</a> &gt; <span class="el_source">TartanResource.java</span></div><h1>TartanResource.java</h1><pre class="source lang-java linenums">package tartan.smarthome.resources;
+
+import com.codahale.metrics.annotation.Timed;
+import io.dropwizard.auth.Auth;
+import io.dropwizard.hibernate.UnitOfWork;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import tartan.smarthome.TartanHomeSettings;
+import tartan.smarthome.auth.TartanUser;
+import tartan.smarthome.core.TartanHome;
+import tartan.smarthome.db.HomeDAO;
+import tartan.smarthome.views.SmartHomeView;
+
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * The resource class implements the HTTP handlers via Jersey.
+ *  @see &lt;a href=&quot;https://www.dropwizard.io/1.0.0/docs/getting-started.html#creating-a-resource-class&quot;&gt;Dropwizard Resouces&lt;/a&gt;
+ */
+@Path(&quot;/smarthome&quot;)
+@Produces(MediaType.APPLICATION_JSON)
+public class TartanResource {
+
+<span class="nc" id="L28">    private static final Logger LOGGER = LoggerFactory.getLogger(TartanResource.class);</span>
+
+    // There is one service per home
+    private ArrayList&lt;TartanHomeService&gt; services;
+
+    /**
+     * Create and connect to a list of houses
+     * @param houses the settings for each hose
+     * @param homeDAO the historian
+     * @param historyTimer how often to log history
+     */
+<span class="nc" id="L39">    public TartanResource(List&lt;TartanHomeSettings&gt; houses, HomeDAO homeDAO, Integer historyTimer) {</span>
+
+<span class="nc" id="L41">        this.services = new ArrayList&lt;&gt;(houses.size());</span>
+<span class="nc bnc" id="L42" title="All 2 branches missed.">        for (TartanHomeSettings homeSettings : houses) {</span>
+<span class="nc" id="L43">            TartanHomeService service = new TartanHomeService(homeDAO);</span>
+<span class="nc" id="L44">            service.initializeSettings(homeSettings, historyTimer);</span>
+
+<span class="nc bnc" id="L46" title="All 2 branches missed.">            if (!service.isConnected()) {</span>
+                try {
+
+<span class="nc" id="L49">                    service.connect();</span>
+<span class="nc" id="L50">                    this.services.add(service);</span>
+<span class="nc" id="L51">                    LOGGER.info(&quot;Connected to house &quot; + service.getName() + &quot; @ &quot; + service.getAddress());</span>
+
+<span class="nc" id="L53">                } catch (TartanHomeConnectException thce) {</span>
+<span class="nc" id="L54">                    LOGGER.error(&quot;Could not connect to house &quot; + service.getName() + &quot; @ &quot; + service.getAddress());</span>
+<span class="nc" id="L55">                }</span>
+
+<span class="nc" id="L57">                startHistorian(service);</span>
+            }
+<span class="nc" id="L59">        }</span>
+<span class="nc" id="L60">    }</span>
+
+    /**
+     * Start the historian
+     * @param service the service to start logging
+     */
+    public void startHistorian(TartanHomeService service) {
+<span class="nc bnc" id="L67" title="All 2 branches missed.">        if (service.isConnected()) {</span>
+<span class="nc" id="L68">            service.startHistorian();</span>
+        }
+<span class="nc" id="L70">    }</span>
+
+    /**
+     * Fetch the service for a house
+     * @param houseName the target house
+     * @return the service or null if not found
+     */
+    private TartanHomeService getHomeService(String houseName) {
+<span class="nc bnc" id="L78" title="All 2 branches missed.">        for (TartanHomeService h : services) {</span>
+<span class="nc bnc" id="L79" title="All 2 branches missed.">            if (h.getName().equals(houseName)) {</span>
+<span class="nc" id="L80">                return h;</span>
+            }
+<span class="nc" id="L82">        }</span>
+<span class="nc" id="L83">        return null;</span>
+    }
+
+    /**
+     * Fetch the current house state via HTTP GET. Managed by Jersey
+     * @param house the house
+     * @param user the user allowed to access this house
+     * @return a view of the house or null
+     */
+    @GET
+    @Produces({MediaType.TEXT_HTML, MediaType.APPLICATION_JSON})
+    @Path(&quot;/state/{house}&quot;)
+    @Timed
+    @UnitOfWork
+    public SmartHomeView state(@PathParam(&quot;house&quot;) String house,  @Auth TartanUser user) {
+        // There are better ways to check authorization, but this works fine
+<span class="nc bnc" id="L99" title="All 2 branches missed.">        if (user.getHouse().equals(house)) {</span>
+<span class="nc" id="L100">            LOGGER.info(&quot;Received a house GET for house: &quot; + house);</span>
+<span class="nc" id="L101">            TartanHomeService service = getHomeService(house);</span>
+<span class="nc bnc" id="L102" title="All 2 branches missed.">            if (service == null) return null;</span>
+
+<span class="nc" id="L104">            return new SmartHomeView(service.getState());</span>
+        }
+<span class="nc" id="L106">        return null;</span>
+    }
+
+    /**
+     * update the house state via a HTTP POST. Managed by Jersey
+     * @param house the house
+     * @param user the user allowed to access this house
+     * @param h the new state
+     * @return either HTTP OK or UNAUTHORIZED
+     */
+    @POST
+    @Path(&quot;/update/{house}&quot;)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Timed
+    public Response update(@PathParam(&quot;house&quot;) String house, @Auth TartanUser user, TartanHome h) {
+<span class="nc bnc" id="L121" title="All 2 branches missed.">        if (user.getHouse().equals(house)) {</span>
+<span class="nc" id="L122">            LOGGER.info(&quot;Received a house POST to house &quot; + house);</span>
+<span class="nc" id="L123">            TartanHomeService service = getHomeService(house);</span>
+<span class="nc bnc" id="L124" title="All 2 branches missed.">            if (service != null) {</span>
+                // tell the house about the update
+<span class="nc" id="L126">                service.setState(h);</span>
+
+<span class="nc" id="L128">                return Response</span>
+<span class="nc" id="L129">                        .status(Response.Status.OK)</span>
+<span class="nc" id="L130">                        .build();</span>
+            }
+        }
+<span class="nc" id="L133">        return Response</span>
+<span class="nc" id="L134">                .status(Response.Status.UNAUTHORIZED)</span>
+<span class="nc" id="L135">                .build();</span>
+    }
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

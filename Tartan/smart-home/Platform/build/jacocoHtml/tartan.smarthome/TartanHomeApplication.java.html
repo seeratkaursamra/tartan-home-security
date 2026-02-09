@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TartanHomeApplication.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">tartan</a> &gt; <a href="index.source.html" class="el_package">tartan.smarthome</a> &gt; <span class="el_source">TartanHomeApplication.java</span></div><h1>TartanHomeApplication.java</h1><pre class="source lang-java linenums">package tartan.smarthome;
+
+import io.dropwizard.core.Application;
+import io.dropwizard.auth.AuthDynamicFeature;
+import io.dropwizard.auth.AuthValueFactoryProvider;
+import io.dropwizard.auth.basic.BasicCredentialAuthFilter;
+import io.dropwizard.db.DataSourceFactory;
+import io.dropwizard.hibernate.HibernateBundle;
+import io.dropwizard.core.setup.Bootstrap;
+import io.dropwizard.core.setup.Environment;
+import io.dropwizard.views.common.ViewBundle;
+import tartan.smarthome.auth.TartanAuthenticator;
+import tartan.smarthome.auth.TartanUser;
+import tartan.smarthome.core.TartanHomeData;
+import tartan.smarthome.db.HomeDAO;
+import tartan.smarthome.resources.TartanResource;
+
+/**
+ * This is the driver for the program.
+ * @see &lt;a href=&quot;https://www.dropwizard.io/1.0.0/docs/manual/core.html#application&quot;&gt;Dropwizard Applications&lt;/a&gt;
+ */
+<span class="nc" id="L22">public class TartanHomeApplication extends Application&lt;TartanHomeConfiguration&gt; {</span>
+
+<span class="nc" id="L24">    private final HibernateBundle&lt;TartanHomeConfiguration&gt; hibernateBundle =</span>
+<span class="nc" id="L25">            new HibernateBundle&lt;TartanHomeConfiguration&gt;(TartanHomeData.class) {</span>
+                @Override
+                public DataSourceFactory getDataSourceFactory(TartanHomeConfiguration configuration) {
+<span class="nc" id="L28">                    return configuration.getDataSourceFactory();</span>
+                }
+            };
+
+    /**
+     * The driver
+     * @param args command line arguments
+     * @throws Exception a catch all exception
+     */
+    public static void main(final String[] args) throws Exception {
+<span class="nc" id="L38">        new TartanHomeApplication().run(args);</span>
+<span class="nc" id="L39">    }</span>
+
+    /**
+     * Get the application name. This is the core URL for the system
+     * @return the name
+     */
+    @Override
+    public String getName() {
+<span class="nc" id="L47">        return &quot;smarthome&quot;;</span>
+    }
+
+    /**
+     * Initialize the system
+     * @param bootstrap the initial settings from from the YAML file
+     */
+    @Override
+    public void initialize(final Bootstrap&lt;TartanHomeConfiguration&gt; bootstrap) {
+        // We need the view bundle for rendering
+<span class="nc" id="L57">        bootstrap.addBundle(new ViewBundle());</span>
+<span class="nc" id="L58">        bootstrap.addBundle(hibernateBundle);</span>
+<span class="nc" id="L59">    }</span>
+
+    /**
+     * Run the system.
+     * @param configuration system settings
+     * @param environment system environment
+     */
+    @Override
+    public void run(final TartanHomeConfiguration configuration,
+                    final Environment environment) {
+<span class="nc" id="L69">        HomeDAO dao = new HomeDAO(hibernateBundle.getSessionFactory());</span>
+
+<span class="nc" id="L71">        TartanAuthenticator auth = new TartanAuthenticator();</span>
+<span class="nc" id="L72">        auth.setValidUsers(configuration);</span>
+
+<span class="nc" id="L74">        final TartanResource resource = new TartanResource(configuration.getHouses(),</span>
+<span class="nc" id="L75">                dao, Integer.parseInt(configuration.getHistoryTimer()));</span>
+
+<span class="nc" id="L77">        environment.jersey().register(resource);</span>
+<span class="nc" id="L78">        environment.jersey().register(new AuthDynamicFeature(new BasicCredentialAuthFilter.Builder&lt;TartanUser&gt;()</span>
+<span class="nc" id="L79">                .setAuthenticator(auth)</span>
+<span class="nc" id="L80">                .buildAuthFilter()));</span>
+<span class="nc" id="L81">        environment.jersey().register(new AuthValueFactoryProvider.Binder&lt;&gt;(TartanUser.class));</span>
+<span class="nc" id="L82">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>
