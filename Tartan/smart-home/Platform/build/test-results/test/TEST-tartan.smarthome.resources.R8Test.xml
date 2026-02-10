@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="tartan.smarthome.resources.R8Test" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-02-09T18:06:29" hostname="MOOSELAPTOPTWO" time="0.028">
+<testsuite name="tartan.smarthome.resources.R8Test" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-02-10T03:27:07" hostname="MOOSELAPTOPTWO" time="0.017">
   <properties/>
-  <testcase name="R8: Empty passcode in person does NOT disable alarm" classname="tartan.smarthome.resources.R8Test" time="0.004"/>
-  <testcase name="R8: Wrong passcode in person does NOT disable alarm" classname="tartan.smarthome.resources.R8Test" time="0.005"/>
-  <testcase name="R8: Alarm already disabled remains disabled even with correct passcode" classname="tartan.smarthome.resources.R8Test" time="0.004"/>
-  <testcase name="R8: Correct passcode in person successfully disables the alarm" classname="tartan.smarthome.resources.R8Test" time="0.003"/>
-  <testcase name="R8: Alarm must NOT be disabled remotely, even with correct passcode" classname="tartan.smarthome.resources.R8Test" time="0.003"/>
+  <testcase name="R8: Empty passcode in person does NOT disable alarm" classname="tartan.smarthome.resources.R8Test" time="0.002"/>
+  <testcase name="R8: Wrong passcode in person does NOT disable alarm" classname="tartan.smarthome.resources.R8Test" time="0.003"/>
+  <testcase name="R8: Alarm already disabled remains disabled even with correct passcode" classname="tartan.smarthome.resources.R8Test" time="0.002"/>
+  <testcase name="R8: Correct passcode in person successfully disables the alarm" classname="tartan.smarthome.resources.R8Test" time="0.002"/>
+  <testcase name="R8: Alarm must NOT be disabled remotely, even with correct passcode" classname="tartan.smarthome.resources.R8Test" time="0.002"/>
   <system-out><![CDATA[Evaluating new state statically
 Evaluating new state statically
 Evaluating new state statically

@@ -80,8 +80,8 @@ public class UserLoginInfo {
      * @param userName
      */
     public void setUserName(String userName) {
-<span class="nc" id="L83">        this.userName = userName;</span>
-<span class="nc" id="L84">    }</span>
+<span class="fc" id="L83">        this.userName = userName;</span>
+<span class="fc" id="L84">    }</span>
 
     /**
      * Get password
@@ -96,13 +96,13 @@ public class UserLoginInfo {
      * @param password
      */
     public void setPassword(String password) {
-<span class="nc bnc" id="L99" title="All 2 branches missed.">        if (!isValidPassword(password)) { // again this is just for rule 14</span>
-<span class="nc" id="L100">            throw new IllegalArgumentException(</span>
+<span class="fc bfc" id="L99" title="All 2 branches covered.">        if (!isValidPassword(password)) { // again this is just for rule 14</span>
+<span class="fc" id="L100">            throw new IllegalArgumentException(</span>
                     &quot;Password must be at least 8 characters and contain &quot; +
                             &quot;at least one uppercase letter, one number, and one symbol&quot;
             );
         }
-<span class="nc" id="L105">        this.password = password;</span>
-<span class="nc" id="L106">    }</span>
+<span class="fc" id="L105">        this.password = password;</span>
+<span class="fc" id="L106">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

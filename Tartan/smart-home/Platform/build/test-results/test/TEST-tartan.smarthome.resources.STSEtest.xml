@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="tartan.smarthome.resources.STSEtest" tests="16" skipped="0" failures="0" errors="0" timestamp="2026-02-10T03:27:07" hostname="MOOSELAPTOPTWO" time="0.064">
+  <properties/>
+  <testcase name="testDoorOpenWithSomeoneHome()" classname="tartan.smarthome.resources.STSEtest" time="0.002"/>
+  <testcase name="testChillerStateNullHandledByElseBranch()" classname="tartan.smarthome.resources.STSEtest" time="0.004"/>
+  <testcase name="testSwitchingFromHeaterToChiller()" classname="tartan.smarthome.resources.STSEtest" time="0.003"/>
+  <testcase name="testBreakInViaClosedDoor()" classname="tartan.smarthome.resources.STSEtest" time="0.003"/>
+  <testcase name="testProximityStateStartsAwayTimer()" classname="tartan.smarthome.resources.STSEtest" time="0.002"/>
+  <testcase name="testAutoLightWhenArrivingHome()" classname="tartan.smarthome.resources.STSEtest" time="0.001"/>
+  <testcase name="testLightOnWhenVacantForcesLightOff()" classname="tartan.smarthome.resources.STSEtest" time="0.002"/>
+  <testcase name="testDoorOpenVacantAlarmDisabledClosesDoor()" classname="tartan.smarthome.resources.STSEtest" time="0.003"/>
+  <testcase name="testAwayTimerAutolockForcesSecureState()" classname="tartan.smarthome.resources.STSEtest" time="0.003"/>
+  <testcase name="testACTurnsOnWhenTempAboveTarget()" classname="tartan.smarthome.resources.STSEtest" time="0.003"/>
+  <testcase name="testDoorOpenVacantAlarmEnabledActivatesAlarm()" classname="tartan.smarthome.resources.STSEtest" time="0.002"/>
+  <testcase name="testAlarmActiveValidPasscodeDisablesAlarmActive()" classname="tartan.smarthome.resources.STSEtest" time="0.003"/>
+  <testcase name="testAlarmActiveInvalidPasscodeKeepsAlarmEnabled()" classname="tartan.smarthome.resources.STSEtest" time="0.003"/>
+  <testcase name="testCannotDisableAlarmWhenVacant()" classname="tartan.smarthome.resources.STSEtest" time="0.002"/>
+  <testcase name="testLightOnWhenSomeoneHome()" classname="tartan.smarthome.resources.STSEtest" time="0.003"/>
+  <testcase name="testHeaterTurnsOnWhenTempBelowTarget()" classname="tartan.smarthome.resources.STSEtest" time="0.004"/>
+  <system-out><![CDATA[STSE: Testing door open with someone home (allowed)
+Evaluating new state statically
+STSE: Testing chillerState null is handled
+Evaluating new state statically
+STSE: Testing switch from Heater to Chiller mode
+Evaluating new state statically
+STSE: Testing break-in detection via closed door
+Evaluating new state statically
+STSE: Testing away timer starts when house becomes vacant
+Evaluating new state statically
+STSE: Testing auto-light when arriving home
+Evaluating new state statically
+STSE: Testing light forced off when vacant
+Evaluating new state statically
+STSE: Testing door open + vacant + alarm disabled = close door
+Evaluating new state statically
+STSE: Testing away timer autolock
+Evaluating new state statically
+STSE: Testing AC turns on when temperature above target
+Evaluating new state statically
+STSE: Testing door open + vacant + alarm enabled = break-in
+Evaluating new state statically
+STSE: Testing valid passcode disables alarm
+Evaluating new state statically
+STSE: Testing invalid passcode keeps alarm active
+Evaluating new state statically
+STSE: Testing cannot disable alarm when house is vacant
+Evaluating new state statically
+STSE: Testing light on when someone is home (normal operation)
+Evaluating new state statically
+STSE: Testing heater turns on when temperature below target
+Evaluating new state statically
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
