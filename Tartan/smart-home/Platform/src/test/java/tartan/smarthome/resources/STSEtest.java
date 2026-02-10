@@ -25,7 +25,7 @@ import tartan.smarthome.resources.iotcontroller.IoTValues;
  * for the entire state evaluation logic.
  *
  * Created: 2026-02-09 with assistance from Openai, ChatGPT 5.2, "My Rule10Test is a mess, can you please extract some of the new tests added to it (not the first 4)
- * and add it to the new file STSEtest, formatted for readability, If you notice any tests missing that will need to be added for branch coverage add it."
+ * and add it to the new file STSEtest, Sorted by what it tests, If you notice any tests missing that will need to be added for branch coverage add it."
  */
 public class STSEtest {
 
@@ -87,10 +87,8 @@ public class STSEtest {
         Map<String, Object> newState = evaluator.evaluateState(state, log);
 
         // Light should stay ON (allowed when someone is home)
-        assertTrue((Boolean) newState.get(IoTValues.LIGHT_STATE),
-                "Light should remain ON when someone is home");
-        assertTrue(log.toString().contains("Light on"),
-                "Log should confirm light is on");
+        assertTrue((Boolean) newState.get(IoTValues.LIGHT_STATE),"Light should remain ON when someone is home");
+        assertTrue(log.toString().contains("Light on"), "Log should confirm light is on");
     }
 
     @Test
@@ -104,10 +102,8 @@ public class STSEtest {
         Map<String, Object> newState = evaluator.evaluateState(state, log);
 
         // Cannot turn on light because user not home -> forced off
-        assertFalse((Boolean) newState.get(IoTValues.LIGHT_STATE),
-                "Light should be forced OFF when house is vacant");
-        assertTrue(log.toString().contains("Cannot turn on light because user not home"),
-                "Log should explain why light was turned off");
+        assertFalse((Boolean) newState.get(IoTValues.LIGHT_STATE), "Light should be forced OFF when house is vacant");
+        assertTrue(log.toString().contains("Cannot turn on light because user not home"), "Log should explain why light was turned off");
     }
 
     @Test
@@ -122,10 +118,8 @@ public class STSEtest {
         Map<String, Object> newState = evaluator.evaluateState(state, log);
 
         // Light should auto-turn on when arriving home with alarm disabled
-        assertTrue((Boolean) newState.get(IoTValues.LIGHT_STATE),
-                "Light should auto-turn on when someone arrives home with alarm disabled");
-        assertTrue(log.toString().contains("Turning on light"),
-                "Log should mention turning on light");
+        assertTrue((Boolean) newState.get(IoTValues.LIGHT_STATE), "Light should auto-turn on when someone arrives home with alarm disabled");
+        assertTrue(log.toString().contains("Turning on light"), "Log should mention turning on light");
     }
 
     // ========== DOOR CONTROL TESTS ==========
@@ -142,10 +136,8 @@ public class STSEtest {
         Map<String, Object> newState = evaluator.evaluateState(state, log);
 
         // Door should stay open (allowed when someone is home)
-        assertTrue((Boolean) newState.get(IoTValues.DOOR_STATE),
-                "Door should remain open when someone is home");
-        assertTrue(log.toString().contains("Door open"),
-                "Log should confirm door is open");
+        assertTrue((Boolean) newState.get(IoTValues.DOOR_STATE), "Door should remain open when someone is home");
+        assertTrue(log.toString().contains("Door open"), "Log should confirm door is open");
     }
 
     @Test
@@ -160,10 +152,8 @@ public class STSEtest {
         Map<String, Object> newState = evaluator.evaluateState(state, log);
 
         // Break-in detected -> alarm becomes active
-        assertTrue((Boolean) newState.get(IoTValues.ALARM_ACTIVE),
-                "Alarm should activate when door opens with house vacant and alarm enabled");
-        assertTrue(log.toString().contains("Break in detected"),
-                "Log should mention break-in detection");
+        assertTrue((Boolean) newState.get(IoTValues.ALARM_ACTIVE), "Alarm should activate when door opens with house vacant and alarm enabled");
+        assertTrue(log.toString().contains("Break in detected"), "Log should mention break-in detection");
     }
 
     @Test
@@ -178,10 +168,8 @@ public class STSEtest {
         Map<String, Object> newState = evaluator.evaluateState(state, log);
 
         // House vacant and door open with alarm disabled -> door should be closed
-        assertFalse((Boolean) newState.get(IoTValues.DOOR_STATE),
-                "Door should be closed when house is vacant and alarm is disabled");
-        assertTrue(log.toString().contains("Closed door because house vacant"),
-                "Log should explain door was closed");
+        assertFalse((Boolean) newState.get(IoTValues.DOOR_STATE), "Door should be closed when house is vacant and alarm is disabled");
+        assertTrue(log.toString().contains("Closed door because house vacant"), "Log should explain door was closed");
     }
 
     @Test
@@ -196,10 +184,8 @@ public class STSEtest {
         Map<String, Object> newState = evaluator.evaluateState(state, log);
 
         // Alarm should activate (someone inside with closed door = break-in)
-        assertTrue((Boolean) newState.get(IoTValues.ALARM_ACTIVE),
-                "Alarm should activate when someone is detected inside with closed door and alarm enabled");
-        assertTrue(log.toString().contains("Break in detected"),
-                "Log should mention break-in detection");
+        assertTrue((Boolean) newState.get(IoTValues.ALARM_ACTIVE), "Alarm should activate when someone is detected inside with closed door and alarm enabled");
+        assertTrue(log.toString().contains("Break in detected"), "Log should mention break-in detection");
     }
 
     // ========== AWAY TIMER TESTS ==========
@@ -217,14 +203,10 @@ public class STSEtest {
         Map<String, Object> newState = evaluator.evaluateState(state, log);
 
         // Auto lock the house: light off, door closed, alarm on
-        assertFalse((Boolean) newState.get(IoTValues.LIGHT_STATE),
-                "Light should be turned off by away timer");
-        assertFalse((Boolean) newState.get(IoTValues.DOOR_STATE),
-                "Door should be closed by away timer");
-        assertTrue((Boolean) newState.get(IoTValues.ALARM_STATE),
-                "Alarm should be enabled by away timer");
-        assertFalse((Boolean) newState.get(IoTValues.AWAY_TIMER),
-                "Away timer should be reset to false after triggering");
+        assertFalse((Boolean) newState.get(IoTValues.LIGHT_STATE), "Light should be turned off by away timer");
+        assertFalse((Boolean) newState.get(IoTValues.DOOR_STATE), "Door should be closed by away timer");
+        assertTrue((Boolean) newState.get(IoTValues.ALARM_STATE), "Alarm should be enabled by away timer");
+        assertFalse((Boolean) newState.get(IoTValues.AWAY_TIMER), "Away timer should be reset to false after triggering");
     }
 
     // ========== ALARM SYSTEM TESTS ==========
@@ -241,10 +223,8 @@ public class STSEtest {
         Map<String, Object> newState = evaluator.evaluateState(state, log);
 
         // Alarm should be forced back to enabled
-        assertTrue((Boolean) newState.get(IoTValues.ALARM_STATE),
-                "Alarm should be forced ON when trying to disable while house is vacant");
-        assertTrue(log.toString().contains("Cannot disable the alarm, house is empty"),
-                "Log should explain why alarm cannot be disabled");
+        assertTrue((Boolean) newState.get(IoTValues.ALARM_STATE), "Alarm should be forced ON when trying to disable while house is vacant");
+        assertTrue(log.toString().contains("Cannot disable the alarm, house is empty"), "Log should explain why alarm cannot be disabled");
     }
 
     @Test
@@ -261,12 +241,9 @@ public class STSEtest {
         Map<String, Object> newState = evaluator.evaluateState(state, log);
 
         // Invalid passcode path forces alarmState back to true
-        assertTrue((Boolean) newState.get(IoTValues.ALARM_STATE),
-                "Alarm should remain enabled with invalid passcode");
-        assertTrue((Boolean) newState.get(IoTValues.ALARM_ACTIVE),
-                "Alarm should still be active with invalid passcode");
-        assertTrue(log.toString().contains("Cannot disable alarm, invalid passcode given"),
-                "Log should mention invalid passcode");
+        assertTrue((Boolean) newState.get(IoTValues.ALARM_STATE), "Alarm should remain enabled with invalid passcode");
+        assertTrue((Boolean) newState.get(IoTValues.ALARM_ACTIVE), "Alarm should still be active with invalid passcode");
+        assertTrue(log.toString().contains("Cannot disable alarm, invalid passcode given"), "Log should mention invalid passcode");
     }
 
     @Test
@@ -283,10 +260,8 @@ public class STSEtest {
         Map<String, Object> newState = evaluator.evaluateState(state, log);
 
         // Correct passcode disables alarmActiveState
-        assertFalse((Boolean) newState.get(IoTValues.ALARM_ACTIVE),
-                "Alarm should be deactivated with valid passcode");
-        assertTrue(log.toString().contains("Correct passcode entered, disabled alarm"),
-                "Log should mention correct passcode");
+        assertFalse((Boolean) newState.get(IoTValues.ALARM_ACTIVE), "Alarm should be deactivated with valid passcode");
+        assertTrue(log.toString().contains("Correct passcode entered, disabled alarm"), "Log should mention correct passcode");
     }
 
     // ========== HVAC SYSTEM TESTS ==========
@@ -305,12 +280,9 @@ public class STSEtest {
         Map<String, Object> newState = evaluator.evaluateState(state, log);
 
         // AC should turn ON because temp (75) > target (70)
-        assertTrue((Boolean) newState.get(IoTValues.CHILLER_STATE),
-                "Chiller should be ON when temp above target");
-        assertFalse((Boolean) newState.get(IoTValues.HEATER_STATE),
-                "Heater should be OFF");
-        assertEquals("Chiller", newState.get(IoTValues.HVAC_MODE),
-                "HVAC mode should be Chiller");
+        assertTrue((Boolean) newState.get(IoTValues.CHILLER_STATE), "Chiller should be ON when temp above target");
+        assertFalse((Boolean) newState.get(IoTValues.HEATER_STATE), "Heater should be OFF");
+        assertEquals("Chiller", newState.get(IoTValues.HVAC_MODE), "HVAC mode should be Chiller");
     }
 
     @Test
@@ -327,14 +299,9 @@ public class STSEtest {
 
         Map<String, Object> newState = evaluator.evaluateState(state, log);
 
-        assertTrue((Boolean) newState.get(IoTValues.CHILLER_STATE),
-                "Chiller should be ON because temp (75) > target (70)");
-
-        assertFalse((Boolean) newState.get(IoTValues.HEATER_STATE),
-                "Heater should be OFF when cooling is needed");
-
-        assertEquals("Chiller", newState.get(IoTValues.HVAC_MODE),
-                "HVAC mode should be Chiller");
+        assertTrue((Boolean) newState.get(IoTValues.CHILLER_STATE), "Chiller should be ON because temp (75) > target (70)");
+        assertFalse((Boolean) newState.get(IoTValues.HEATER_STATE), "Heater should be OFF when cooling is needed");
+        assertEquals("Chiller", newState.get(IoTValues.HVAC_MODE), "HVAC mode should be Chiller");
     }
 
 
@@ -351,12 +318,9 @@ public class STSEtest {
         Map<String, Object> newState = evaluator.evaluateState(state, log);
 
         // Heater should turn ON because temp (65) < target (72)
-        assertTrue((Boolean) newState.get(IoTValues.HEATER_STATE),
-                "Heater should be ON when temp below target");
-        assertFalse((Boolean) newState.get(IoTValues.CHILLER_STATE),
-                "Chiller should be OFF");
-        assertEquals("Heater", newState.get(IoTValues.HVAC_MODE),
-                "HVAC mode should be Heater");
+        assertTrue((Boolean) newState.get(IoTValues.HEATER_STATE), "Heater should be ON when temp below target");
+        assertFalse((Boolean) newState.get(IoTValues.CHILLER_STATE), "Chiller should be OFF");
+        assertEquals("Heater", newState.get(IoTValues.HVAC_MODE), "HVAC mode should be Heater");
     }
 
     // ========== EDGE CASE / BUG DOCUMENTATION TESTS ==========
@@ -378,8 +342,7 @@ public class STSEtest {
 
         assertNotNull(newState);
         // ChillerOnState gets set to false by line 228
-        assertFalse((Boolean) newState.get(IoTValues.CHILLER_STATE),
-                "Chiller should be false after null is handled");
+        assertFalse((Boolean) newState.get(IoTValues.CHILLER_STATE), "Chiller should be false after null is handled");
     }
 
     // ========== PROXIMITY STATE TESTS ==========
@@ -395,9 +358,230 @@ public class STSEtest {
         Map<String, Object> newState = evaluator.evaluateState(state, log);
 
         // Away timer should start when house is vacant
-        assertTrue((Boolean) newState.get(IoTValues.AWAY_TIMER),
-                "Away timer should start when house becomes vacant");
-        assertTrue(log.toString().contains("House is vacant, starting away timer"),
-                "Log should mention starting away timer");
+        assertTrue((Boolean) newState.get(IoTValues.AWAY_TIMER), "Away timer should start when house becomes vacant");
+        assertTrue(log.toString().contains("House is vacant, starting away timer"), "Log should mention starting away timer");
+    }
+
+    @Test
+    public void testHeaterModeDisablesRunningChiller() {
+        Map<String, Object> state = baseState();
+        state.put(IoTValues.HVAC_MODE, "Heater");
+        state.put(IoTValues.HEATER_STATE, true);
+        state.put(IoTValues.CHILLER_STATE, true);  // Chiller currently ON
+        state.put(IoTValues.HUMIDIFIER_STATE, true);
+        state.put(IoTValues.TEMP_READING, 75);
+        state.put(IoTValues.TARGET_TEMP, 70);
+
+        Map<String, Object> newState = evaluator.evaluateState(state, log);
+
+        assertFalse((Boolean) newState.get(IoTValues.CHILLER_STATE), "Chiller should be OFF when HVAC mode is Heater");
+        assertTrue(log.toString().contains("Turning off air conditioner"), "Log should mention turning off air conditioner");
+    }
+
+    @Test
+    public void testChillerModeDisablesRunningHeater() {
+        Map<String, Object> state = baseState();
+        state.put(IoTValues.HVAC_MODE, "Chiller");
+        state.put(IoTValues.CHILLER_STATE, true);
+        state.put(IoTValues.HEATER_STATE, true);  // Heater currently ON
+        state.put(IoTValues.HUMIDIFIER_STATE, false);
+        state.put(IoTValues.TEMP_READING, 65);
+        state.put(IoTValues.TARGET_TEMP, 70);
+
+        Map<String, Object> newState = evaluator.evaluateState(state, log);
+
+        assertFalse((Boolean) newState.get(IoTValues.HEATER_STATE), "Heater should be OFF when HVAC mode is Chiller");
+        assertTrue(log.toString().contains("Turning off heater"), "Log should mention turning off heater");
+    }
+
+    // ========== NEW TESTS FOR MISSING BRANCH/STATEMENT COVERAGE ==========
+
+    /**
+     * Missing branch: Door closed, no alarm or no proximity -> "Closed door" log
+     * Covers: else branch of (!doorState) when !(alarmState && proximityState)
+     *
+     * In the evaluator:
+     *   else if (!doorState) {
+     *       if (alarmState && proximityState) { ... }
+     *       else { log "Closed door" }   <-- THIS BRANCH
+     *   }
+     */
+    @Test
+    public void testDoorClosedNormalConditionLogsClosed() {
+        System.out.println("STSE: Testing door closed normal condition");
+
+        Map<String, Object> state = baseState();
+        state.put(IoTValues.DOOR_STATE, false);       // Door closed
+        state.put(IoTValues.PROXIMITY_STATE, true);   // Someone home
+        state.put(IoTValues.ALARM_STATE, false);      // Alarm NOT enabled
+
+        Map<String, Object> newState = evaluator.evaluateState(state, log);
+
+        assertFalse((Boolean) newState.get(IoTValues.DOOR_STATE), "Door should remain closed");
+        assertTrue(log.toString().contains("Closed door"), "Log should contain 'Closed door' message");
+    }
+
+    /**
+     * Missing branch: Proximity true, but light already ON -> no auto-light
+     * Covers: proximityState block where (!lightState && !alarmState) is FALSE
+     *         because lightState is already true
+     *
+     * In the evaluator:
+     *   if (proximityState) {
+     *       log "House is occupied"
+     *       if (!lightState && !alarmState) { ... }  <-- skipped when light already on
+     *   }
+     */
+    @Test
+    public void testProximityHomeLightAlreadyOnNoAutoLight() {
+        System.out.println("STSE: Testing no auto-light when light already on");
+
+        Map<String, Object> state = baseState();
+        state.put(IoTValues.PROXIMITY_STATE, true);
+        state.put(IoTValues.LIGHT_STATE, true);   // Light already on
+        state.put(IoTValues.ALARM_STATE, false);
+
+        Map<String, Object> newState = evaluator.evaluateState(state, log);
+
+        assertTrue((Boolean) newState.get(IoTValues.LIGHT_STATE), "Light should stay on");
+        assertTrue(log.toString().contains("House is occupied"), "Log should say house is occupied");
+        assertFalse(log.toString().contains("Turning on light"), "Log should NOT mention turning on light (it was already on)");
+    }
+
+    /**
+     * Missing branch: Proximity true, alarm enabled -> no auto-light
+     * Covers: proximityState block where (!lightState && !alarmState) is FALSE
+     *         because alarmState is true
+     *
+     * Note: This also triggers the alarm activation logic since
+     *       alarmState && !doorState && proximityState is true.
+     */
+    @Test
+    public void testProximityHomeAlarmEnabledNoAutoLight() {
+        System.out.println("STSE: Testing no auto-light when alarm is enabled");
+
+        Map<String, Object> state = baseState();
+        state.put(IoTValues.PROXIMITY_STATE, true);
+        state.put(IoTValues.LIGHT_STATE, false);   // Light off
+        state.put(IoTValues.ALARM_STATE, true);    // Alarm enabled - blocks auto-light
+
+        Map<String, Object> newState = evaluator.evaluateState(state, log);
+
+        assertTrue(log.toString().contains("House is occupied"), "Log should say house is occupied");
+        assertFalse(log.toString().contains("Turning on light"), "Log should NOT mention turning on light (alarm is enabled)");
+    }
+
+    /**
+     * Missing branch: Alarm active, attempt to disable with empty passcode
+     * Covers: the else branch in the passcode check
+     *
+     * In the evaluator:
+     *   if (givenPassCode.length() > 0 && givenPassCode.compareTo(alarmPassCode) < 0) {
+     *       // invalid passcode
+     *   } else {
+     *       // "Correct passcode entered, disabled alarm"  <-- also reached when length == 0
+     *       alarmActiveState = false;
+     *   }
+     *
+     * When givenPassCode is empty (""), length() > 0 is false, so the entire
+     * if-condition short-circuits to the else branch, disabling the alarm.
+     * This is arguably a BUG (empty passcode shouldn't disable alarm),
+     * but the test documents the current behavior.
+     */
+    @Test
+    public void testAlarmActiveEmptyPasscodeFallsToElseBranch() {
+        System.out.println("STSE: Testing alarm active with empty passcode (hits else branch)");
+
+        Map<String, Object> state = baseState();
+        state.put(IoTValues.PROXIMITY_STATE, true);
+        state.put(IoTValues.ALARM_STATE, false);        // Attempt to disable
+        state.put(IoTValues.ALARM_ACTIVE, true);        // Alarm is sounding
+        state.put(IoTValues.ALARM_PASSCODE, "1234");
+        state.put(IoTValues.GIVEN_PASSCODE, "");        // Empty passcode
+
+        Map<String, Object> newState = evaluator.evaluateState(state, log);
+
+        assertFalse((Boolean) newState.get(IoTValues.ALARM_ACTIVE), "Alarm active should be false (empty passcode falls to else branch - possible bug)");
+        assertTrue(log.toString().contains("Correct passcode entered, disabled alarm"), "Log should say correct passcode (even though it was empty - possible bug)");
+    }
+
+    /**
+     * Missing branch: Chiller already ON when temp > target
+     * Covers: the inner if (!chillerOnState) being FALSE (chiller already running)
+     *
+     * In the evaluator:
+     *   if (tempReading > targetTempSetting) {
+     *       if (chillerOnState != null) {
+     *           if (!chillerOnState) { ... turn on chiller ... }
+     *           // else: AC already on  <-- THIS BRANCH
+     *       }
+     *   }
+     */
+    @Test
+    public void testChillerAlreadyOnWhenTempAboveTarget() {
+        System.out.println("STSE: Testing chiller already on, no redundant activation");
+
+        Map<String, Object> state = baseState();
+        state.put(IoTValues.TEMP_READING, 80);
+        state.put(IoTValues.TARGET_TEMP, 70);
+        state.put(IoTValues.HVAC_MODE, "Chiller");
+        state.put(IoTValues.CHILLER_STATE, true);   // Already running
+        state.put(IoTValues.HEATER_STATE, false);
+
+        Map<String, Object> newState = evaluator.evaluateState(state, log);
+
+        assertTrue((Boolean) newState.get(IoTValues.CHILLER_STATE), "Chiller should remain ON");
+        assertFalse((Boolean) newState.get(IoTValues.HEATER_STATE), "Heater should be OFF");
+        // Should NOT log "Turning on air conditioner" since it was already on
+        assertFalse(log.toString().contains("Turning on air conditioner"), "Log should NOT mention turning on AC (it was already on)");
+    }
+
+    /**
+     * Missing branch: Alarm enabled, door open, someone home
+     * Covers: the doorState == true && proximityState == true path
+     *         with alarm enabled. Falls to "Door open" log.
+     *
+     * The comment in the evaluator says "this is not allowed so discard the
+     * processStateUpdate" but no action is taken - it just logs "Door open".
+     */
+    @Test
+    public void testDoorOpenSomeoneHomeAlarmEnabled() {
+        System.out.println("STSE: Testing door open with someone home and alarm enabled");
+
+        Map<String, Object> state = baseState();
+        state.put(IoTValues.DOOR_STATE, true);
+        state.put(IoTValues.PROXIMITY_STATE, true);
+        state.put(IoTValues.ALARM_STATE, true);
+
+        Map<String, Object> newState = evaluator.evaluateState(state, log);
+
+        assertTrue((Boolean) newState.get(IoTValues.DOOR_STATE), "Door should remain open");
+        assertTrue(log.toString().contains("Door open"), "Log should say door open");
+        assertTrue(log.toString().contains("Alarm enabled"), "Log should confirm alarm is enabled");
+    }
+
+    /**
+     * Missing branch: temp == target (neither heater nor chiller needed)
+     * Covers: both heater and chiller "not needed" else branches simultaneously
+     *
+     * When temp == target:
+     *   - tempReading < targetTempSetting is false -> heater off
+     *   - tempReading > targetTempSetting is false -> chiller off (else branch)
+     */
+    @Test
+    public void testTempEqualsTargetNoHVACNeeded() {
+        System.out.println("STSE: Testing temp equals target, no HVAC needed");
+
+        Map<String, Object> state = baseState();
+        state.put(IoTValues.TEMP_READING, 70);
+        state.put(IoTValues.TARGET_TEMP, 70);
+        state.put(IoTValues.HVAC_MODE, "Heater");
+        state.put(IoTValues.HEATER_STATE, true);    // Was on
+        state.put(IoTValues.CHILLER_STATE, false);
+
+        Map<String, Object> newState = evaluator.evaluateState(state, log);
+
+        assertFalse((Boolean) newState.get(IoTValues.HEATER_STATE),"Heater should be OFF when temp equals target");
+        assertFalse((Boolean) newState.get(IoTValues.CHILLER_STATE), "Chiller should be OFF when temp equals target");
     }
 }

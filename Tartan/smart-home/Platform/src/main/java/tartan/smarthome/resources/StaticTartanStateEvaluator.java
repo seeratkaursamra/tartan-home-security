@@ -227,12 +227,14 @@ public class StaticTartanStateEvaluator implements TartanStateEvaluator {
         else {
             chillerOnState = false;
         }
-        
 
-        if (chillerOnState) {
-            hvacSetting = "Chiller";
-        } else if (heaterOnState) {
-            hvacSetting = "Heater";
+        // only set hvacSetting if not already set by user
+        if (hvacSetting == null || hvacSetting.isEmpty()) {
+            if (chillerOnState) {
+                hvacSetting = "Chiller";
+            } else if (heaterOnState) {
+                hvacSetting = "Heater";
+            }
         }
         // manage the HVAC control
 
