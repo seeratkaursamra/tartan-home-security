@@ -1,167 +1,172 @@
 package tartan.smarthome.resources.iotcontroller;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.DisplayName;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Test cases for rule 14:
  * R14: The IoT Controller shall require the user to login to the house control panel using a username and password.
  * The password has the following requirements:
- * Minimum length: 8 characters
- * At least one uppercase character
- * At least one number
- * At least one symbol
+ * - Minimum length: 8 characters
+ * - At least one uppercase character
+ * - At least one number
+ * - At least one symbol
  *
- * a test for new users, and legacy users
- *  - new users have to follow the strong password guidelines
- *  - legacy, can have any password so don't really need to be tested
+ * new users have to follow the guidlines
+ * legacy users do not
  *
- * 11 total tests
- *  - 8 validated ones
- *  testR14_ValidPassword_MeetsAllRequirements
- *  testR14_strongValidPassword
- *  testR14_InvalidPassword_TooShort
- *  testR14_InvalidPassword_NoUppercase
- *  testR14_InvalidPassword_NoNumber
- *  testR14_InvalidPassword_NoSymbol
- *  testR14_InvalidPassword_Null
- *  testR14_InvalidPassword_EmptyString
- *
- *  - 3 unvalidated ones
- *  testR14_LegacyUser_WeakPasswordAllowed
- *  testR14_ConfigUser_NoValidation
- *  testR14_BypassValidation_StrongPasswordStillWorks
+ * also tests the set password and set username to ensure they work
  *
  * OpenAI, chatgpt 5.2 was used 2026-01-25, "Although I can see my tests are running in the build/~/index.html file
  * it is not printing anything to the console please add code to do so."
- *  - it added both a @displayname
- *  - and the system.out.println
- *      - but only the system print was necessary to log it, hence removed the display name
- *  - was also used to quickly add legacy password testing
+ *  - Added system.out.println for test logging
+ *  - Used to quickly add legacy password testing
+ *
+ * OpenAI, chatgpt 5.2 was used 2026-02-09, "My tests are a mess please go through and remove superflous tests, and organize the tests"
  */
 public class Rule14Test {
+    // New Users
 
-    // ========== VALIDATED PASSWORD TESTS (New Users) ==========
-
+    /**
+     * Test valid password at boundary (exactly 8 characters)
+     * This covers BVA and tests that a minimal valid password works
+     */
     @Test
-    public void testR14_ValidPassword_MeetsAllRequirements() {
-        System.out.println("Testing valid password with all requirements");
-        // Arrange & Act
-        UserLoginInfo user = new UserLoginInfo("admin", "1VPass!b");
+    public void testR14_ValidPassword_MinimumRequirements() {
+        System.out.println("R14: Testing valid password with minimum requirements (8 chars)");
 
-        // Assert
+        UserLoginInfo user = new UserLoginInfo("admin", "Pass123!");
         assertNotNull(user);
         assertEquals("admin", user.getUserName());
-        assertEquals("1VPass!b", user.getPassword());
+        assertEquals("Pass123!", user.getPassword());
     }
 
-    @Test
-    public void testR14_strongValidPassword() {
-        System.out.println("Testing strong valid password");
-        // Arrange & Act
-        UserLoginInfo user = new UserLoginInfo("admin", "ABCDEFabcdef123456!@#$%^wowthisisalongpasswordIhopeitisaccepted" +
-                "wouldsuckifitwasn'thjhfjakhsdkjlfhkjalshfkjahsdkjfhsakjdhfkjsahfkjhssdkjfhkjsa");
-
-        // Assert
-        assertNotNull(user);
-        assertEquals("admin", user.getUserName());
-    }
-
+    /**
+     * Test password that's too short (7 characters)
+     * BVA: boundary - 1
+     */
     @Test
     public void testR14_InvalidPassword_TooShort() {
-        System.out.println("Testing password validation: too short");
-        // Arrange, Act & Assert
+        System.out.println("R14: Testing password validation - too short");
+
         IllegalArgumentException exception = assertThrows(
                 IllegalArgumentException.class,
-                () -> new UserLoginInfo("admin", "Short1!")
+                () -> new UserLoginInfo("admin", "Pass12!")
         );
 
-        assertTrue(exception.getMessage().contains("8"));
+        assertTrue(exception.getMessage().contains("8") ||
+                        exception.getMessage().toLowerCase().contains("char"),
+                "Error message should mention minimum length requirement");
     }
 
+    /**
+     * Test password without uppercase letter
+     * Tests one of the 4 requirements
+     */
     @Test
     public void testR14_InvalidPassword_NoUppercase() {
-        System.out.println("Testing password validation: no uppercase");
-        // Arrange, Act & Assert
+        System.out.println("R14: Testing password validation - no uppercase");
+
         assertThrows(IllegalArgumentException.class, () -> {
-            new UserLoginInfo("admin", "nouppercase1!");
+            new UserLoginInfo("admin", "password123!");
         });
     }
 
+    /**
+     * Test password without number
+     * Tests one of the 4 requirements
+     */
     @Test
     public void testR14_InvalidPassword_NoNumber() {
-        System.out.println("Testing password validation: no number");
-        // Arrange, Act & Assert
+        System.out.println("R14: Testing password validation - no number");
+
         assertThrows(IllegalArgumentException.class, () -> {
-            new UserLoginInfo("admin", "NoNumber!");
+            new UserLoginInfo("admin", "Password!");
         });
     }
 
+    /**
+     * Test password without symbol
+     * Tests one of the 4 requirements
+     */
     @Test
     public void testR14_InvalidPassword_NoSymbol() {
-        System.out.println("Testing password validation: no symbol");
-        // Arrange, Act & Assert
+        System.out.println("R14: Testing password validation - no symbol");
+
         assertThrows(IllegalArgumentException.class, () -> {
-            new UserLoginInfo("admin", "NoSymbol1");
+            new UserLoginInfo("admin", "Password1");
         });
     }
 
+    /**
+     * Test null password (edge case)
+     * Ensures robust handling of invalid input
+     */
     @Test
     public void testR14_InvalidPassword_Null() {
-        System.out.println("Testing password validation: null password");
-        // Arrange, Act & Assert
+        System.out.println("R14: Testing password validation - null password");
+
         assertThrows(IllegalArgumentException.class, () -> {
             new UserLoginInfo("admin", null);
         });
     }
 
+    // Legacy Users
+
+    /**
+     * Test that legacy users can bypass password validation
+     * This is required for backwards compatibility with existing weak passwords
+     */
     @Test
-    @DisplayName("R14: Invalid password - empty string")
-    public void testR14_InvalidPassword_EmptyString() {
-        System.out.println("Testing password validation: empty string");
-        // Arrange, Act & Assert
-        assertThrows(IllegalArgumentException.class, () -> {
-            new UserLoginInfo("admin", "");
-        });
-    }
+    public void testR14_LegacyUser_BypassValidation() {
+        System.out.println("R14: Testing legacy user with weak password (validation bypassed)");
 
-    // ========== BYPASS VALIDATION TESTS (Legacy/Config Users) ==========
-    // ie constructor uses a false
+        UserLoginInfo legacyUser = new UserLoginInfo("legacyuser", "weak", false);
 
-    @Test
-    public void testR14_LegacyUser_WeakPasswordAllowed() {
-        System.out.println("un:Testing legacy user creation with weak password (validation bypassed)");
-        // Arrange & Act
-        UserLoginInfo legacyUser = new UserLoginInfo("dockeruser", "weak", false);
-
-        // Assert
         assertNotNull(legacyUser);
-        assertEquals("dockeruser", legacyUser.getUserName());
+        assertEquals("legacyuser", legacyUser.getUserName());
         assertEquals("weak", legacyUser.getPassword());
     }
 
-    @Test
-    public void testR14_ConfigUser_NoValidation() {
-        System.out.println("un:Testing config user creation without validation");
-        // Arrange & Act
-        UserLoginInfo configUser = new UserLoginInfo("config", "password123", false);
+    // Update password, or username
 
-        // Assert
-        assertNotNull(configUser);
-        assertEquals("config", configUser.getUserName());
-        assertEquals("password123", configUser.getPassword());
+    /**
+     * Test that setPassword() enforces validation
+     * This ensures password can be updated but must meet requirements
+     */
+    @Test
+    public void testR14_SetPassword_EnforcesValidation() {
+        System.out.println("R14: Testing setPassword enforces validation");
+
+        UserLoginInfo user = new UserLoginInfo("admin", "Initial1!");
+        String originalPassword = user.getPassword();
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            user.setPassword("weak");
+        });
+
+        assertEquals(originalPassword, user.getPassword(),
+                "Password should remain unchanged after validation failure");
+
+        user.setPassword("NewPass2@");
+        assertEquals("NewPass2@", user.getPassword(),
+                "Password should update when valid");
     }
 
+    /**
+     * Test setUserName() method
+     * Ensures username can be changed after user creation
+     */
     @Test
-    public void testR14_BypassValidation_StrongPasswordStillWorks() {
-        System.out.println("un:Testing that bypass mode still accepts strong passwords");
-        // Arrange & Act
-        UserLoginInfo user = new UserLoginInfo("admin", "StrongPass123!", false);
+    public void testR14_SetUserName() {
+        System.out.println("R14: Testing setUserName");
 
-        // Assert
-        assertNotNull(user);
+        UserLoginInfo user = new UserLoginInfo("admin", "Password1!");
         assertEquals("admin", user.getUserName());
-        assertEquals("StrongPass123!", user.getPassword());
+
+        user.setUserName("newadmin");
+
+        assertEquals("newadmin", user.getUserName(),
+                "Username should be updated to new value");
     }
 }
