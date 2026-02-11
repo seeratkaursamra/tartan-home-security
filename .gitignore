@@ -1,0 +1,4 @@
+*.xml
+*.lock
+*.bin
+Tartan/smart-home/Platform/build/tmp/shadowJar/MANIFEST.MF
