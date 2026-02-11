@@ -4,32 +4,33 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Test cases for rule 14:
- * R14: The IoT Controller shall require the user to login to the house control panel using a username and password.
- * The password has the following requirements:
- * - Minimum length: 8 characters
- * - At least one uppercase character
- * - At least one number
- * - At least one symbol
+ * Tests for Rule 14:
+ * Login requires username/password; password policy (new users):
+ * - length >= 8
+ * - >= 1 uppercase
+ * - >= 1 number
+ * - >= 1 symbol
+ * Legacy users can bypass validation via (validate=false) constructor.
  *
- * new users have to follow the guidlines
- * legacy users do not
+ * Openai, chatgpt 5.2 "I am lazy please add comments for how this document adheres to white and black box testing"
+ * BLACK-BOX DESIGN:
+ * - Boundary Value Analysis (BVA) on password length: 7 vs 8 characters.
+ * - Equivalence Class Partitioning (ECP) on password composition:
+ *   - Missing uppercase / missing number / missing symbol / null password.
+ * - Feature interaction: "legacy users" path bypasses policy, but setPassword() enforces policy.
  *
- * also tests the set password and set username to ensure they work
- *
- * OpenAI, chatgpt 5.2 was used 2026-01-25, "Although I can see my tests are running in the build/~/index.html file
- * it is not printing anything to the console please add code to do so."
- *  - Added system.out.println for test logging
- *  - Used to quickly add legacy password testing
- *
- * OpenAI, chatgpt 5.2 was used 2026-02-09, "My tests are a mess please go through and remove superflous tests, and organize the tests"
+ * WHITE-BOX INTENT:
+ * - Cover the branch in constructor:
+ *     if (validate && !isValidPassword(password)) throw ...
+ * - Cover isValidPassword branches:
+ *     null/length check, loop setting hasUppercase/hasNumber/hasSymbol
+ * - Cover setPassword() failure branch and success branch.
  */
 public class Rule14Test {
-    // New Users
 
     /**
-     * Test valid password at boundary (exactly 8 characters)
-     * This covers BVA and tests that a minimal valid password works
+     * BVA (length == 8) + ECP (all required character classes present).
+     * WB: drives isValidPassword() through the loop and returns true.
      */
     @Test
     public void testR14_ValidPassword_MinimumRequirements() {
@@ -42,8 +43,9 @@ public class Rule14Test {
     }
 
     /**
-     * Test password that's too short (7 characters)
-     * BVA: boundary - 1
+     * BVA: length boundary - 1 (7 chars).
+     * WB: hits (password == null || password.length() < 8) early return false,
+     * then constructor throws IllegalArgumentException.
      */
     @Test
     public void testR14_InvalidPassword_TooShort() {
@@ -60,8 +62,8 @@ public class Rule14Test {
     }
 
     /**
-     * Test password without uppercase letter
-     * Tests one of the 4 requirements
+     * ECP: missing uppercase class.
+     * WB: isValidPassword loop never sets hasUppercase => returns false => constructor throws.
      */
     @Test
     public void testR14_InvalidPassword_NoUppercase() {
@@ -73,8 +75,8 @@ public class Rule14Test {
     }
 
     /**
-     * Test password without number
-     * Tests one of the 4 requirements
+     * ECP: missing number class.
+     * WB: isValidPassword loop never sets hasNumber => returns false => constructor throws.
      */
     @Test
     public void testR14_InvalidPassword_NoNumber() {
@@ -86,8 +88,8 @@ public class Rule14Test {
     }
 
     /**
-     * Test password without symbol
-     * Tests one of the 4 requirements
+     * ECP: missing symbol class.
+     * WB: isValidPassword loop never sets hasSymbol => returns false => constructor throws.
      */
     @Test
     public void testR14_InvalidPassword_NoSymbol() {
@@ -99,8 +101,9 @@ public class Rule14Test {
     }
 
     /**
-     * Test null password (edge case)
-     * Ensures robust handling of invalid input
+     * Edge case / robustness:
+     * ECP: password = null.
+     * WB: hits null check branch in isValidPassword and throws via constructor.
      */
     @Test
     public void testR14_InvalidPassword_Null() {
@@ -111,11 +114,10 @@ public class Rule14Test {
         });
     }
 
-    // Legacy Users
-
     /**
-     * Test that legacy users can bypass password validation
-     * This is required for backwards compatibility with existing weak passwords
+     * Legacy user bypass (interaction case):
+     * - BLACK-BOX: validate=false should bypass password policy for backwards compatibility.
+     * - WHITE-BOX: covers constructor path where (validate && ...) is false, so no exception.
      */
     @Test
     public void testR14_LegacyUser_BypassValidation() {
@@ -128,11 +130,10 @@ public class Rule14Test {
         assertEquals("weak", legacyUser.getPassword());
     }
 
-    // Update password, or username
-
     /**
-     * Test that setPassword() enforces validation
-     * This ensures password can be updated but must meet requirements
+     * setPassword interaction:
+     * - BLACK-BOX: even if legacy users exist, updating passwords must meet the rule.
+     * - WHITE-BOX: covers setPassword failure branch (throws) and success branch (updates).
      */
     @Test
     public void testR14_SetPassword_EnforcesValidation() {
@@ -154,8 +155,9 @@ public class Rule14Test {
     }
 
     /**
-     * Test setUserName() method
-     * Ensures username can be changed after user creation
+     * Username setter:
+     * - BLACK-BOX: setter should update stored username.
+     * - WHITE-BOX: trivial path coverage for setUserName/getUserName.
      */
     @Test
     public void testR14_SetUserName() {
