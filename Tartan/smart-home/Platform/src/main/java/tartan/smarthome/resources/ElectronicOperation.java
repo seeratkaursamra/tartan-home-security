@@ -1,23 +1,28 @@
 package tartan.smarthome.resources;
 
 /**
- * Smart door lock: supports Electronic Operation (lock/unlock from access panel
- * with passcode validation).
+ * Electronic Operation: lock/unlock from an access panel with passcode validation.
+ *
+ * If a person requests a lock or unlock operation, the system first checks if
+ * that operation requires a passcode. If so, it validates the input before
+ * proceeding. If the passcode is rejected, an appropriate response is sent to
+ * the access panel. Otherwise, the requested operation is carried out.
  *
  * Lock state (locked/unlocked) is separate from door physical state (open/closed).
  * The deadbolt can be locked or unlocked independently of whether the door is open or closed.
  */
-public class SmartDoorLock {
+public class ElectronicOperation {
 
     private final String lockPasscode;
     private boolean locked;
 
     /**
-     * Create a new SmartDoorLock. Starts locked by default.
+     * Create a new ElectronicOperation lock. Starts locked by default.
+     *
      * @param lockPasscode the passcode required to lock/unlock
      */
-    public SmartDoorLock(String lockPasscode) {
-        this.lockPasscode = lockPasscode != null ? lockPasscode : "";
+    public ElectronicOperation(String lockPasscode) {
+        this.lockPasscode = (lockPasscode != null) ? lockPasscode : "";
         this.locked = true;
     }
 
@@ -30,6 +35,7 @@ public class SmartDoorLock {
 
     /**
      * Request to unlock from the access panel. Validates the passcode first.
+     *
      * @param givenPasscode the passcode entered by the user
      * @return a message for the access panel log
      */
@@ -37,17 +43,16 @@ public class SmartDoorLock {
         if (!isValidPasscode(givenPasscode)) {
             return "Invalid passcode. Unlock denied.";
         }
-
         if (!locked) {
             return "Door lock is already unlocked.";
         }
-
         locked = false;
         return "Door lock unlocked successfully.";
     }
 
     /**
      * Request to lock from the access panel. Validates the passcode first.
+     *
      * @param givenPasscode the passcode entered by the user
      * @return a message for the access panel log
      */
@@ -55,11 +60,9 @@ public class SmartDoorLock {
         if (!isValidPasscode(givenPasscode)) {
             return "Invalid passcode. Lock denied.";
         }
-
         if (locked) {
             return "Door lock is already locked.";
         }
-
         locked = true;
         return "Door lock locked successfully.";
     }

@@ -16,14 +16,14 @@ import static org.junit.jupiter.api.Assertions.*;
  *
  * Lock state (locked/unlocked) is separate from door state (open/closed).
  */
-public class SmartDoorLockTest {
+public class ElectronicOperationTest {
 
-    private SmartDoorLock lock;
+    private ElectronicOperation lock;
     private static final String LOCK_PASSCODE = "5678";
 
     @BeforeEach
     void setUp() {
-        lock = new SmartDoorLock(LOCK_PASSCODE);
+        lock = new ElectronicOperation(LOCK_PASSCODE);
     }
 
     // ---- Lock starts locked by default ----
