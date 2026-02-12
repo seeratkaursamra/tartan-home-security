@@ -66,4 +66,11 @@ public abstract class IoTValues {
     public static final String SETTINGS_FILE = "settings.txt";
     public static final String USERS_DB = "users.txt";
 	public static final String AWAY_TIMER = "AW";
+
+    // Night Lock feature
+    public static final String LOCK_STATE = "LKS";
+    public static final String NIGHT_LOCK_ENABLED = "NLE";
+    public static final String NIGHT_LOCK_START = "NLS";
+    public static final String NIGHT_LOCK_END = "NLEND";
+    public static final String CURRENT_HOUR = "CH";
 }
