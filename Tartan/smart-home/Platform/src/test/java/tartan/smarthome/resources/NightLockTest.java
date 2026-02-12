@@ -71,4 +71,19 @@ public class NightLockTest {
         assertTrue(log.toString().contains("Night Lock"),
                 "Night Lock FAILED: Log should mention Night Lock");
     }
+
+    // ---- Cycle 2: Re-lock during night ----
+
+    @Test
+    @DisplayName("Night Lock: Unlocked door during night is re-locked")
+    void testNightLock_UnlockedDuringNight_Relocks() {
+        Map<String, Object> state = createDefaultState();
+        state.put(IoTValues.LOCK_STATE, false);      // someone unlocked it
+        state.put(IoTValues.CURRENT_HOUR, 2);        // 2 AM — night time
+
+        Map<String, Object> newState = evaluator.evaluateState(state, log);
+
+        assertTrue((Boolean) newState.get(IoTValues.LOCK_STATE),
+                "Night Lock FAILED: Unlocked door should be re-locked during night");
+    }
 }
