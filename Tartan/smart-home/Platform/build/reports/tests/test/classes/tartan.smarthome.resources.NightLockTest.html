@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="x-ua-compatible" content="IE=edge"/>
+<title>Test results - NightLockTest</title>
+<link href="../css/base-style.css" rel="stylesheet" type="text/css"/>
+<link href="../css/style.css" rel="stylesheet" type="text/css"/>
+<script src="../js/report.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+<h1>NightLockTest</h1>
+<div class="breadcrumbs">
+<a href="../index.html">all</a> &gt; 
+<a href="../packages/tartan.smarthome.resources.html">tartan.smarthome.resources</a> &gt; NightLockTest</div>
+<div id="summary">
+<table>
+<tr>
+<td>
+<div class="summaryGroup">
+<table>
+<tr>
+<td>
+<div class="infoBox" id="tests">
+<div class="counter">14</div>
+<p>tests</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="failures">
+<div class="counter">0</div>
+<p>failures</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="ignored">
+<div class="counter">0</div>
+<p>ignored</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="duration">
+<div class="counter">0.048s</div>
+<p>duration</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</td>
+<td>
+<div class="infoBox success" id="successRate">
+<div class="percent">100%</div>
+<p>successful</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div id="tabs">
+<ul class="tabLinks">
+<li>
+<a href="#tab0">Tests</a>
+</li>
+<li>
+<a href="#tab1">Standard output</a>
+</li>
+</ul>
+<div id="tab0" class="tab">
+<h2>Tests</h2>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Method name</th>
+<th>Duration</th>
+<th>Result</th>
+</tr>
+</thead>
+<tr>
+<td class="success">Night Lock: Already locked — no duplicate log entry</td>
+<td class="success">testNightLock_AlreadyLocked_NoDoubleLog()</td>
+<td class="success">0.001s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">Night Lock: Boundary — hour == end → NOT locked</td>
+<td class="success">testNightLock_Boundary_HourEqualsEnd_NotLocked()</td>
+<td class="success">0.001s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">Night Lock: Boundary — hour == start → locked</td>
+<td class="success">testNightLock_Boundary_HourEqualsStart_Locked()</td>
+<td class="success">0.001s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">Night Lock: Disabled feature does not lock door at night</td>
+<td class="success">testNightLock_Disabled_NoEffect()</td>
+<td class="success">0.001s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">Night Lock: During day, unlocked door stays unlocked</td>
+<td class="success">testNightLock_DuringDay_DoesNotForceLock()</td>
+<td class="success">0.001s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">Night Lock: Door is locked automatically during night hours</td>
+<td class="success">testNightLock_DuringNight_LocksDoor()</td>
+<td class="success">0.003s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">Night Lock Integration: Evaluator output includes lock state for full pipeline</td>
+<td class="success">testNightLock_Integration_EvaluatorPipeline()</td>
+<td class="success">0.002s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">Night Lock Integration: TartanHome fields round-trip through state conversion</td>
+<td class="success">testNightLock_Integration_TartanHomeFields()</td>
+<td class="success">0.003s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">Night Lock: Midnight crossing — hour 23, start=22, end=6 → locked</td>
+<td class="success">testNightLock_MidnightCrossing_Hour23_Locked()</td>
+<td class="success">0.001s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">Night Lock: Midnight crossing — hour 3, start=22, end=6 → locked</td>
+<td class="success">testNightLock_MidnightCrossing_Hour3_Locked()</td>
+<td class="success">0.001s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">Night Lock: Midnight crossing — hour 7, start=22, end=6 → NOT locked</td>
+<td class="success">testNightLock_MidnightCrossing_Hour7_NotLocked()</td>
+<td class="success">0.029s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">Night Lock: Non-crossing range — start=8, end=18, hour=10 → locked</td>
+<td class="success">testNightLock_NonCrossingRange_DuringRange_Locked()</td>
+<td class="success">0s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">Night Lock: Non-crossing range — start=8, end=18, hour=20 → NOT locked</td>
+<td class="success">testNightLock_NonCrossingRange_OutsideRange_NotLocked()</td>
+<td class="success">0.002s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">Night Lock: Unlocked door during night is re-locked</td>
+<td class="success">testNightLock_UnlockedDuringNight_Relocks()</td>
+<td class="success">0.002s</td>
+<td class="success">passed</td>
+</tr>
+</table>
+</div>
+<div id="tab1" class="tab">
+<h2>Standard output</h2>
+<span class="code">
+<pre>Evaluating new state statically
+Evaluating new state statically
+Evaluating new state statically
+Evaluating new state statically
+Evaluating new state statically
+Evaluating new state statically
+Evaluating new state statically
+Evaluating new state statically
+Evaluating new state statically
+Evaluating new state statically
+Evaluating new state statically
+Evaluating new state statically
+Evaluating new state statically
+</pre>
+</span>
+</div>
+</div>
+<div id="footer">
+<p>
+<div>
+<label class="hidden" id="label-for-line-wrapping-toggle" for="line-wrapping-toggle">Wrap lines
+<input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
+</label>
+</div>Generated by 
+<a href="http://www.gradle.org">Gradle 8.6</a> at Feb 11, 2026, 10:48:47 p.m.</p>
+</div>
+</div>
+</body>
+</html>

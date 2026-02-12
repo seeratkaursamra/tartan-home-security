@@ -1,34 +1,47 @@
  Evaluating new state statically
- Evaluating new state statically
- Evaluating new state statically
- Evaluating new state statically
-	 Evaluating new state statically
-
+ Evaluating new state statically
+ Evaluating new state statically
+ Evaluating new state statically
+ Evaluating new state statically
+ Evaluating new state statically
+ Evaluating new state statically
+	 Evaluating new state statically
+
  Evaluating new state statically
- Evaluating new state statically
- Evaluating new state statically
- Evaluating new state statically
- Evaluating new state statically
- Evaluating new state statically
- Evaluating new state statically
- Evaluating new state statically
- Evaluating new state statically
- Evaluating new state statically
- Evaluating new state statically
- Evaluating new state statically
- Evaluating new state statically
- Evaluating new state statically
- Evaluating new state statically
- Evaluating new state statically
- Evaluating new state statically
-+Testing password validation: null password
-'Testing password validation: no symbol
-*Testing password validation: no uppercase
- -Testing valid password with all requirements
-!;un:Testing that bypass mode still accepts strong passwords
-"'Testing password validation: too short
-#Iun:Testing legacy user creation with weak password (validation bypassed)
-$Testing strong valid password
-%3un:Testing config user creation without validation
-&*Testing password validation: empty string
-''Testing password validation: no number
+ Evaluating new state statically
+ Evaluating new state statically
+ Evaluating new state statically
+ Evaluating new state statically
+ Evaluating new state statically
+ Evaluating new state statically
+ Evaluating new state statically
+ Evaluating new state statically
+ Evaluating new state statically
+ Evaluating new state statically
+ Evaluating new state statically
+ Evaluating new state statically
+ Evaluating new state statically
+ Evaluating new state statically
+ Evaluating new state statically
+ Evaluating new state statically
+  Evaluating new state statically
+! Evaluating new state statically
+" Evaluating new state statically
+# Evaluating new state statically
+$ Evaluating new state statically
+% Evaluating new state statically
+'& Evaluating new state statically
+'( Evaluating new state statically
+') Evaluating new state statically
+'* Evaluating new state statically
+,++Testing password validation: null password
+,-'Testing password validation: no symbol
+,.*Testing password validation: no uppercase
+,/-Testing valid password with all requirements
+,0;un:Testing that bypass mode still accepts strong passwords
+,1'Testing password validation: too short
+,2Iun:Testing legacy user creation with weak password (validation bypassed)
+,3Testing strong valid password
+,43un:Testing config user creation without validation
+,5*Testing password validation: empty string
+,6'Testing password validation: no number
