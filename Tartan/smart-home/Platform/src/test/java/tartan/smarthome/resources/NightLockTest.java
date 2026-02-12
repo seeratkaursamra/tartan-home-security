@@ -245,4 +245,45 @@ public class NightLockTest {
         assertFalse((Boolean) newState.get(IoTValues.LOCK_STATE),
                 "Night Lock FAILED: Hour 20 should NOT be in range [8,18)");
     }
+
+    // ---- Cycle 7: Full stack integration ----
+
+    @Test
+    @DisplayName("Night Lock Integration: TartanHome fields round-trip through state conversion")
+    void testNightLock_Integration_TartanHomeFields() {
+        // Verify TartanHome has night lock fields and they serialize correctly
+        tartan.smarthome.core.TartanHome home = new tartan.smarthome.core.TartanHome();
+        home.setLockState(tartan.smarthome.core.TartanHomeValues.LOCKED);
+        home.setNightLockEnabled("true");
+        home.setNightLockStart("22");
+        home.setNightLockEnd("6");
+
+        assertEquals(tartan.smarthome.core.TartanHomeValues.LOCKED, home.getLockState(),
+                "Integration FAILED: lockState should be LOCKED");
+        assertEquals("true", home.getNightLockEnabled(),
+                "Integration FAILED: nightLockEnabled should be true");
+        assertEquals("22", home.getNightLockStart(),
+                "Integration FAILED: nightLockStart should be 22");
+        assertEquals("6", home.getNightLockEnd(),
+                "Integration FAILED: nightLockEnd should be 6");
+    }
+
+    @Test
+    @DisplayName("Night Lock Integration: Evaluator output includes lock state for full pipeline")
+    void testNightLock_Integration_EvaluatorPipeline() {
+        Map<String, Object> state = createDefaultState();
+        state.put(IoTValues.LOCK_STATE, false);
+        state.put(IoTValues.NIGHT_LOCK_ENABLED, true);
+        state.put(IoTValues.NIGHT_LOCK_START, 22);
+        state.put(IoTValues.NIGHT_LOCK_END, 6);
+        state.put(IoTValues.CURRENT_HOUR, 23);
+
+        Map<String, Object> newState = evaluator.evaluateState(state, log);
+
+        // Verify the output map contains the lock state
+        assertTrue(newState.containsKey(IoTValues.LOCK_STATE),
+                "Integration FAILED: Output state should contain LOCK_STATE");
+        assertTrue((Boolean) newState.get(IoTValues.LOCK_STATE),
+                "Integration FAILED: LOCK_STATE should be true during night");
+    }
 }
