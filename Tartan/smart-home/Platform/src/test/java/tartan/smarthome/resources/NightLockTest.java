@@ -168,4 +168,81 @@ public class NightLockTest {
         assertFalse((Boolean) newState.get(IoTValues.LOCK_STATE),
                 "Night Lock FAILED: Hour 7 should NOT be night when start=22, end=6");
     }
+
+    // ---- Cycle 6: Edge cases & log messages ----
+
+    @Test
+    @DisplayName("Night Lock: Boundary — hour == start → locked")
+    void testNightLock_Boundary_HourEqualsStart_Locked() {
+        Map<String, Object> state = createDefaultState();
+        state.put(IoTValues.NIGHT_LOCK_START, 22);
+        state.put(IoTValues.NIGHT_LOCK_END, 6);
+        state.put(IoTValues.LOCK_STATE, false);
+        state.put(IoTValues.CURRENT_HOUR, 22);
+
+        Map<String, Object> newState = evaluator.evaluateState(state, log);
+
+        assertTrue((Boolean) newState.get(IoTValues.LOCK_STATE),
+                "Night Lock FAILED: hour==start should be night (inclusive)");
+    }
+
+    @Test
+    @DisplayName("Night Lock: Boundary — hour == end → NOT locked")
+    void testNightLock_Boundary_HourEqualsEnd_NotLocked() {
+        Map<String, Object> state = createDefaultState();
+        state.put(IoTValues.NIGHT_LOCK_START, 22);
+        state.put(IoTValues.NIGHT_LOCK_END, 6);
+        state.put(IoTValues.LOCK_STATE, false);
+        state.put(IoTValues.CURRENT_HOUR, 6);
+
+        Map<String, Object> newState = evaluator.evaluateState(state, log);
+
+        assertFalse((Boolean) newState.get(IoTValues.LOCK_STATE),
+                "Night Lock FAILED: hour==end should NOT be night (exclusive)");
+    }
+
+    @Test
+    @DisplayName("Night Lock: Already locked — no duplicate log entry")
+    void testNightLock_AlreadyLocked_NoDoubleLog() {
+        Map<String, Object> state = createDefaultState();
+        state.put(IoTValues.LOCK_STATE, true);       // already locked
+        state.put(IoTValues.CURRENT_HOUR, 23);       // night time
+
+        Map<String, Object> newState = evaluator.evaluateState(state, log);
+
+        assertTrue((Boolean) newState.get(IoTValues.LOCK_STATE),
+                "Night Lock FAILED: Door should remain locked");
+        assertFalse(log.toString().contains("Night Lock"),
+                "Night Lock FAILED: No log entry when already locked");
+    }
+
+    @Test
+    @DisplayName("Night Lock: Non-crossing range — start=8, end=18, hour=10 → locked")
+    void testNightLock_NonCrossingRange_DuringRange_Locked() {
+        Map<String, Object> state = createDefaultState();
+        state.put(IoTValues.NIGHT_LOCK_START, 8);
+        state.put(IoTValues.NIGHT_LOCK_END, 18);
+        state.put(IoTValues.LOCK_STATE, false);
+        state.put(IoTValues.CURRENT_HOUR, 10);
+
+        Map<String, Object> newState = evaluator.evaluateState(state, log);
+
+        assertTrue((Boolean) newState.get(IoTValues.LOCK_STATE),
+                "Night Lock FAILED: Hour 10 should be in range [8,18)");
+    }
+
+    @Test
+    @DisplayName("Night Lock: Non-crossing range — start=8, end=18, hour=20 → NOT locked")
+    void testNightLock_NonCrossingRange_OutsideRange_NotLocked() {
+        Map<String, Object> state = createDefaultState();
+        state.put(IoTValues.NIGHT_LOCK_START, 8);
+        state.put(IoTValues.NIGHT_LOCK_END, 18);
+        state.put(IoTValues.LOCK_STATE, false);
+        state.put(IoTValues.CURRENT_HOUR, 20);
+
+        Map<String, Object> newState = evaluator.evaluateState(state, log);
+
+        assertFalse((Boolean) newState.get(IoTValues.LOCK_STATE),
+                "Night Lock FAILED: Hour 20 should NOT be in range [8,18)");
+    }
 }
