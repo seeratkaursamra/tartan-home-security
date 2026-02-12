@@ -217,6 +217,16 @@ public class TartanHomeService {
      * @param tartanHome the home
      * @return true if open; false if closed' otherwise null
      */
+    private Boolean toIoTLockState(TartanHome tartanHome) {
+        if (tartanHome.getLockState().equals(TartanHomeValues.LOCKED)) return true;
+        else if (tartanHome.getLockState().equals(TartanHomeValues.UNLOCKED)) return false;
+        return null;
+    }
+
+    private Boolean toIoTNightLockEnabled(TartanHome tartanHome) {
+        return Boolean.parseBoolean(tartanHome.getNightLockEnabled());
+    }
+
     private Boolean toIoTDoorState(TartanHome tartanHome) {
         if (tartanHome.getDoor().equals(TartanHomeValues.CLOSED)) return false;
         else if (tartanHome.getDoor().equals(TartanHomeValues.OPEN)) return true;
@@ -360,6 +370,7 @@ public class TartanHomeService {
             tartanHome.setAlarmActive(TartanHomeValues.UNKNOWN);
             tartanHome.setHvacMode(TartanHomeValues.UNKNOWN);
             tartanHome.setHvacState(TartanHomeValues.UNKNOWN);
+            tartanHome.setLockState(TartanHomeValues.UNKNOWN);
 
             return tartanHome;
         }
@@ -421,6 +432,13 @@ public class TartanHomeService {
                     tartanHome.setAlarmActive(TartanHomeValues.INACTIVE);
                 }
 
+            } else if (key.equals(IoTValues.LOCK_STATE)) {
+                Boolean lockSt = (Boolean) state.get(key);
+                if (lockSt) {
+                    tartanHome.setLockState(TartanHomeValues.LOCKED);
+                } else {
+                    tartanHome.setLockState(TartanHomeValues.UNLOCKED);
+                }
             } else if (key.equals(IoTValues.HVAC_MODE)) {
                 if (state.get(key).equals("Heater")) {
                     tartanHome.setHvacMode(TartanHomeValues.HEAT);
@@ -505,6 +523,19 @@ public class TartanHomeService {
             }
         }
         
+        if (tartanHome.getLockState() != null) {
+            state.put(IoTValues.LOCK_STATE, toIoTLockState(tartanHome));
+        }
+        if (tartanHome.getNightLockEnabled() != null) {
+            state.put(IoTValues.NIGHT_LOCK_ENABLED, toIoTNightLockEnabled(tartanHome));
+        }
+        if (tartanHome.getNightLockStart() != null) {
+            state.put(IoTValues.NIGHT_LOCK_START, Integer.parseInt(tartanHome.getNightLockStart()));
+        }
+        if (tartanHome.getNightLockEnd() != null) {
+            state.put(IoTValues.NIGHT_LOCK_END, Integer.parseInt(tartanHome.getNightLockEnd()));
+        }
+
         for (Map.Entry<String,Object> e : state.entrySet()) {
             LOGGER.info("State: " + e.getKey() + "=" + e.getValue());
         }

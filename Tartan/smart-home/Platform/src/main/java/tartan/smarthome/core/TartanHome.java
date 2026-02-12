@@ -76,6 +76,19 @@ public class TartanHome {
     @JsonProperty
     private String alarmPasscode;
 
+    // Night Lock fields
+    @JsonProperty
+    private String lockState;
+
+    @JsonProperty
+    private String nightLockEnabled;
+
+    @JsonProperty
+    private String nightLockStart;
+
+    @JsonProperty
+    private String nightLockEnd;
+
     /**
      * Empty constructor needed by Jackson deserialization
      */
@@ -341,6 +354,18 @@ public class TartanHome {
      * @param alarmPasscode the new passcode
      */
     public void setAlarmPasscode(String alarmPasscode) { this.alarmPasscode = alarmPasscode; }
+
+    public String getLockState() { return lockState; }
+    public void setLockState(String lockState) { this.lockState = lockState; }
+
+    public String getNightLockEnabled() { return nightLockEnabled; }
+    public void setNightLockEnabled(String nightLockEnabled) { this.nightLockEnabled = nightLockEnabled; }
+
+    public String getNightLockStart() { return nightLockStart; }
+    public void setNightLockStart(String nightLockStart) { this.nightLockStart = nightLockStart; }
+
+    public String getNightLockEnd() { return nightLockEnd; }
+    public void setNightLockEnd(String nightLockEnd) { this.nightLockEnd = nightLockEnd; }
 
     @Override
     public boolean equals(Object o) {
