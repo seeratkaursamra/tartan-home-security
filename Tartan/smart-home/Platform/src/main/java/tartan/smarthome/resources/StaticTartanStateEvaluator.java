@@ -45,6 +45,15 @@ public class StaticTartanStateEvaluator implements TartanStateEvaluator {
         String hvacSetting = null; // the HVAC mode setting, either Heater or Chiller
         String givenPassCode = "";
 
+        //again more behaviour for keylessentry
+        // this one will have defaults to hopefully not cause any errors or require a refactor
+        Boolean lockState = (Boolean) inState.getOrDefault(IoTValues.LOCK_STATE, true);
+        Boolean keylessEnabled = (Boolean) inState.getOrDefault(IoTValues.KEYLESS_ENABLED, false);
+        Boolean authorizedApproach = (Boolean) inState.getOrDefault(IoTValues.AUTHORIZED_APPROACH, false);
+        Boolean intruderActive = (Boolean) inState.getOrDefault(IoTValues.INTRUDER_ACTIVE, false);
+        Boolean nightActive = (Boolean) inState.getOrDefault(IoTValues.NIGHT_ACTIVE, false);
+
+
         System.out.println("Evaluating new state statically");
 
         Set<String> keys = inState.keySet();
@@ -264,6 +273,29 @@ public class StaticTartanStateEvaluator implements TartanStateEvaluator {
             humidifierState = false;
         }
 
+        // Smart lock priority logic
+        // Priority: Intruder > Keyless > Night
+        if (intruderActive) {
+            if (!lockState) {
+                lockState = true;
+                log.append(formatLogEntry("Possible intruder detected: locking door"));
+            } else {
+                log.append(formatLogEntry("Possible intruder detected: door already locked"));
+            }
+        } else {
+            KeylessEntry.Result kr = KeylessEntry.apply(inState, lockState, log);
+            lockState = kr.lockState;
+
+            // Only apply Night Lock if Keyless did NOT trigger
+            if (!kr.triggered && nightActive) {
+                if (!lockState) {
+                    lockState = true;
+                    log.append(formatLogEntry("Night lock: locking door"));
+                }
+            }
+        }
+
+
         Map<String, Object> newState = new Hashtable<>();
         newState.put(IoTValues.DOOR_STATE, doorState);
         newState.put(IoTValues.AWAY_TIMER, awayTimerState);
@@ -277,7 +309,8 @@ public class StaticTartanStateEvaluator implements TartanStateEvaluator {
         newState.put(IoTValues.HVAC_MODE, hvacSetting);
         newState.put(IoTValues.ALARM_PASSCODE, alarmPassCode);
         newState.put(IoTValues.GIVEN_PASSCODE, givenPassCode);
-        
+        newState.put(IoTValues.LOCK_STATE, lockState);
+
         return newState; 
     }
 }

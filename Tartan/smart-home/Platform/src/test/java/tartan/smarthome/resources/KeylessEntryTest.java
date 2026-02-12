@@ -14,7 +14,7 @@ import tartan.smarthome.resources.iotcontroller.IoTValues;
  *  KeylessEntryTesting
  *  - provides unit testing for the keyless entry
  */
-public class KeylessEntryTests {
+public class KeylessEntryTest {
 
     private StaticTartanStateEvaluator evaluator;
     private StringBuffer log;
