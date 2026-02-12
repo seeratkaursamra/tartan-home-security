@@ -99,11 +99,11 @@ import tartan.smarthome.resources.iotcontroller.IoTValues;
 
         // The door is now open
 <span class="fc bfc" id="L101" title="All 2 branches covered.">        if (doorState) {        </span>
-<span class="pc bpc" id="L102" title="2 of 4 branches missed.">            if (!proximityState &amp;&amp; alarmState) {</span>
+<span class="pc bpc" id="L102" title="1 of 4 branches missed.">            if (!proximityState &amp;&amp; alarmState) {</span>
 
                 // door open and no one home and the alarm is set - sound alarm
-<span class="nc" id="L105">                log.append(formatLogEntry(&quot;Break in detected: Activating alarm&quot;));</span>
-<span class="nc" id="L106">                alarmActiveState = true;</span>
+<span class="fc" id="L105">                log.append(formatLogEntry(&quot;Break in detected: Activating alarm&quot;));</span>
+<span class="fc" id="L106">                alarmActiveState = true;</span>
             }
             // House vacant, close the door
 <span class="pc bpc" id="L109" title="1 of 2 branches missed.">            else if (!proximityState) {</span>
@@ -121,7 +121,7 @@ import tartan.smarthome.resources.iotcontroller.IoTValues;
         // The door is now closed
 <span class="pc bpc" id="L122" title="1 of 2 branches missed.">        else if (!doorState) {</span>
             // the door is closed - if the house is suddenly occupied this is a break-in
-<span class="pc bpc" id="L124" title="1 of 4 branches missed.">            if (alarmState &amp;&amp; proximityState) {</span>
+<span class="fc bfc" id="L124" title="All 4 branches covered.">            if (alarmState &amp;&amp; proximityState) {</span>
 <span class="fc" id="L125">                log.append(formatLogEntry(&quot;Break in detected: Activating alarm&quot;));</span>
 <span class="fc" id="L126">                alarmActiveState = true;</span>
             } else {
@@ -130,11 +130,11 @@ import tartan.smarthome.resources.iotcontroller.IoTValues;
         }
         
         // Auto lock the house
-<span class="pc bpc" id="L133" title="1 of 2 branches missed.">        if (awayTimerState == true) {</span>
-<span class="nc" id="L134">            lightState = false;</span>
-<span class="nc" id="L135">            doorState = false;</span>
-<span class="nc" id="L136">            alarmState = true;</span>
-<span class="nc" id="L137">            awayTimerState = false;</span>
+<span class="fc bfc" id="L133" title="All 2 branches covered.">        if (awayTimerState == true) {</span>
+<span class="fc" id="L134">            lightState = false;</span>
+<span class="fc" id="L135">            doorState = false;</span>
+<span class="fc" id="L136">            alarmState = true;</span>
+<span class="fc" id="L137">            awayTimerState = false;</span>
         }
 
         // the user has arrived
@@ -167,9 +167,9 @@ import tartan.smarthome.resources.iotcontroller.IoTValues;
             }
 
 <span class="fc bfc" id="L169" title="All 2 branches covered.">            if (alarmActiveState) {</span>
-<span class="pc bpc" id="L170" title="2 of 4 branches missed.">                if (givenPassCode.length()&gt;0  &amp;&amp; givenPassCode.compareTo(alarmPassCode) &lt; 0) {</span>
-<span class="nc" id="L171">                    log.append(formatLogEntry(&quot;Cannot disable alarm, invalid passcode given&quot;));</span>
-<span class="nc" id="L172">                    alarmState = true;</span>
+<span class="fc bfc" id="L170" title="All 4 branches covered.">                if (givenPassCode.length()&gt;0  &amp;&amp; givenPassCode.compareTo(alarmPassCode) &lt; 0) {</span>
+<span class="fc" id="L171">                    log.append(formatLogEntry(&quot;Cannot disable alarm, invalid passcode given&quot;));</span>
+<span class="fc" id="L172">                    alarmState = true;</span>
 
                 } else {
 <span class="fc" id="L175">                    log.append(formatLogEntry(&quot;Correct passcode entered, disabled alarm&quot;));</span>
@@ -191,7 +191,7 @@ import tartan.smarthome.resources.iotcontroller.IoTValues;
         // 1. the door is opened when no one is home
         // 2. the house is suddenly occupied
         try {
-<span class="pc bpc" id="L194" title="4 of 12 branches missed.">            if ((alarmState &amp;&amp; !doorState &amp;&amp; proximityState) || (alarmState &amp;&amp; doorState &amp;&amp; !proximityState)) {</span>
+<span class="pc bpc" id="L194" title="1 of 12 branches missed.">            if ((alarmState &amp;&amp; !doorState &amp;&amp; proximityState) || (alarmState &amp;&amp; doorState &amp;&amp; !proximityState)) {</span>
 <span class="fc" id="L195">                log.append(formatLogEntry(&quot;Activating alarm&quot;));</span>
 <span class="fc" id="L196">                alarmActiveState = true;</span>
             }

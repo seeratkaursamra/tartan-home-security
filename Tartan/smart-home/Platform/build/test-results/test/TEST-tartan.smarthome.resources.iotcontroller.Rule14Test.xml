@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="tartan.smarthome.resources.iotcontroller.Rule14Test" tests="11" skipped="0" failures="0" errors="0" timestamp="2026-02-09T18:06:29" hostname="MOOSELAPTOPTWO" time="0.054">
+<testsuite name="tartan.smarthome.resources.iotcontroller.Rule14Test" tests="11" skipped="0" failures="0" errors="0" timestamp="2026-02-09T23:47:05" hostname="Abdulrahmans-MacBook-Air-2.local" time="0.011">
   <properties/>
-  <testcase name="testR14_InvalidPassword_Null()" classname="tartan.smarthome.resources.iotcontroller.Rule14Test" time="0.004"/>
-  <testcase name="testR14_InvalidPassword_NoSymbol()" classname="tartan.smarthome.resources.iotcontroller.Rule14Test" time="0.002"/>
-  <testcase name="testR14_InvalidPassword_NoUppercase()" classname="tartan.smarthome.resources.iotcontroller.Rule14Test" time="0.003"/>
-  <testcase name="testR14_ValidPassword_MeetsAllRequirements()" classname="tartan.smarthome.resources.iotcontroller.Rule14Test" time="0.004"/>
-  <testcase name="testR14_BypassValidation_StrongPasswordStillWorks()" classname="tartan.smarthome.resources.iotcontroller.Rule14Test" time="0.004"/>
-  <testcase name="testR14_InvalidPassword_TooShort()" classname="tartan.smarthome.resources.iotcontroller.Rule14Test" time="0.004"/>
-  <testcase name="testR14_LegacyUser_WeakPasswordAllowed()" classname="tartan.smarthome.resources.iotcontroller.Rule14Test" time="0.002"/>
-  <testcase name="testR14_strongValidPassword()" classname="tartan.smarthome.resources.iotcontroller.Rule14Test" time="0.002"/>
-  <testcase name="testR14_ConfigUser_NoValidation()" classname="tartan.smarthome.resources.iotcontroller.Rule14Test" time="0.002"/>
-  <testcase name="R14: Invalid password - empty string" classname="tartan.smarthome.resources.iotcontroller.Rule14Test" time="0.002"/>
-  <testcase name="testR14_InvalidPassword_NoNumber()" classname="tartan.smarthome.resources.iotcontroller.Rule14Test" time="0.004"/>
+  <testcase name="testR14_InvalidPassword_Null()" classname="tartan.smarthome.resources.iotcontroller.Rule14Test" time="0.001"/>
+  <testcase name="testR14_InvalidPassword_NoSymbol()" classname="tartan.smarthome.resources.iotcontroller.Rule14Test" time="0.0"/>
+  <testcase name="testR14_InvalidPassword_NoUppercase()" classname="tartan.smarthome.resources.iotcontroller.Rule14Test" time="0.001"/>
+  <testcase name="testR14_ValidPassword_MeetsAllRequirements()" classname="tartan.smarthome.resources.iotcontroller.Rule14Test" time="0.001"/>
+  <testcase name="testR14_BypassValidation_StrongPasswordStillWorks()" classname="tartan.smarthome.resources.iotcontroller.Rule14Test" time="0.001"/>
+  <testcase name="testR14_InvalidPassword_TooShort()" classname="tartan.smarthome.resources.iotcontroller.Rule14Test" time="0.001"/>
+  <testcase name="testR14_LegacyUser_WeakPasswordAllowed()" classname="tartan.smarthome.resources.iotcontroller.Rule14Test" time="0.001"/>
+  <testcase name="testR14_strongValidPassword()" classname="tartan.smarthome.resources.iotcontroller.Rule14Test" time="0.001"/>
+  <testcase name="testR14_ConfigUser_NoValidation()" classname="tartan.smarthome.resources.iotcontroller.Rule14Test" time="0.0"/>
+  <testcase name="R14: Invalid password - empty string" classname="tartan.smarthome.resources.iotcontroller.Rule14Test" time="0.0"/>
+  <testcase name="testR14_InvalidPassword_NoNumber()" classname="tartan.smarthome.resources.iotcontroller.Rule14Test" time="0.0"/>
   <system-out><![CDATA[Testing password validation: null password
 Testing password validation: no symbol
 Testing password validation: no uppercase

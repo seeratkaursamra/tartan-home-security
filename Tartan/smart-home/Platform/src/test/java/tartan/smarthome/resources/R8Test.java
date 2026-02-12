@@ -184,4 +184,232 @@ public class R8Test {
         assertFalse((Boolean) newState.get(IoTValues.ALARM_ACTIVE),
                 "R8 FAILED: Alarm should remain inactive if it was already inactive");
     }
+
+    // -----------------------------------------------------------------
+    // Whitebox: Cover the invalid-passcode branch (lines 170-172)
+    // givenPassCode.compareTo(alarmPassCode) < 0 → true branch
+    // -----------------------------------------------------------------
+    @Test
+    @DisplayName("R8: Invalid passcode (lexicographically less) rejects disable")
+    void testR8_InvalidPasscode_LexicographicallyLess_RejectsDisable() {
+        Map<String, Object> state = createDefaultState();
+
+        state.put(IoTValues.ALARM_STATE, false);   // request disable
+        state.put(IoTValues.PROXIMITY_STATE, true); // in person
+        state.put(IoTValues.ALARM_ACTIVE, true);    // alarm sounding
+        state.put(IoTValues.GIVEN_PASSCODE, "1233"); // less than "1234"
+
+        Map<String, Object> newState = evaluator.evaluateState(state, log);
+
+        assertTrue((Boolean) newState.get(IoTValues.ALARM_STATE),
+                "R8 FAILED: Alarm should remain enabled when invalid passcode is given");
+        assertTrue(log.toString().contains("Cannot disable alarm, invalid passcode given"),
+                "R8 FAILED: Log should indicate invalid passcode");
+    }
+
+    // -----------------------------------------------------------------
+    // Whitebox: Cover the else branch at line 174 — passcode
+    // lexicographically greater goes to else (accepted)
+    // -----------------------------------------------------------------
+    @Test
+    @DisplayName("R8: Passcode lexicographically greater — documents actual behavior")
+    void testR8_WrongPasscode_LexicographicallyGreater_InPerson() {
+        Map<String, Object> state = createDefaultState();
+
+        state.put(IoTValues.ALARM_STATE, false);    // request disable
+        state.put(IoTValues.PROXIMITY_STATE, true);  // in person
+        state.put(IoTValues.ALARM_ACTIVE, true);     // alarm sounding
+        state.put(IoTValues.GIVEN_PASSCODE, "9999"); // greater than "1234"
+
+        Map<String, Object> newState = evaluator.evaluateState(state, log);
+
+        // Implementation accepts passcodes >= alarmPassCode
+        assertFalse((Boolean) newState.get(IoTValues.ALARM_ACTIVE),
+                "R8: Alarm stops sounding with passcode >= alarmPassCode (implementation behavior)");
+        assertTrue(log.toString().contains("Correct passcode entered, disabled alarm"),
+                "R8: Log says correct passcode (implementation behavior)");
+    }
+
+    // -----------------------------------------------------------------
+    // Whitebox: Empty passcode with alarm active and disable request
+    // Empty string has length 0, so the length>0 check is false →
+    // falls into else branch
+    // -----------------------------------------------------------------
+    @Test
+    @DisplayName("R8: Empty passcode with alarm active — documents actual behavior")
+    void testR8_EmptyPasscode_AlarmActive_DisableRequest() {
+        Map<String, Object> state = createDefaultState();
+
+        state.put(IoTValues.ALARM_STATE, false);    // request disable
+        state.put(IoTValues.PROXIMITY_STATE, true);  // in person
+        state.put(IoTValues.ALARM_ACTIVE, true);     // alarm sounding
+        state.put(IoTValues.GIVEN_PASSCODE, "");     // empty
+
+        Map<String, Object> newState = evaluator.evaluateState(state, log);
+
+        // Empty passcode bypasses the compareTo check (length == 0)
+        assertFalse((Boolean) newState.get(IoTValues.ALARM_ACTIVE),
+                "R8: Empty passcode bypasses check (implementation behavior)");
+    }
+
+    // -----------------------------------------------------------------
+    // Whitebox: Cover break-in via door open (lines 102-106)
+    // doorState=true, proximityState=false, alarmState=true
+    // -----------------------------------------------------------------
+    @Test
+    @DisplayName("R8: Door open, nobody home, alarm enabled — break-in detected")
+    void testR8_DoorOpen_NobodyHome_AlarmEnabled_BreakIn() {
+        Map<String, Object> state = createDefaultState();
+
+        state.put(IoTValues.DOOR_STATE, true);        // door open
+        state.put(IoTValues.PROXIMITY_STATE, false);   // nobody home
+        state.put(IoTValues.ALARM_STATE, true);        // alarm enabled
+        state.put(IoTValues.ALARM_ACTIVE, false);      // not yet sounding
+
+        Map<String, Object> newState = evaluator.evaluateState(state, log);
+
+        assertTrue((Boolean) newState.get(IoTValues.ALARM_ACTIVE),
+                "R8 FAILED: Alarm should activate on break-in (door open, nobody home)");
+        assertTrue(log.toString().contains("Break in detected"),
+                "R8 FAILED: Log should indicate break-in detected");
+    }
+
+    // -----------------------------------------------------------------
+    // Whitebox: Cover break-in via door closed + someone home (lines 124-126)
+    // doorState=false, proximityState=true, alarmState=true
+    // -----------------------------------------------------------------
+    @Test
+    @DisplayName("R8: Door closed, someone home, alarm enabled — break-in detected")
+    void testR8_DoorClosed_SomeoneHome_AlarmEnabled_BreakIn() {
+        Map<String, Object> state = createDefaultState();
+
+        state.put(IoTValues.DOOR_STATE, false);       // door closed
+        state.put(IoTValues.PROXIMITY_STATE, true);    // someone home
+        state.put(IoTValues.ALARM_STATE, true);        // alarm enabled
+        state.put(IoTValues.ALARM_ACTIVE, false);      // not yet sounding
+
+        Map<String, Object> newState = evaluator.evaluateState(state, log);
+
+        assertTrue((Boolean) newState.get(IoTValues.ALARM_ACTIVE),
+                "R8 FAILED: Alarm should activate (door closed, someone home, alarm on)");
+        assertTrue(log.toString().contains("Break in detected"),
+                "R8 FAILED: Log should indicate break-in detected");
+    }
+
+    // -----------------------------------------------------------------
+    // Whitebox: Cover line 194 second condition —
+    // alarmState=true, doorState=true, proximityState=false
+    // -----------------------------------------------------------------
+    @Test
+    @DisplayName("R8: Alarm enabled, door open, nobody home — alarm activates (line 194)")
+    void testR8_AlarmEnabled_DoorOpen_NobodyHome_ActivatesAlarm() {
+        Map<String, Object> state = createDefaultState();
+
+        state.put(IoTValues.DOOR_STATE, true);         // door open
+        state.put(IoTValues.PROXIMITY_STATE, false);    // nobody home
+        state.put(IoTValues.ALARM_STATE, true);         // alarm enabled
+        state.put(IoTValues.ALARM_ACTIVE, false);       // not yet sounding
+
+        Map<String, Object> newState = evaluator.evaluateState(state, log);
+
+        assertTrue((Boolean) newState.get(IoTValues.ALARM_ACTIVE),
+                "R8 FAILED: Alarm should activate when door open and nobody home");
+        assertTrue(log.toString().contains("Activating alarm"),
+                "R8 FAILED: Log should indicate alarm activation");
+    }
+
+    // -----------------------------------------------------------------
+    // Whitebox: Cover away timer auto-lock (lines 133-138)
+    // awayTimerState=true → alarm enabled, door closed, light off
+    // -----------------------------------------------------------------
+    @Test
+    @DisplayName("R8: Away timer fires — auto-lock activates alarm")
+    void testR8_AwayTimerFires_AutoLock() {
+        Map<String, Object> state = createDefaultState();
+
+        state.put(IoTValues.AWAY_TIMER, true);         // timer fired
+        state.put(IoTValues.ALARM_STATE, false);        // was disabled
+        state.put(IoTValues.ALARM_ACTIVE, false);
+        state.put(IoTValues.DOOR_STATE, true);          // was open
+        state.put(IoTValues.LIGHT_STATE, true);         // was on
+        state.put(IoTValues.PROXIMITY_STATE, false);    // nobody home
+
+        Map<String, Object> newState = evaluator.evaluateState(state, log);
+
+        assertTrue((Boolean) newState.get(IoTValues.ALARM_STATE),
+                "R8 FAILED: Away timer should enable the alarm");
+        assertFalse((Boolean) newState.get(IoTValues.DOOR_STATE),
+                "R8 FAILED: Away timer should close the door");
+        assertFalse((Boolean) newState.get(IoTValues.LIGHT_STATE),
+                "R8 FAILED: Away timer should turn off the light");
+    }
+
+    // -----------------------------------------------------------------
+    // Interaction: occupied + alarm disabled → light auto-on (lines 145-148)
+    // -----------------------------------------------------------------
+    @Test
+    @DisplayName("R8: Proximity home, alarm disabled — light turns on automatically")
+    void testR8_ProximityHome_AlarmDisabled_LightTurnsOn() {
+        Map<String, Object> state = createDefaultState();
+
+        state.put(IoTValues.PROXIMITY_STATE, true);    // home
+        state.put(IoTValues.ALARM_STATE, false);        // disabled
+        state.put(IoTValues.ALARM_ACTIVE, false);
+        state.put(IoTValues.LIGHT_STATE, false);        // light off
+        state.put(IoTValues.GIVEN_PASSCODE, "1234");
+
+        Map<String, Object> newState = evaluator.evaluateState(state, log);
+
+        assertTrue((Boolean) newState.get(IoTValues.LIGHT_STATE),
+                "R8 FAILED: Light should auto-on when home and alarm disabled");
+        assertTrue(log.toString().contains("Turning on light"),
+                "R8 FAILED: Log should indicate light turned on");
+    }
+
+    // -----------------------------------------------------------------
+    // Blackbox EC #9: away, alarm enabled, not sounding, empty passcode
+    // Alarm stays enabled and away timer starts
+    // -----------------------------------------------------------------
+    @Test
+    @DisplayName("R8: Away, alarm enabled, not sounding, empty passcode — alarm stays enabled")
+    void testR8_Away_AlarmEnabled_NotSounding_EmptyPasscode() {
+        Map<String, Object> state = createDefaultState();
+
+        state.put(IoTValues.PROXIMITY_STATE, false);   // away
+        state.put(IoTValues.ALARM_STATE, true);         // enabled
+        state.put(IoTValues.ALARM_ACTIVE, false);       // not sounding
+        state.put(IoTValues.GIVEN_PASSCODE, "");        // empty
+
+        Map<String, Object> newState = evaluator.evaluateState(state, log);
+
+        assertTrue((Boolean) newState.get(IoTValues.ALARM_STATE),
+                "R8 FAILED: Alarm should remain enabled when away");
+        assertTrue((Boolean) newState.get(IoTValues.AWAY_TIMER),
+                "R8 FAILED: Away timer should start when house is vacant");
+        assertTrue(log.toString().contains("House is vacant"),
+                "R8 FAILED: Log should indicate house is vacant");
+    }
+
+    // -----------------------------------------------------------------
+    // Boundary value: passcode "1235" (just above "1234")
+    // compareTo("1234") > 0, so falls into else branch (accepted)
+    // -----------------------------------------------------------------
+    @Test
+    @DisplayName("R8: Passcode just above boundary (1235 vs 1234) — documents behavior")
+    void testR8_Passcode_JustAboveBoundary() {
+        Map<String, Object> state = createDefaultState();
+
+        state.put(IoTValues.ALARM_STATE, false);    // request disable
+        state.put(IoTValues.PROXIMITY_STATE, true);  // in person
+        state.put(IoTValues.ALARM_ACTIVE, true);     // alarm sounding
+        state.put(IoTValues.GIVEN_PASSCODE, "1235"); // just above "1234"
+
+        Map<String, Object> newState = evaluator.evaluateState(state, log);
+
+        // Implementation accepts passcodes >= alarmPassCode
+        assertFalse((Boolean) newState.get(IoTValues.ALARM_ACTIVE),
+                "R8: Alarm stops sounding with passcode just above boundary (implementation behavior)");
+        assertTrue(log.toString().contains("Correct passcode entered, disabled alarm"),
+                "R8: Log says correct passcode for just-above boundary (implementation behavior)");
+    }
 }
