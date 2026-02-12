@@ -30,61 +30,14 @@ public class STSESLtest {
         log = new StringBuffer();
     }
 
-    /**
-     * STSE requires several unrelated fields to avoid NPEs (temp/target/hvac etc.),
-     * so this baseState includes them.
-     */
-    private Map<String, Object> baseState() {
-        Map<String, Object> s = new HashMap<>();
-
-        // Required by your STSE to avoid NPEs
-        s.put(IoTValues.TEMP_READING, 70);
-        s.put(IoTValues.TARGET_TEMP, 70);
-        s.put(IoTValues.HUMIDITY_READING, 50);
-        s.put(IoTValues.HVAC_MODE, "Heater"); // must be non-null before hvacSetting.equals(...)
-
-        // Existing required states
-        s.put(IoTValues.DOOR_STATE, false);
-        s.put(IoTValues.LIGHT_STATE, false);
-        s.put(IoTValues.PROXIMITY_STATE, false);
-
-        s.put(IoTValues.ALARM_STATE, false);
-        s.put(IoTValues.ALARM_ACTIVE, false);
-        s.put(IoTValues.ALARM_PASSCODE, "1234");
-        s.put(IoTValues.GIVEN_PASSCODE, "");
-
-        s.put(IoTValues.HEATER_STATE, false);
-        s.put(IoTValues.CHILLER_STATE, false);
-        s.put(IoTValues.HUMIDIFIER_STATE, false);
-
-        // Away timer default
-        s.put(IoTValues.AWAY_TIMER, false);
-
-        // New Smart Lock defaults
-        s.put(IoTValues.LOCK_STATE, true);
-        s.put(IoTValues.KEYLESS_ENABLED, false);
-        s.put(IoTValues.AUTHORIZED_APPROACH, false);
-        s.put(IoTValues.INTRUDER_ACTIVE, false);
-        s.put(IoTValues.NIGHT_ACTIVE, false);
-
-        return s;
-    }
-
-    private void assertLogContains(String needle) {
-        String txt = log.toString().toLowerCase();
-        assertTrue(
-                txt.contains(needle.toLowerCase()),
-                "Expected log to contain: " + needle + "\nActual log:\n" + log
-        );
-    }
-
     // -------------------------------------------------------------------------
     // Backwards-compatible behavior: missing new inputs should not break anything
     // -------------------------------------------------------------------------
 
     @Test
     public void missingSmartLockInputs_defaultsToLocked_andOutputsLockState() {
-        Map<String, Object> state = baseState();
+        Map<String, Object> state = TestStateFactory.baseStateCopy();
+
 
         // Simulate legacy callers: remove all new inputs
         state.remove(IoTValues.LOCK_STATE);
@@ -105,7 +58,8 @@ public class STSESLtest {
 
     @Test
     public void keylessEnabledAndAuthorized_unlocksDoor() {
-        Map<String, Object> state = baseState();
+        Map<String, Object> state = TestStateFactory.baseStateCopy();
+
         state.put(IoTValues.LOCK_STATE, true);
         state.put(IoTValues.KEYLESS_ENABLED, true);
         state.put(IoTValues.AUTHORIZED_APPROACH, true);
@@ -113,13 +67,14 @@ public class STSESLtest {
         Map<String, Object> newState = evaluator.evaluateState(state, log);
 
         assertEquals(false, newState.get(IoTValues.LOCK_STATE), "Expected Keyless Entry to unlock.");
-        assertLogContains("keyless entry");
-        assertLogContains("unlocking");
+        LogAssertions.assertLogContains(log,"keyless entry");
+        LogAssertions.assertLogContains(log,"unlocking");
     }
 
     @Test
     public void keylessDisabled_doesNotUnlock_evenIfAuthorized() {
-        Map<String, Object> state = baseState();
+        Map<String, Object> state = TestStateFactory.baseStateCopy();
+
         state.put(IoTValues.LOCK_STATE, true);
         state.put(IoTValues.KEYLESS_ENABLED, false);
         state.put(IoTValues.AUTHORIZED_APPROACH, true);
@@ -135,7 +90,8 @@ public class STSESLtest {
 
     @Test
     public void nightActive_relocksIfUnlocked_whenNoKeylessTrigger() {
-        Map<String, Object> state = baseState();
+        Map<String, Object> state = TestStateFactory.baseStateCopy();
+
         state.put(IoTValues.LOCK_STATE, false); // unlocked
         state.put(IoTValues.NIGHT_ACTIVE, true);
         state.put(IoTValues.KEYLESS_ENABLED, false);
@@ -144,13 +100,14 @@ public class STSESLtest {
         Map<String, Object> newState = evaluator.evaluateState(state, log);
 
         assertEquals(true, newState.get(IoTValues.LOCK_STATE), "Night lock should relock when unlocked.");
-        assertLogContains("night lock");
-        assertLogContains("locking door");
+        LogAssertions.assertLogContains(log,"night lock");
+        LogAssertions.assertLogContains(log,"locking door");
     }
 
     @Test
     public void keylessOverridesNight_unlocksDuringNight_ifAuthorized() {
-        Map<String, Object> state = baseState();
+        Map<String, Object> state = TestStateFactory.baseStateCopy();
+
         state.put(IoTValues.LOCK_STATE, true); // locked
         state.put(IoTValues.NIGHT_ACTIVE, true);
         state.put(IoTValues.KEYLESS_ENABLED, true);
@@ -159,8 +116,8 @@ public class STSESLtest {
         Map<String, Object> newState = evaluator.evaluateState(state, log);
 
         assertEquals(false, newState.get(IoTValues.LOCK_STATE), "Keyless should override Night and unlock.");
-        assertLogContains("keyless entry");
-        assertLogContains("unlocking");
+        LogAssertions.assertLogContains(log,"keyless entry");
+        LogAssertions.assertLogContains(log,"unlocking");
     }
 
     // -------------------------------------------------------------------------
@@ -169,7 +126,8 @@ public class STSESLtest {
 
     @Test
     public void intruderActive_forcesLocked_evenIfKeylessAndNight() {
-        Map<String, Object> state = baseState();
+        Map<String, Object> state = TestStateFactory.baseStateCopy();
+
         state.put(IoTValues.LOCK_STATE, false); // currently unlocked
         state.put(IoTValues.INTRUDER_ACTIVE, true);
         state.put(IoTValues.NIGHT_ACTIVE, true);
@@ -179,7 +137,53 @@ public class STSESLtest {
         Map<String, Object> newState = evaluator.evaluateState(state, log);
 
         assertEquals(true, newState.get(IoTValues.LOCK_STATE), "Intruder defence must force locked.");
-        assertLogContains("possible intruder detected");
-        assertLogContains("locking door");
+        LogAssertions.assertLogContains(log,"possible intruder detected");
+        LogAssertions.assertLogContains(log,"locking door");
     }
+
+    //Chatgpt openai 5.2, 2026-02-11 : "please check these files for branch, statement and mutation coverage add tests to ensure this coverage"
+    @Test
+    public void smartLock_missingKeys_defaultsToLocked_andDoesNotCrash() {
+        Map<String, Object> state = TestStateFactory.baseStateCopy();
+
+
+        // Intentionally omit:
+        // IoTValues.LOCK_STATE, IoTValues.KEYLESS_ENABLED, IoTValues.AUTHORIZED_APPROACH,
+        // IoTValues.INTRUDER_ACTIVE, IoTValues.NIGHT_ACTIVE
+        // This kills mutants that change defaults (e.g., default unlocked) or cause NPEs.
+
+        Map<String, Object> newState = evaluator.evaluateState(state, log);
+
+        assertTrue(newState.containsKey(IoTValues.LOCK_STATE),
+                "STSE should always output a lock state once smart-lock is integrated.");
+        assertEquals(true, newState.get(IoTValues.LOCK_STATE),
+                "Expected default lock state to be LOCKED when no smart-lock inputs are provided.");
+    }
+
+    @Test
+    public void intruderActive_alreadyLocked_doesNotUnlock_andLogsAlreadyLocked() {
+        Map<String, Object> state = TestStateFactory.baseStateCopy();
+
+        state.put(IoTValues.INTRUDER_ACTIVE, true);
+        state.put(IoTValues.LOCK_STATE, true); // already locked
+        state.put(IoTValues.KEYLESS_ENABLED, true);
+        state.put(IoTValues.AUTHORIZED_APPROACH, true); // try to tempt keyless
+        state.put(IoTValues.NIGHT_ACTIVE, true);         // try to tempt night
+
+        Map<String, Object> newState = evaluator.evaluateState(state, log);
+
+        assertEquals(true, newState.get(IoTValues.LOCK_STATE),
+                "Intruder defence must keep the door locked (highest priority).");
+
+        String lower = log.toString().toLowerCase();
+        assertTrue(lower.contains("intruder"),
+                "Expected intruder messaging in log.\nLog:\n" + log);
+        assertTrue(lower.contains("already locked") || lower.contains("locking door"),
+                "Expected intruder locking/already-locked message.\nLog:\n" + log);
+
+        // Mutation-killer: ensure keyless didn't 'win'
+        assertFalse(lower.contains("keyless") && lower.contains("unlock"),
+                "Keyless must not unlock while intruder is active.\nLog:\n" + log);
+    }
+
 }

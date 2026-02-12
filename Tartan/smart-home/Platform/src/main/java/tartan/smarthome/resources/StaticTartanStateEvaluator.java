@@ -102,7 +102,7 @@ public class StaticTartanStateEvaluator implements TartanStateEvaluator {
             else {
                 log.append(formatLogEntry("Light on"));
             }        
-        } else if (lightState) {
+        } else{ // potential bug
             log.append(formatLogEntry("Light off"));
         }
 

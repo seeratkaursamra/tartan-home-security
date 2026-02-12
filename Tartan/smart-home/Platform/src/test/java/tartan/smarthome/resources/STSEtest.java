@@ -63,31 +63,6 @@ public class STSEtest {
      * Baseline state acts as a default representative of the “normal” equivalence class.
      * Each test perturbs only the variables relevant to its partition / boundary / interaction.
      */
-    private Map<String, Object> baseState() {
-        Map<String, Object> state = new HashMap<>();
-
-        state.put(IoTValues.TEMP_READING, 70);
-        state.put(IoTValues.TARGET_TEMP, 70);
-        state.put(IoTValues.HUMIDITY_READING, 40);
-
-        state.put(IoTValues.HVAC_MODE, "Heater");
-        state.put(IoTValues.HEATER_STATE, false);
-        state.put(IoTValues.CHILLER_STATE, false);
-        state.put(IoTValues.HUMIDIFIER_STATE, false);
-
-        state.put(IoTValues.PROXIMITY_STATE, true);
-        state.put(IoTValues.DOOR_STATE, false);
-        state.put(IoTValues.LIGHT_STATE, false);
-
-        state.put(IoTValues.ALARM_STATE, false);
-        state.put(IoTValues.ALARM_ACTIVE, false);
-        state.put(IoTValues.ALARM_PASSCODE, "1234");
-        state.put(IoTValues.GIVEN_PASSCODE, "");
-
-        state.put(IoTValues.AWAY_TIMER, false);
-
-        return state;
-    }
 
     // ========== LIGHT AUTOMATION TESTS ==========
 
@@ -99,7 +74,8 @@ public class STSEtest {
     public void testLightOnWhenSomeoneHome() {
         System.out.println("STSE: Testing light on when someone is home (normal operation)");
 
-        Map<String, Object> state = baseState();
+        Map<String, Object> state = TestStateFactory.baseStateCopy();
+
         state.put(IoTValues.LIGHT_STATE, true);
         state.put(IoTValues.PROXIMITY_STATE, true);
         state.put(IoTValues.ALARM_STATE, false);
@@ -118,7 +94,8 @@ public class STSEtest {
     public void testLightOnWhenVacantForcesLightOff() {
         System.out.println("STSE: Testing light forced off when vacant");
 
-        Map<String, Object> state = baseState();
+        Map<String, Object> state = TestStateFactory.baseStateCopy();
+
         state.put(IoTValues.LIGHT_STATE, true);
         state.put(IoTValues.PROXIMITY_STATE, false);
 
@@ -136,7 +113,8 @@ public class STSEtest {
     public void testAutoLightWhenArrivingHome() {
         System.out.println("STSE: Testing auto-light when arriving home");
 
-        Map<String, Object> state = baseState();
+        Map<String, Object> state = TestStateFactory.baseStateCopy();
+
         state.put(IoTValues.PROXIMITY_STATE, true);
         state.put(IoTValues.LIGHT_STATE, false);
         state.put(IoTValues.ALARM_STATE, false);
@@ -157,7 +135,8 @@ public class STSEtest {
     public void testDoorOpenWithSomeoneHome() {
         System.out.println("STSE: Testing door open with someone home (allowed)");
 
-        Map<String, Object> state = baseState();
+        Map<String, Object> state = TestStateFactory.baseStateCopy();
+
         state.put(IoTValues.DOOR_STATE, true);
         state.put(IoTValues.PROXIMITY_STATE, true);
         state.put(IoTValues.ALARM_STATE, false);
@@ -176,7 +155,8 @@ public class STSEtest {
     public void testDoorOpenVacantAlarmEnabledActivatesAlarm() {
         System.out.println("STSE: Testing door open + vacant + alarm enabled = break-in");
 
-        Map<String, Object> state = baseState();
+        Map<String, Object> state = TestStateFactory.baseStateCopy();
+
         state.put(IoTValues.DOOR_STATE, true);
         state.put(IoTValues.PROXIMITY_STATE, false);
         state.put(IoTValues.ALARM_STATE, true);
@@ -195,7 +175,8 @@ public class STSEtest {
     public void testDoorOpenVacantAlarmDisabledClosesDoor() {
         System.out.println("STSE: Testing door open + vacant + alarm disabled = close door");
 
-        Map<String, Object> state = baseState();
+        Map<String, Object> state = TestStateFactory.baseStateCopy();
+
         state.put(IoTValues.DOOR_STATE, true);
         state.put(IoTValues.PROXIMITY_STATE, false);
         state.put(IoTValues.ALARM_STATE, false);
@@ -214,7 +195,8 @@ public class STSEtest {
     public void testBreakInViaClosedDoor() {
         System.out.println("STSE: Testing break-in detection via closed door");
 
-        Map<String, Object> state = baseState();
+        Map<String, Object> state = TestStateFactory.baseStateCopy();
+
         state.put(IoTValues.DOOR_STATE, false);
         state.put(IoTValues.PROXIMITY_STATE, true);
         state.put(IoTValues.ALARM_STATE, true);
@@ -236,11 +218,14 @@ public class STSEtest {
     public void testAwayTimerAutolockForcesSecureState() {
         System.out.println("STSE: Testing away timer autolock");
 
-        Map<String, Object> state = baseState();
+        Map<String, Object> state = TestStateFactory.baseStateCopy();
+
         state.put(IoTValues.AWAY_TIMER, true);
         state.put(IoTValues.LIGHT_STATE, true);
         state.put(IoTValues.DOOR_STATE, true);
         state.put(IoTValues.ALARM_STATE, false);
+        state.put(IoTValues.PROXIMITY_STATE, true);
+
 
         Map<String, Object> newState = evaluator.evaluateState(state, log);
 
@@ -260,7 +245,8 @@ public class STSEtest {
     public void testCannotDisableAlarmWhenVacant() {
         System.out.println("STSE: Testing cannot disable alarm when house is vacant");
 
-        Map<String, Object> state = baseState();
+        Map<String, Object> state = TestStateFactory.baseStateCopy();
+
         state.put(IoTValues.PROXIMITY_STATE, false);
         state.put(IoTValues.ALARM_STATE, false);
         state.put(IoTValues.ALARM_ACTIVE, false);
@@ -279,7 +265,8 @@ public class STSEtest {
     public void testAlarmActiveInvalidPasscodeKeepsAlarmEnabled() {
         System.out.println("STSE: Testing invalid passcode keeps alarm active");
 
-        Map<String, Object> state = baseState();
+        Map<String, Object> state = TestStateFactory.baseStateCopy();
+
         state.put(IoTValues.PROXIMITY_STATE, true);
         state.put(IoTValues.ALARM_STATE, false);
         state.put(IoTValues.ALARM_ACTIVE, true);
@@ -301,7 +288,8 @@ public class STSEtest {
     public void testAlarmActiveValidPasscodeDisablesAlarmActive() {
         System.out.println("STSE: Testing valid passcode disables alarm");
 
-        Map<String, Object> state = baseState();
+        Map<String, Object> state = TestStateFactory.baseStateCopy();
+
         state.put(IoTValues.PROXIMITY_STATE, true);
         state.put(IoTValues.ALARM_STATE, false);
         state.put(IoTValues.ALARM_ACTIVE, true);
@@ -324,7 +312,8 @@ public class STSEtest {
     public void testACTurnsOnWhenTempAboveTarget() {
         System.out.println("STSE: Testing AC turns on when temperature above target");
 
-        Map<String, Object> state = baseState();
+        Map<String, Object> state = TestStateFactory.baseStateCopy();
+
         state.put(IoTValues.TEMP_READING, 75);
         state.put(IoTValues.TARGET_TEMP, 70);
         state.put(IoTValues.HVAC_MODE, "Chiller");
@@ -346,7 +335,8 @@ public class STSEtest {
     public void testSwitchingFromHeaterToChiller() {
         System.out.println("STSE: Testing switch from Heater to Chiller mode");
 
-        Map<String, Object> state = baseState();
+        Map<String, Object> state = TestStateFactory.baseStateCopy();
+
         state.put(IoTValues.TEMP_READING, 75);
         state.put(IoTValues.TARGET_TEMP, 70);
         state.put(IoTValues.HVAC_MODE, "Chiller");
@@ -369,7 +359,8 @@ public class STSEtest {
     public void testHeaterTurnsOnWhenTempBelowTarget() {
         System.out.println("STSE: Testing heater turns on when temperature below target");
 
-        Map<String, Object> state = baseState();
+        Map<String, Object> state = TestStateFactory.baseStateCopy();
+
         state.put(IoTValues.TEMP_READING, 65);
         state.put(IoTValues.TARGET_TEMP, 72);
         state.put(IoTValues.HVAC_MODE, "Heater");
@@ -393,7 +384,8 @@ public class STSEtest {
     public void testChillerStateNullHandledByElseBranch() {
         System.out.println("STSE: Testing chillerState null is handled");
 
-        Map<String, Object> state = baseState();
+        Map<String, Object> state = TestStateFactory.baseStateCopy();
+
         state.put(IoTValues.TEMP_READING, 70);
         state.put(IoTValues.TARGET_TEMP, 70);
         state.put(IoTValues.HVAC_MODE, "Heater");
@@ -414,7 +406,8 @@ public class STSEtest {
     public void testProximityStateStartsAwayTimer() {
         System.out.println("STSE: Testing away timer starts when house becomes vacant");
 
-        Map<String, Object> state = baseState();
+        Map<String, Object> state = TestStateFactory.baseStateCopy();
+
         state.put(IoTValues.PROXIMITY_STATE, false);
         state.put(IoTValues.AWAY_TIMER, false);
 
@@ -429,7 +422,8 @@ public class STSEtest {
      */
     @Test
     public void testHeaterModeDisablesRunningChiller() {
-        Map<String, Object> state = baseState();
+        Map<String, Object> state = TestStateFactory.baseStateCopy();
+
         state.put(IoTValues.HVAC_MODE, "Heater");
         state.put(IoTValues.HEATER_STATE, true);
         state.put(IoTValues.CHILLER_STATE, true);
@@ -448,7 +442,8 @@ public class STSEtest {
      */
     @Test
     public void testChillerModeDisablesRunningHeater() {
-        Map<String, Object> state = baseState();
+        Map<String, Object> state = TestStateFactory.baseStateCopy();
+
         state.put(IoTValues.HVAC_MODE, "Chiller");
         state.put(IoTValues.CHILLER_STATE, true);
         state.put(IoTValues.HEATER_STATE, true);
@@ -469,7 +464,8 @@ public class STSEtest {
     public void testDoorClosedNormalConditionLogsClosed() {
         System.out.println("STSE: Testing door closed normal condition");
 
-        Map<String, Object> state = baseState();
+        Map<String, Object> state = TestStateFactory.baseStateCopy();
+
         state.put(IoTValues.DOOR_STATE, false);
         state.put(IoTValues.PROXIMITY_STATE, true);
         state.put(IoTValues.ALARM_STATE, false);
@@ -487,7 +483,8 @@ public class STSEtest {
     public void testProximityHomeLightAlreadyOnNoAutoLight() {
         System.out.println("STSE: Testing no auto-light when light already on");
 
-        Map<String, Object> state = baseState();
+        Map<String, Object> state = TestStateFactory.baseStateCopy();
+
         state.put(IoTValues.PROXIMITY_STATE, true);
         state.put(IoTValues.LIGHT_STATE, true);
         state.put(IoTValues.ALARM_STATE, false);
@@ -506,7 +503,8 @@ public class STSEtest {
     public void testProximityHomeAlarmEnabledNoAutoLight() {
         System.out.println("STSE: Testing no auto-light when alarm is enabled");
 
-        Map<String, Object> state = baseState();
+        Map<String, Object> state = TestStateFactory.baseStateCopy();
+
         state.put(IoTValues.PROXIMITY_STATE, true);
         state.put(IoTValues.LIGHT_STATE, false);
         state.put(IoTValues.ALARM_STATE, true);
@@ -525,7 +523,8 @@ public class STSEtest {
     public void testAlarmActiveEmptyPasscodeFallsToElseBranch() {
         System.out.println("STSE: Testing alarm active with empty passcode (hits else branch)");
 
-        Map<String, Object> state = baseState();
+        Map<String, Object> state = TestStateFactory.baseStateCopy();
+
         state.put(IoTValues.PROXIMITY_STATE, true);
         state.put(IoTValues.ALARM_STATE, false);
         state.put(IoTValues.ALARM_ACTIVE, true);
@@ -545,7 +544,8 @@ public class STSEtest {
     public void testChillerAlreadyOnWhenTempAboveTarget() {
         System.out.println("STSE: Testing chiller already on, no redundant activation");
 
-        Map<String, Object> state = baseState();
+        Map<String, Object> state = TestStateFactory.baseStateCopy();
+
         state.put(IoTValues.TEMP_READING, 80);
         state.put(IoTValues.TARGET_TEMP, 70);
         state.put(IoTValues.HVAC_MODE, "Chiller");
@@ -566,7 +566,8 @@ public class STSEtest {
     public void testDoorOpenSomeoneHomeAlarmEnabled() {
         System.out.println("STSE: Testing door open with someone home and alarm enabled");
 
-        Map<String, Object> state = baseState();
+        Map<String, Object> state = TestStateFactory.baseStateCopy();
+
         state.put(IoTValues.DOOR_STATE, true);
         state.put(IoTValues.PROXIMITY_STATE, true);
         state.put(IoTValues.ALARM_STATE, true);
@@ -586,7 +587,8 @@ public class STSEtest {
     public void testTempEqualsTargetNoHVACNeeded() {
         System.out.println("STSE: Testing temp equals target, no HVAC needed");
 
-        Map<String, Object> state = baseState();
+        Map<String, Object> state = TestStateFactory.baseStateCopy();
+
         state.put(IoTValues.TEMP_READING, 70);
         state.put(IoTValues.TARGET_TEMP, 70);
         state.put(IoTValues.HVAC_MODE, "Heater");
