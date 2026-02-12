@@ -44,6 +44,11 @@ public class StaticTartanStateEvaluator implements TartanStateEvaluator {
         String alarmPassCode = null;
         String hvacSetting = null; // the HVAC mode setting, either Heater or Chiller
         String givenPassCode = "";
+        Boolean lockState = null;
+        Boolean nightLockEnabled = null;
+        Integer nightLockStart = null;
+        Integer nightLockEnd = null;
+        Integer currentHour = null;
 
         System.out.println("Evaluating new state statically");
 
@@ -81,6 +86,16 @@ public class StaticTartanStateEvaluator implements TartanStateEvaluator {
                 awayTimerState = (Boolean) inState.getOrDefault(key, false);
              } else if (key.equals(IoTValues.ALARM_ACTIVE)) {
                 alarmActiveState = (Boolean) inState.get(key);
+            } else if (key.equals(IoTValues.LOCK_STATE)) {
+                lockState = (Boolean) inState.get(key);
+            } else if (key.equals(IoTValues.NIGHT_LOCK_ENABLED)) {
+                nightLockEnabled = (Boolean) inState.get(key);
+            } else if (key.equals(IoTValues.NIGHT_LOCK_START)) {
+                nightLockStart = (Integer) inState.get(key);
+            } else if (key.equals(IoTValues.NIGHT_LOCK_END)) {
+                nightLockEnd = (Integer) inState.get(key);
+            } else if (key.equals(IoTValues.CURRENT_HOUR)) {
+                currentHour = (Integer) inState.get(key);
             }
         }
 
@@ -200,7 +215,24 @@ public class StaticTartanStateEvaluator implements TartanStateEvaluator {
             log.append(formatLogEntry("Warning: Not enough information to evaluate alarm"));
         }
 
-       
+        // Night Lock — auto-lock the door during configured night hours
+        if (nightLockEnabled != null && nightLockEnabled
+                && nightLockStart != null && nightLockEnd != null
+                && currentHour != null && lockState != null) {
+            boolean isNight;
+            if (nightLockStart > nightLockEnd) {  // crosses midnight
+                isNight = (currentHour >= nightLockStart || currentHour < nightLockEnd);
+            } else {
+                isNight = (currentHour >= nightLockStart && currentHour < nightLockEnd);
+            }
+            if (isNight) {
+                if (!lockState) {
+                    lockState = true;
+                    log.append(formatLogEntry("Night Lock: Door locked automatically during night hours"));
+                }
+            }
+        }
+
         // Is the heater needed?
         if (tempReading < targetTempSetting) {
             log.append(formatLogEntry("Turning on heater, target temperature = " + targetTempSetting
@@ -275,7 +307,10 @@ public class StaticTartanStateEvaluator implements TartanStateEvaluator {
         newState.put(IoTValues.HVAC_MODE, hvacSetting);
         newState.put(IoTValues.ALARM_PASSCODE, alarmPassCode);
         newState.put(IoTValues.GIVEN_PASSCODE, givenPassCode);
-        
+        if (lockState != null) {
+            newState.put(IoTValues.LOCK_STATE, lockState);
+        }
+
         return newState; 
     }
 }
