@@ -9,6 +9,18 @@ import tartan.smarthome.resources.iotcontroller.IoTValues;
 
 public class StaticTartanStateEvaluator implements TartanStateEvaluator {
 
+    /**
+     * Determine if the given hour falls within the night window.
+     * Supports midnight-crossing (e.g., start=22, end=6).
+     */
+    boolean isNightTime(int currentHour, int nightStart, int nightEnd) {
+        if (nightStart > nightEnd) {
+            return currentHour >= nightStart || currentHour < nightEnd;
+        } else {
+            return currentHour >= nightStart && currentHour < nightEnd;
+        }
+    }
+
     private String formatLogEntry(String entry) {
         Long timeStamp = System.currentTimeMillis();
         SimpleDateFormat sdf = new SimpleDateFormat("MMM dd,yyyy HH:mm");
@@ -219,13 +231,7 @@ public class StaticTartanStateEvaluator implements TartanStateEvaluator {
         if (nightLockEnabled != null && nightLockEnabled
                 && nightLockStart != null && nightLockEnd != null
                 && currentHour != null && lockState != null) {
-            boolean isNight;
-            if (nightLockStart > nightLockEnd) {  // crosses midnight
-                isNight = (currentHour >= nightLockStart || currentHour < nightLockEnd);
-            } else {
-                isNight = (currentHour >= nightLockStart && currentHour < nightLockEnd);
-            }
-            if (isNight) {
+            if (isNightTime(currentHour, nightLockStart, nightLockEnd)) {
                 if (!lockState) {
                     lockState = true;
                     log.append(formatLogEntry("Night Lock: Door locked automatically during night hours"));
