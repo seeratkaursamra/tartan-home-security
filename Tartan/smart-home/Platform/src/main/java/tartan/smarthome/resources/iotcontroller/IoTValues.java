@@ -68,7 +68,7 @@ public abstract class IoTValues {
 	public static final String AWAY_TIMER = "AW";
 
     // Night Lock feature
-    public static final String LOCK_STATE = "LKS";
+    public static final String LOCK_STATE = "lockState";
     public static final String NIGHT_LOCK_ENABLED = "NLE";
     public static final String NIGHT_LOCK_START = "NLS";
     public static final String NIGHT_LOCK_END = "NLEND";
