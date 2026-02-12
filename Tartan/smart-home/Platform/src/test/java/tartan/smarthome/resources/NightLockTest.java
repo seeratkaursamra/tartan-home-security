@@ -121,4 +121,51 @@ public class NightLockTest {
         assertFalse(log.toString().contains("Night Lock"),
                 "Night Lock FAILED: No Night Lock log expected when feature is disabled");
     }
+
+    // ---- Cycle 5: Midnight crossing ----
+
+    @Test
+    @DisplayName("Night Lock: Midnight crossing — hour 23, start=22, end=6 → locked")
+    void testNightLock_MidnightCrossing_Hour23_Locked() {
+        Map<String, Object> state = createDefaultState();
+        state.put(IoTValues.NIGHT_LOCK_START, 22);
+        state.put(IoTValues.NIGHT_LOCK_END, 6);
+        state.put(IoTValues.LOCK_STATE, false);
+        state.put(IoTValues.CURRENT_HOUR, 23);
+
+        Map<String, Object> newState = evaluator.evaluateState(state, log);
+
+        assertTrue((Boolean) newState.get(IoTValues.LOCK_STATE),
+                "Night Lock FAILED: Hour 23 should be night when start=22, end=6");
+    }
+
+    @Test
+    @DisplayName("Night Lock: Midnight crossing — hour 3, start=22, end=6 → locked")
+    void testNightLock_MidnightCrossing_Hour3_Locked() {
+        Map<String, Object> state = createDefaultState();
+        state.put(IoTValues.NIGHT_LOCK_START, 22);
+        state.put(IoTValues.NIGHT_LOCK_END, 6);
+        state.put(IoTValues.LOCK_STATE, false);
+        state.put(IoTValues.CURRENT_HOUR, 3);
+
+        Map<String, Object> newState = evaluator.evaluateState(state, log);
+
+        assertTrue((Boolean) newState.get(IoTValues.LOCK_STATE),
+                "Night Lock FAILED: Hour 3 should be night when start=22, end=6");
+    }
+
+    @Test
+    @DisplayName("Night Lock: Midnight crossing — hour 7, start=22, end=6 → NOT locked")
+    void testNightLock_MidnightCrossing_Hour7_NotLocked() {
+        Map<String, Object> state = createDefaultState();
+        state.put(IoTValues.NIGHT_LOCK_START, 22);
+        state.put(IoTValues.NIGHT_LOCK_END, 6);
+        state.put(IoTValues.LOCK_STATE, false);
+        state.put(IoTValues.CURRENT_HOUR, 7);
+
+        Map<String, Object> newState = evaluator.evaluateState(state, log);
+
+        assertFalse((Boolean) newState.get(IoTValues.LOCK_STATE),
+                "Night Lock FAILED: Hour 7 should NOT be night when start=22, end=6");
+    }
 }
