@@ -86,4 +86,21 @@ public class NightLockTest {
         assertTrue((Boolean) newState.get(IoTValues.LOCK_STATE),
                 "Night Lock FAILED: Unlocked door should be re-locked during night");
     }
+
+    // ---- Cycle 3: Daytime — no forced lock ----
+
+    @Test
+    @DisplayName("Night Lock: During day, unlocked door stays unlocked")
+    void testNightLock_DuringDay_DoesNotForceLock() {
+        Map<String, Object> state = createDefaultState();
+        state.put(IoTValues.LOCK_STATE, false);      // unlocked
+        state.put(IoTValues.CURRENT_HOUR, 12);       // noon — daytime
+
+        Map<String, Object> newState = evaluator.evaluateState(state, log);
+
+        assertFalse((Boolean) newState.get(IoTValues.LOCK_STATE),
+                "Night Lock FAILED: Door should stay unlocked during daytime");
+        assertFalse(log.toString().contains("Night Lock"),
+                "Night Lock FAILED: No Night Lock log entry expected during daytime");
+    }
 }
