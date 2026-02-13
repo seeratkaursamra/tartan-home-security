@@ -26,9 +26,27 @@ import tartan.smarthome.resources.iotcontroller.IoTValues;
  * This was written with completion assistance from claude Sonnet 4.5, 2026-01-24
  *  - claudes input was mainly used as bug testing - why doesn't this work type questions
  *  - and to clean the documentation
+ *
+ *  Openai chatgpt 5.2, 2026-02-10 "Please add comments on how this test adheres to black and white box testing
+ *
+ * BLACK-BOX DESIGN (rule-level):
+ * - Equivalence Classes (ECP) over the relevant inputs:
+ *   - hvacSetting ∈ {"Heater", "Chiller"} (and implicitly: other modes are irrelevant to R10 here)
+ *   - humidifierState ∈ {true, false}
+ *   - heaterOnState/chillerOnState ∈ {true, false}
+ * - Rule interaction scenarios:
+ *   - HVAC mode selection interacts with the dehumidifier constraint:
+ *       * In "Heater" mode: dehumidifier must be forced OFF.
+ *       * In "Chiller" mode: dehumidifier may remain ON.
+ *
+ * WHITE-BOX INTENT (code-coverage guided):
+ * - Target branches in StaticTartanStateEvaluator.evaluateState():
+ *   - hvacSetting.equals("Heater") path forces humidifierState = false.
+ *   - humidifierState && hvacSetting.equals("Chiller") path logs "Enabled Dehumidifier".
+ *   - else branch logs "Automatically disabled dehumidifier when running heater".
+
  */
 public class Rule10Test {
-
     private StaticTartanStateEvaluator evaluator;
     private StringBuffer log;
 
@@ -39,23 +57,23 @@ public class Rule10Test {
     }
 
     /**
-     * Test Case 1: When heater is turned ON, dehumidifier should be turned OFF
+     * TC1 (ECP + WB branch): Heater mode + humidifier ON request.
      *
-     * Setup:
-     * - Set HVAC mode to "Heater"
-     * - Set heater state to ON
-     * - Set humidifier state to ON (attempting to run both)
+     * BLACK-BOX:
+     * - Class: hvacSetting="Heater" with humidifierState=true (invalid combination by spec).
+     * - Oracle: humidifier must be false in evaluated state.
      *
-     * Expected Result:
-     * - Humidifier state should be OFF in the returned state
+     * WHITE-BOX:
+     * - Exercises hvacSetting.equals("Heater") branch (forces humidifierState=false).
+     * - Also hits the dehumidifier enforcement else-branch that logs
+     *   "Automatically disabled dehumidifier when running heater".
      */
     @Test
     public void testHeaterOnForcesDehumidifierOff() {
-        // Arrange: Create initial state with heater ON and humidifier ON
         Map<String, Object> state = new HashMap<>();
         state.put(IoTValues.HVAC_MODE, "Heater");
         state.put(IoTValues.HEATER_STATE, true);
-        state.put(IoTValues.HUMIDIFIER_STATE, true);  // Try to turn on humidifier
+        state.put(IoTValues.HUMIDIFIER_STATE, true);
         state.put(IoTValues.CHILLER_STATE, false);
         state.put(IoTValues.TEMP_READING, 60);
         state.put(IoTValues.TARGET_TEMP, 70);
@@ -70,7 +88,6 @@ public class Rule10Test {
 
         assertFalse((Boolean) newState.get(IoTValues.HUMIDIFIER_STATE),
                 "Humidifier should be OFF when heater is ON");
-
         assertTrue((Boolean) newState.get(IoTValues.HEATER_STATE),
                 "Heater should remain ON");
 
@@ -79,23 +96,22 @@ public class Rule10Test {
     }
 
     /**
-     * Test Case 2: When humidifier is ON and heater is requested, humidifier turns OFF
+     * TC2 (ECP + interaction): Heater becomes needed (temp < target) while humidifier is ON.
      *
-     * Setup:
-     * - Temperature reading below target (heater will turn on)
-     * - Humidifier is initially ON
+     * BLACK-BOX:
+     * - Class: temp < target implies heating behavior; with humidifier initially ON.
+     * - Oracle: heater ON, humidifier forced OFF (R10).
      *
-     * Expected Result:
-     * - Heater should turn ON
-     * - Humidifier should be turned OFF
+     * WHITE-BOX:
+     * - Exercises tempReading < targetTempSetting path that sets heaterOnState=true.
+     * - Then exercises heater-mode enforcement that disables humidifierState.
      */
     @Test
     public void testHeaterActivationDisablesHumidifier() {
-        // Arrange: Create state where heater will activate
         Map<String, Object> state = new HashMap<>();
         state.put(IoTValues.TEMP_READING, 65);
-        state.put(IoTValues.TARGET_TEMP, 72);  // Target higher than current
-        state.put(IoTValues.HUMIDIFIER_STATE, true);  // Humidifier initially ON
+        state.put(IoTValues.TARGET_TEMP, 72);
+        state.put(IoTValues.HUMIDIFIER_STATE, true);
         state.put(IoTValues.HVAC_MODE, "Heater");
         state.put(IoTValues.HEATER_STATE, false);
         state.put(IoTValues.CHILLER_STATE, false);
@@ -115,23 +131,22 @@ public class Rule10Test {
     }
 
     /**
-     * Test Case 3: Dehumidifier CAN run with chiller (AC), but NOT with heater
+     * TC3 (ECP + WB branch): Chiller mode allows dehumidifier.
      *
-     * Setup:
-     * - HVAC mode set to "Chiller"
-     * - Chiller (AC) is ON
-     * - Humidifier is ON
+     * BLACK-BOX:
+     * - Class: hvacSetting="Chiller" with humidifierState=true (allowed combination).
+     * - Oracle: humidifier remains true.
      *
-     * Expected Result:
-     * - Humidifier should remain ON (allowed with chiller)
+     * WHITE-BOX:
+     * - Exercises humidifierState && hvacSetting.equals("Chiller") branch,
+     *   which logs "Enabled Dehumidifier".
      */
     @Test
     public void testDehumidifierCanRunWithChiller() {
-        // Arrange: Create state with chiller ON and humidifier ON
         Map<String, Object> state = new HashMap<>();
         state.put(IoTValues.HVAC_MODE, "Chiller");
         state.put(IoTValues.CHILLER_STATE, true);
-        state.put(IoTValues.HUMIDIFIER_STATE, true);  // Should be allowed with AC
+        state.put(IoTValues.HUMIDIFIER_STATE, true);
         state.put(IoTValues.HEATER_STATE, false);
         state.put(IoTValues.TEMP_READING, 75);
         state.put(IoTValues.TARGET_TEMP, 70);
@@ -146,7 +161,6 @@ public class Rule10Test {
 
         assertTrue((Boolean) newState.get(IoTValues.HUMIDIFIER_STATE),
                 "Humidifier should be ON when chiller is ON");
-
         assertTrue((Boolean) newState.get(IoTValues.CHILLER_STATE),
                 "Chiller should remain ON");
 
@@ -155,23 +169,23 @@ public class Rule10Test {
     }
 
     /**
-     * Test Case 4: Switching from Chiller to Heater disables humidifier
+     * TC4 (interaction regression): "switching" scenario (represented by requesting Heater mode
+     * while humidifier was ON previously).
      *
-     * Setup:
-     * - Initially in Chiller mode with humidifier ON
-     * - Switch to Heater mode
+     * BLACK-BOX:
+     * - Class: heater-mode requested with humidifierState=true.
+     * - Oracle: humidifier forced OFF.
      *
-     * Expected Result:
-     * - Humidifier should be turned OFF when switching to Heater
+     * WHITE-BOX:
+     * - Exercises the same heater-mode enforcement branch, but framed as a mode-change scenario.
      */
     @Test
     public void testSwitchingToHeaterDisablesHumidifier() {
-        // Arrange: Start with chiller and humidifier ON
         Map<String, Object> state = new HashMap<>();
-        state.put(IoTValues.HVAC_MODE, "Heater");  // Switching to heater
+        state.put(IoTValues.HVAC_MODE, "Heater");
         state.put(IoTValues.HEATER_STATE, true);
         state.put(IoTValues.CHILLER_STATE, false);
-        state.put(IoTValues.HUMIDIFIER_STATE, true);  // Was ON with chiller
+        state.put(IoTValues.HUMIDIFIER_STATE, true);
         state.put(IoTValues.TEMP_READING, 65);
         state.put(IoTValues.TARGET_TEMP, 72);
         state.put(IoTValues.PROXIMITY_STATE, true);

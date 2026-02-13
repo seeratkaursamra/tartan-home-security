@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="tartan.smarthome.resources.STSEtest" tests="25" skipped="0" failures="0" errors="0" timestamp="2026-02-13T05:03:15" hostname="Abdulrahmans-MacBook-Air-2.local" time="0.025">
+  <properties/>
+  <testcase name="testDoorOpenWithSomeoneHome()" classname="tartan.smarthome.resources.STSEtest" time="0.0"/>
+  <testcase name="testChillerStateNullHandledByElseBranch()" classname="tartan.smarthome.resources.STSEtest" time="0.001"/>
+  <testcase name="testSwitchingFromHeaterToChiller()" classname="tartan.smarthome.resources.STSEtest" time="0.0"/>
+  <testcase name="testDoorClosedNormalConditionLogsClosed()" classname="tartan.smarthome.resources.STSEtest" time="0.001"/>
+  <testcase name="testBreakInViaClosedDoor()" classname="tartan.smarthome.resources.STSEtest" time="0.0"/>
+  <testcase name="testDoorOpenSomeoneHomeAlarmEnabled()" classname="tartan.smarthome.resources.STSEtest" time="0.001"/>
+  <testcase name="testProximityStateStartsAwayTimer()" classname="tartan.smarthome.resources.STSEtest" time="0.001"/>
+  <testcase name="testHeaterModeDisablesRunningChiller()" classname="tartan.smarthome.resources.STSEtest" time="0.001"/>
+  <testcase name="testAutoLightWhenArrivingHome()" classname="tartan.smarthome.resources.STSEtest" time="0.0"/>
+  <testcase name="testLightOnWhenVacantForcesLightOff()" classname="tartan.smarthome.resources.STSEtest" time="0.001"/>
+  <testcase name="testDoorOpenVacantAlarmDisabledClosesDoor()" classname="tartan.smarthome.resources.STSEtest" time="0.0"/>
+  <testcase name="testAwayTimerAutolockForcesSecureState()" classname="tartan.smarthome.resources.STSEtest" time="0.001"/>
+  <testcase name="testChillerModeDisablesRunningHeater()" classname="tartan.smarthome.resources.STSEtest" time="0.0"/>
+  <testcase name="testChillerAlreadyOnWhenTempAboveTarget()" classname="tartan.smarthome.resources.STSEtest" time="0.0"/>
+  <testcase name="testACTurnsOnWhenTempAboveTarget()" classname="tartan.smarthome.resources.STSEtest" time="0.001"/>
+  <testcase name="testDoorOpenVacantAlarmEnabledActivatesAlarm()" classname="tartan.smarthome.resources.STSEtest" time="0.001"/>
+  <testcase name="testAlarmActiveValidPasscodeDisablesAlarmActive()" classname="tartan.smarthome.resources.STSEtest" time="0.0"/>
+  <testcase name="testAlarmActiveInvalidPasscodeKeepsAlarmEnabled()" classname="tartan.smarthome.resources.STSEtest" time="0.0"/>
+  <testcase name="testCannotDisableAlarmWhenVacant()" classname="tartan.smarthome.resources.STSEtest" time="0.0"/>
+  <testcase name="testLightOnWhenSomeoneHome()" classname="tartan.smarthome.resources.STSEtest" time="0.001"/>
+  <testcase name="testTempEqualsTargetNoHVACNeeded()" classname="tartan.smarthome.resources.STSEtest" time="0.001"/>
+  <testcase name="testHeaterTurnsOnWhenTempBelowTarget()" classname="tartan.smarthome.resources.STSEtest" time="0.001"/>
+  <testcase name="testAlarmActiveEmptyPasscodeFallsToElseBranch()" classname="tartan.smarthome.resources.STSEtest" time="0.001"/>
+  <testcase name="testProximityHomeAlarmEnabledNoAutoLight()" classname="tartan.smarthome.resources.STSEtest" time="0.0"/>
+  <testcase name="testProximityHomeLightAlreadyOnNoAutoLight()" classname="tartan.smarthome.resources.STSEtest" time="0.003"/>
+  <system-out><![CDATA[STSE: Testing door open with someone home (allowed)
+Evaluating new state statically
+STSE: Testing chillerState null is handled
+Evaluating new state statically
+STSE: Testing switch from Heater to Chiller mode
+Evaluating new state statically
+STSE: Testing door closed normal condition
+Evaluating new state statically
+STSE: Testing break-in detection via closed door
+Evaluating new state statically
+STSE: Testing door open with someone home and alarm enabled
+Evaluating new state statically
+STSE: Testing away timer starts when house becomes vacant
+Evaluating new state statically
+Evaluating new state statically
+STSE: Testing auto-light when arriving home
+Evaluating new state statically
+STSE: Testing light forced off when vacant
+Evaluating new state statically
+STSE: Testing door open + vacant + alarm disabled = close door
+Evaluating new state statically
+STSE: Testing away timer autolock
+Evaluating new state statically
+Evaluating new state statically
+STSE: Testing chiller already on, no redundant activation
+Evaluating new state statically
+STSE: Testing AC turns on when temperature above target
+Evaluating new state statically
+STSE: Testing door open + vacant + alarm enabled = break-in
+Evaluating new state statically
+STSE: Testing valid passcode disables alarm
+Evaluating new state statically
+STSE: Testing invalid passcode keeps alarm active
+Evaluating new state statically
+STSE: Testing cannot disable alarm when house is vacant
+Evaluating new state statically
+STSE: Testing light on when someone is home (normal operation)
+Evaluating new state statically
+STSE: Testing temp equals target, no HVAC needed
+Evaluating new state statically
+STSE: Testing heater turns on when temperature below target
+Evaluating new state statically
+STSE: Testing alarm active with empty passcode (hits else branch)
+Evaluating new state statically
+STSE: Testing no auto-light when alarm is enabled
+Evaluating new state statically
+STSE: Testing no auto-light when light already on
+Evaluating new state statically
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

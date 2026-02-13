@@ -56,89 +56,83 @@ import tartan.smarthome.resources.iotcontroller.IoTValues;
 <span class="fc" id="L56">        String alarmPassCode = null;</span>
 <span class="fc" id="L57">        String hvacSetting = null; // the HVAC mode setting, either Heater or Chiller</span>
 <span class="fc" id="L58">        String givenPassCode = &quot;&quot;;</span>
-<span class="fc" id="L59">        Boolean lockState = null;</span>
-<span class="fc" id="L60">        Boolean nightLockEnabled = null;</span>
-<span class="fc" id="L61">        Integer nightLockStart = null;</span>
-<span class="fc" id="L62">        Integer nightLockEnd = null;</span>
-<span class="fc" id="L63">        Integer currentHour = null;</span>
 
-<span class="fc" id="L65">        System.out.println(&quot;Evaluating new state statically&quot;);</span>
+        //again more behaviour for keylessentry
+        // this one will have defaults to hopefully not cause any errors or require a refactor
+<span class="fc" id="L62">        Boolean lockState = (Boolean) inState.getOrDefault(IoTValues.LOCK_STATE, true);</span>
+<span class="fc" id="L63">        Boolean keylessEnabled = (Boolean) inState.getOrDefault(IoTValues.KEYLESS_ENABLED, false);</span>
+<span class="fc" id="L64">        Boolean authorizedApproach = (Boolean) inState.getOrDefault(IoTValues.AUTHORIZED_APPROACH, false);</span>
+<span class="fc" id="L65">        Boolean intruderActive = (Boolean) inState.getOrDefault(IoTValues.INTRUDER_ACTIVE, false);</span>
+<span class="fc" id="L66">        Boolean nightActive = (Boolean) inState.getOrDefault(IoTValues.NIGHT_ACTIVE, false);</span>
 
-<span class="fc" id="L67">        Set&lt;String&gt; keys = inState.keySet();</span>
-<span class="fc bfc" id="L68" title="All 2 branches covered.">        for (String key : keys) {</span>
 
-<span class="fc bfc" id="L70" title="All 2 branches covered.">            if (key.equals(IoTValues.TEMP_READING)) {</span>
-<span class="fc" id="L71">                tempReading = (Integer) inState.get(key);</span>
-<span class="fc bfc" id="L72" title="All 2 branches covered.">            } else if (key.equals(IoTValues.HUMIDITY_READING)) {</span>
-<span class="fc" id="L73">                humidityReading = (Integer) inState.get(key);</span>
-<span class="fc bfc" id="L74" title="All 2 branches covered.">            } else if (key.equals(IoTValues.TARGET_TEMP)) {</span>
-<span class="fc" id="L75">                targetTempSetting = (Integer) inState.get(key);</span>
-<span class="fc bfc" id="L76" title="All 2 branches covered.">            } else if (key.equals(IoTValues.HUMIDIFIER_STATE)) {</span>
-<span class="fc" id="L77">                humidifierState = (Boolean) inState.get(key);</span>
-<span class="fc bfc" id="L78" title="All 2 branches covered.">            } else if (key.equals(IoTValues.DOOR_STATE)) {</span>
-<span class="fc" id="L79">                doorState = (Boolean) inState.get(key);</span>
-<span class="fc bfc" id="L80" title="All 2 branches covered.">            } else if (key.equals(IoTValues.LIGHT_STATE)) {</span>
-<span class="fc" id="L81">                lightState = (Boolean) inState.get(key);</span>
-<span class="fc bfc" id="L82" title="All 2 branches covered.">            } else if (key.equals(IoTValues.PROXIMITY_STATE)) {</span>
-<span class="fc" id="L83">                proximityState = (Boolean) inState.get(key);</span>
-<span class="fc bfc" id="L84" title="All 2 branches covered.">            } else if (key.equals(IoTValues.ALARM_STATE)) {</span>
-<span class="fc" id="L85">                alarmState = (Boolean) inState.get(key);</span>
-<span class="fc bfc" id="L86" title="All 2 branches covered.">            } else if (key.equals(IoTValues.HEATER_STATE)) {</span>
-<span class="fc" id="L87">                heaterOnState = (Boolean) inState.get(key);</span>
-<span class="fc bfc" id="L88" title="All 2 branches covered.">            } else if (key.equals(IoTValues.CHILLER_STATE)) {</span>
-<span class="fc" id="L89">                chillerOnState = (Boolean) inState.get(key);</span>
-<span class="fc bfc" id="L90" title="All 2 branches covered.">            } else if (key.equals(IoTValues.HVAC_MODE)) {</span>
-<span class="fc" id="L91">                hvacSetting = (String) inState.get(key);</span>
-<span class="fc bfc" id="L92" title="All 2 branches covered.">            } else if (key.equals(IoTValues.ALARM_PASSCODE)) {</span>
-<span class="fc" id="L93">                alarmPassCode = (String) inState.get(key);</span>
-<span class="fc bfc" id="L94" title="All 2 branches covered.">            } else if (key.equals(IoTValues.GIVEN_PASSCODE)) {</span>
-<span class="fc" id="L95">                givenPassCode = (String) inState.get(key);</span>
-<span class="fc bfc" id="L96" title="All 2 branches covered.">            } else if (key.equals(IoTValues.AWAY_TIMER)) {</span>
+<span class="fc" id="L69">        System.out.println(&quot;Evaluating new state statically&quot;);</span>
+
+<span class="fc" id="L71">        Set&lt;String&gt; keys = inState.keySet();</span>
+<span class="fc bfc" id="L72" title="All 2 branches covered.">        for (String key : keys) {</span>
+
+<span class="fc bfc" id="L74" title="All 2 branches covered.">            if (key.equals(IoTValues.TEMP_READING)) {</span>
+<span class="fc" id="L75">                tempReading = (Integer) inState.get(key);</span>
+<span class="fc bfc" id="L76" title="All 2 branches covered.">            } else if (key.equals(IoTValues.HUMIDITY_READING)) {</span>
+<span class="fc" id="L77">                humidityReading = (Integer) inState.get(key);</span>
+<span class="fc bfc" id="L78" title="All 2 branches covered.">            } else if (key.equals(IoTValues.TARGET_TEMP)) {</span>
+<span class="fc" id="L79">                targetTempSetting = (Integer) inState.get(key);</span>
+<span class="fc bfc" id="L80" title="All 2 branches covered.">            } else if (key.equals(IoTValues.HUMIDIFIER_STATE)) {</span>
+<span class="fc" id="L81">                humidifierState = (Boolean) inState.get(key);</span>
+<span class="fc bfc" id="L82" title="All 2 branches covered.">            } else if (key.equals(IoTValues.DOOR_STATE)) {</span>
+<span class="fc" id="L83">                doorState = (Boolean) inState.get(key);</span>
+<span class="fc bfc" id="L84" title="All 2 branches covered.">            } else if (key.equals(IoTValues.LIGHT_STATE)) {</span>
+<span class="fc" id="L85">                lightState = (Boolean) inState.get(key);</span>
+<span class="fc bfc" id="L86" title="All 2 branches covered.">            } else if (key.equals(IoTValues.PROXIMITY_STATE)) {</span>
+<span class="fc" id="L87">                proximityState = (Boolean) inState.get(key);</span>
+<span class="fc bfc" id="L88" title="All 2 branches covered.">            } else if (key.equals(IoTValues.ALARM_STATE)) {</span>
+<span class="fc" id="L89">                alarmState = (Boolean) inState.get(key);</span>
+<span class="fc bfc" id="L90" title="All 2 branches covered.">            } else if (key.equals(IoTValues.HEATER_STATE)) {</span>
+<span class="fc" id="L91">                heaterOnState = (Boolean) inState.get(key);</span>
+<span class="fc bfc" id="L92" title="All 2 branches covered.">            } else if (key.equals(IoTValues.CHILLER_STATE)) {</span>
+<span class="fc" id="L93">                chillerOnState = (Boolean) inState.get(key);</span>
+<span class="fc bfc" id="L94" title="All 2 branches covered.">            } else if (key.equals(IoTValues.HVAC_MODE)) {</span>
+<span class="fc" id="L95">                hvacSetting = (String) inState.get(key);</span>
+<span class="fc bfc" id="L96" title="All 2 branches covered.">            } else if (key.equals(IoTValues.ALARM_PASSCODE)) {</span>
+<span class="fc" id="L97">                alarmPassCode = (String) inState.get(key);</span>
+<span class="fc bfc" id="L98" title="All 2 branches covered.">            } else if (key.equals(IoTValues.GIVEN_PASSCODE)) {</span>
+<span class="fc" id="L99">                givenPassCode = (String) inState.get(key);</span>
+<span class="fc bfc" id="L100" title="All 2 branches covered.">            } else if (key.equals(IoTValues.AWAY_TIMER)) {</span>
                 // This is a hack!
-<span class="fc" id="L98">                awayTimerState = (Boolean) inState.getOrDefault(key, false);</span>
-<span class="fc bfc" id="L99" title="All 2 branches covered.">             } else if (key.equals(IoTValues.ALARM_ACTIVE)) {</span>
-<span class="fc" id="L100">                alarmActiveState = (Boolean) inState.get(key);</span>
-<span class="fc bfc" id="L101" title="All 2 branches covered.">            } else if (key.equals(IoTValues.LOCK_STATE)) {</span>
-<span class="fc" id="L102">                lockState = (Boolean) inState.get(key);</span>
-<span class="fc bfc" id="L103" title="All 2 branches covered.">            } else if (key.equals(IoTValues.NIGHT_LOCK_ENABLED)) {</span>
-<span class="fc" id="L104">                nightLockEnabled = (Boolean) inState.get(key);</span>
-<span class="fc bfc" id="L105" title="All 2 branches covered.">            } else if (key.equals(IoTValues.NIGHT_LOCK_START)) {</span>
-<span class="fc" id="L106">                nightLockStart = (Integer) inState.get(key);</span>
-<span class="fc bfc" id="L107" title="All 2 branches covered.">            } else if (key.equals(IoTValues.NIGHT_LOCK_END)) {</span>
-<span class="fc" id="L108">                nightLockEnd = (Integer) inState.get(key);</span>
-<span class="pc bpc" id="L109" title="1 of 2 branches missed.">            } else if (key.equals(IoTValues.CURRENT_HOUR)) {</span>
-<span class="fc" id="L110">                currentHour = (Integer) inState.get(key);</span>
+<span class="fc" id="L102">                awayTimerState = (Boolean) inState.getOrDefault(key, false);</span>
+<span class="fc bfc" id="L103" title="All 2 branches covered.">             } else if (key.equals(IoTValues.ALARM_ACTIVE)) {</span>
+<span class="fc" id="L104">                alarmActiveState = (Boolean) inState.get(key);</span>
             }
-<span class="fc" id="L112">        }</span>
+<span class="fc" id="L106">        }</span>
 
-<span class="fc bfc" id="L114" title="All 2 branches covered.">        if (lightState == true) {</span>
+<span class="fc bfc" id="L108" title="All 2 branches covered.">        if (lightState == true) {</span>
             // The light was activated
-<span class="pc bpc" id="L116" title="1 of 2 branches missed.">            if (!proximityState) {</span>
-<span class="fc" id="L117">                log.append(formatLogEntry(&quot;Cannot turn on light because user not home&quot;));</span>
-<span class="fc" id="L118">                    lightState = false;</span>
+<span class="fc bfc" id="L110" title="All 2 branches covered.">            if (!proximityState) {</span>
+<span class="fc" id="L111">                log.append(formatLogEntry(&quot;Cannot turn on light because user not home&quot;));</span>
+<span class="fc" id="L112">                    lightState = false;</span>
             }
             else {
-<span class="nc" id="L121">                log.append(formatLogEntry(&quot;Light on&quot;));</span>
+<span class="fc" id="L115">                log.append(formatLogEntry(&quot;Light on&quot;));</span>
             }        
-<span class="pc bpc" id="L123" title="1 of 2 branches missed.">        } else if (lightState) {</span>
-<span class="nc" id="L124">            log.append(formatLogEntry(&quot;Light off&quot;));</span>
+        } else{ // potential bug
+<span class="fc" id="L118">            log.append(formatLogEntry(&quot;Light off&quot;));</span>
         }
 
         // The door is now open
-<span class="fc bfc" id="L128" title="All 2 branches covered.">        if (doorState) {        </span>
-<span class="pc bpc" id="L129" title="1 of 4 branches missed.">            if (!proximityState &amp;&amp; alarmState) {</span>
+<span class="fc bfc" id="L122" title="All 2 branches covered.">        if (doorState) {        </span>
+<span class="fc bfc" id="L123" title="All 4 branches covered.">            if (!proximityState &amp;&amp; alarmState) {</span>
 
                 // door open and no one home and the alarm is set - sound alarm
-<span class="fc" id="L132">                log.append(formatLogEntry(&quot;Break in detected: Activating alarm&quot;));</span>
-<span class="fc" id="L133">                alarmActiveState = true;</span>
+<span class="fc" id="L126">                log.append(formatLogEntry(&quot;Break in detected: Activating alarm&quot;));</span>
+<span class="fc" id="L127">                alarmActiveState = true;</span>
             }
             // House vacant, close the door
-<span class="pc bpc" id="L136" title="1 of 2 branches missed.">            else if (!proximityState) {</span>
+<span class="fc bfc" id="L130" title="All 2 branches covered.">            else if (!proximityState) {</span>
                 // close the door
-<span class="fc" id="L138">                doorState = false;</span>
-<span class="fc" id="L139">                log.append(formatLogEntry(&quot;Closed door because house vacant&quot;));</span>
+<span class="fc" id="L132">                doorState = false;</span>
+<span class="fc" id="L133">                log.append(formatLogEntry(&quot;Closed door because house vacant&quot;));</span>
             } else {
-<span class="nc" id="L141">                log.append(formatLogEntry(&quot;Door open&quot;));</span>
+<span class="fc" id="L135">                log.append(formatLogEntry(&quot;Door open&quot;));</span>
             }
 
             // The door is open the alarm is to be set and somebody is home - this is not
@@ -146,71 +140,71 @@ import tartan.smarthome.resources.iotcontroller.IoTValues;
         }
 
         // The door is now closed
-<span class="pc bpc" id="L149" title="1 of 2 branches missed.">        else if (!doorState) {</span>
+<span class="pc bpc" id="L143" title="1 of 2 branches missed.">        else if (!doorState) {</span>
             // the door is closed - if the house is suddenly occupied this is a break-in
-<span class="fc bfc" id="L151" title="All 4 branches covered.">            if (alarmState &amp;&amp; proximityState) {</span>
-<span class="fc" id="L152">                log.append(formatLogEntry(&quot;Break in detected: Activating alarm&quot;));</span>
-<span class="fc" id="L153">                alarmActiveState = true;</span>
+<span class="fc bfc" id="L145" title="All 4 branches covered.">            if (alarmState &amp;&amp; proximityState) {</span>
+<span class="fc" id="L146">                log.append(formatLogEntry(&quot;Break in detected: Activating alarm&quot;));</span>
+<span class="fc" id="L147">                alarmActiveState = true;</span>
             } else {
-<span class="fc" id="L155">                log.append(formatLogEntry(&quot;Closed door&quot;));</span>
+<span class="fc" id="L149">                log.append(formatLogEntry(&quot;Closed door&quot;));</span>
             }
         }
         
         // Auto lock the house
-<span class="fc bfc" id="L160" title="All 2 branches covered.">        if (awayTimerState == true) {</span>
-<span class="fc" id="L161">            lightState = false;</span>
-<span class="fc" id="L162">            doorState = false;</span>
-<span class="fc" id="L163">            alarmState = true;</span>
-<span class="fc" id="L164">            awayTimerState = false;</span>
+<span class="fc bfc" id="L154" title="All 2 branches covered.">        if (awayTimerState == true) {</span>
+<span class="fc" id="L155">            lightState = false;</span>
+<span class="fc" id="L156">            doorState = false;</span>
+<span class="fc" id="L157">            alarmState = true;</span>
+<span class="fc" id="L158">            awayTimerState = false;</span>
         }
 
         // the user has arrived
-<span class="fc bfc" id="L168" title="All 2 branches covered.">        if (proximityState) {</span>
-<span class="fc" id="L169">            log.append(formatLogEntry(&quot;House is occupied&quot;));</span>
+<span class="fc bfc" id="L162" title="All 2 branches covered.">        if (proximityState) {</span>
+<span class="fc" id="L163">            log.append(formatLogEntry(&quot;House is occupied&quot;));</span>
             // if the alarm has been disabled, then turn on the light for the user
 
-<span class="pc bpc" id="L172" title="1 of 4 branches missed.">            if (!lightState &amp;&amp; !alarmState) {</span>
-<span class="fc" id="L173">                lightState = true;</span>
-<span class="fc" id="L174">                log.append(formatLogEntry(&quot;Turning on light&quot;));</span>
+<span class="fc bfc" id="L166" title="All 4 branches covered.">            if (!lightState &amp;&amp; !alarmState) {</span>
+<span class="fc" id="L167">                lightState = true;</span>
+<span class="fc" id="L168">                log.append(formatLogEntry(&quot;Turning on light&quot;));</span>
             }
             
         } else {
             // R12: If the house is empty, then start the away timer
-<span class="fc" id="L179">            awayTimerState = true;</span>
-<span class="fc" id="L180">            log.append(formatLogEntry(&quot;House is vacant, starting away timer&quot;));</span>
+<span class="fc" id="L173">            awayTimerState = true;</span>
+<span class="fc" id="L174">            log.append(formatLogEntry(&quot;House is vacant, starting away timer&quot;));</span>
         }
 
         // set the alarm
-<span class="fc bfc" id="L184" title="All 2 branches covered.">        if (alarmState) {</span>
-<span class="fc" id="L185">            log.append(formatLogEntry(&quot;Alarm enabled&quot;));</span>
+<span class="fc bfc" id="L178" title="All 2 branches covered.">        if (alarmState) {</span>
+<span class="fc" id="L179">            log.append(formatLogEntry(&quot;Alarm enabled&quot;));</span>
             
 
-<span class="pc bpc" id="L188" title="1 of 2 branches missed.">        } else if (!alarmState) { // attempt to disable alarm</span>
+<span class="pc bpc" id="L182" title="1 of 2 branches missed.">        } else if (!alarmState) { // attempt to disable alarm</span>
 
-<span class="fc bfc" id="L190" title="All 2 branches covered.">            if (!proximityState) { </span>
-<span class="fc" id="L191">                alarmState = true;</span>
+<span class="fc bfc" id="L184" title="All 2 branches covered.">            if (!proximityState) { </span>
+<span class="fc" id="L185">                alarmState = true;</span>
 
-<span class="fc" id="L193">                log.append(formatLogEntry(&quot;Cannot disable the alarm, house is empty&quot;));</span>
+<span class="fc" id="L187">                log.append(formatLogEntry(&quot;Cannot disable the alarm, house is empty&quot;));</span>
             }
 
-<span class="fc bfc" id="L196" title="All 2 branches covered.">            if (alarmActiveState) {</span>
-<span class="fc bfc" id="L197" title="All 4 branches covered.">                if (givenPassCode.length()&gt;0  &amp;&amp; givenPassCode.compareTo(alarmPassCode) &lt; 0) {</span>
-<span class="fc" id="L198">                    log.append(formatLogEntry(&quot;Cannot disable alarm, invalid passcode given&quot;));</span>
-<span class="fc" id="L199">                    alarmState = true;</span>
+<span class="fc bfc" id="L190" title="All 2 branches covered.">            if (alarmActiveState) {</span>
+<span class="fc bfc" id="L191" title="All 4 branches covered.">                if (givenPassCode.length()&gt;0  &amp;&amp; givenPassCode.compareTo(alarmPassCode) &lt; 0) {</span>
+<span class="fc" id="L192">                    log.append(formatLogEntry(&quot;Cannot disable alarm, invalid passcode given&quot;));</span>
+<span class="fc" id="L193">                    alarmState = true;</span>
 
                 } else {
-<span class="fc" id="L202">                    log.append(formatLogEntry(&quot;Correct passcode entered, disabled alarm&quot;));</span>
-<span class="fc" id="L203">                    alarmActiveState = false;</span>
+<span class="fc" id="L196">                    log.append(formatLogEntry(&quot;Correct passcode entered, disabled alarm&quot;));</span>
+<span class="fc" id="L197">                    alarmActiveState = false;</span>
                 }
             }
         }
 
-<span class="fc bfc" id="L208" title="All 2 branches covered.">        if (!alarmState) {</span>
-<span class="fc" id="L209">            log.append(formatLogEntry(&quot;Alarm disabled&quot;));</span>
+<span class="fc bfc" id="L202" title="All 2 branches covered.">        if (!alarmState) {</span>
+<span class="fc" id="L203">            log.append(formatLogEntry(&quot;Alarm disabled&quot;));</span>
         }
 
-<span class="fc bfc" id="L212" title="All 2 branches covered.">        if (!alarmState) { // alarm disabled</span>
-<span class="fc" id="L213">            alarmActiveState = false;</span>
+<span class="fc bfc" id="L206" title="All 2 branches covered.">        if (!alarmState) { // alarm disabled</span>
+<span class="fc" id="L207">            alarmActiveState = false;</span>
         }       
         
 
@@ -218,106 +212,117 @@ import tartan.smarthome.resources.iotcontroller.IoTValues;
         // 1. the door is opened when no one is home
         // 2. the house is suddenly occupied
         try {
-<span class="pc bpc" id="L221" title="1 of 12 branches missed.">            if ((alarmState &amp;&amp; !doorState &amp;&amp; proximityState) || (alarmState &amp;&amp; doorState &amp;&amp; !proximityState)) {</span>
-<span class="fc" id="L222">                log.append(formatLogEntry(&quot;Activating alarm&quot;));</span>
-<span class="fc" id="L223">                alarmActiveState = true;</span>
+<span class="fc bfc" id="L215" title="All 12 branches covered.">            if ((alarmState &amp;&amp; !doorState &amp;&amp; proximityState) || (alarmState &amp;&amp; doorState &amp;&amp; !proximityState)) {</span>
+<span class="fc" id="L216">                log.append(formatLogEntry(&quot;Activating alarm&quot;));</span>
+<span class="fc" id="L217">                alarmActiveState = true;</span>
             }
-<span class="nc" id="L225">        } catch (NullPointerException npe) {</span>
+<span class="nc" id="L219">        } catch (NullPointerException npe) {</span>
             // Not enough information to evaluate alarm
-<span class="nc" id="L227">            log.append(formatLogEntry(&quot;Warning: Not enough information to evaluate alarm&quot;));</span>
-<span class="fc" id="L228">        }</span>
-
-        // Night Lock — auto-lock the door during configured night hours
-<span class="pc bpc" id="L231" title="4 of 12 branches missed.">        if (nightLockEnabled != null &amp;&amp; nightLockEnabled</span>
-                &amp;&amp; nightLockStart != null &amp;&amp; nightLockEnd != null
-                &amp;&amp; currentHour != null &amp;&amp; lockState != null) {
-<span class="fc bfc" id="L234" title="All 2 branches covered.">            if (isNightTime(currentHour, nightLockStart, nightLockEnd)) {</span>
-<span class="fc bfc" id="L235" title="All 2 branches covered.">                if (!lockState) {</span>
-<span class="fc" id="L236">                    lockState = true;</span>
-<span class="fc" id="L237">                    log.append(formatLogEntry(&quot;Night Lock: Door locked automatically during night hours&quot;));</span>
-                }
-            }
-        }
+<span class="nc" id="L221">            log.append(formatLogEntry(&quot;Warning: Not enough information to evaluate alarm&quot;));</span>
+<span class="fc" id="L222">        }</span>
 
         // Is the heater needed?
-<span class="fc bfc" id="L243" title="All 2 branches covered.">        if (tempReading &lt; targetTempSetting) {</span>
-<span class="fc" id="L244">            log.append(formatLogEntry(&quot;Turning on heater, target temperature = &quot; + targetTempSetting</span>
+<span class="fc bfc" id="L225" title="All 2 branches covered.">        if (tempReading &lt; targetTempSetting) {</span>
+<span class="fc" id="L226">            log.append(formatLogEntry(&quot;Turning on heater, target temperature = &quot; + targetTempSetting</span>
                     + &quot;F, current temperature = &quot; + tempReading + &quot;F&quot;));
-<span class="fc" id="L246">            heaterOnState = true;</span>
+<span class="fc" id="L228">            heaterOnState = true;</span>
 
             // Heater already on
         } else {
             // Heater not needed
-<span class="fc" id="L251">            heaterOnState = false;</span>
+<span class="fc" id="L233">            heaterOnState = false;</span>
         }
 
-<span class="fc bfc" id="L254" title="All 2 branches covered.">        if (tempReading &gt; targetTempSetting) {</span>
+<span class="fc bfc" id="L236" title="All 2 branches covered.">        if (tempReading &gt; targetTempSetting) {</span>
             // Is the heater needed?
-<span class="pc bpc" id="L256" title="1 of 2 branches missed.">            if (chillerOnState != null) {</span>
-<span class="pc bpc" id="L257" title="1 of 2 branches missed.">                if (!chillerOnState) {</span>
-<span class="nc" id="L258">                    log.append(formatLogEntry(&quot;Turning on air conditioner target temperature = &quot; + targetTempSetting</span>
+<span class="pc bpc" id="L238" title="1 of 2 branches missed.">            if (chillerOnState != null) {</span>
+<span class="fc bfc" id="L239" title="All 2 branches covered.">                if (!chillerOnState) {</span>
+<span class="fc" id="L240">                    log.append(formatLogEntry(&quot;Turning on air conditioner target temperature = &quot; + targetTempSetting</span>
                             + &quot;F, current temperature = &quot; + tempReading + &quot;F&quot;));
-<span class="nc" id="L260">                    chillerOnState = true;</span>
+<span class="fc" id="L242">                    chillerOnState = true;</span>
                 } // AC already on
             }
         }
         // AC not needed
         else {
-<span class="fc" id="L266">            chillerOnState = false;</span>
+<span class="fc" id="L248">            chillerOnState = false;</span>
         }
-        
 
-<span class="fc bfc" id="L270" title="All 2 branches covered.">        if (chillerOnState) {</span>
-<span class="fc" id="L271">            hvacSetting = &quot;Chiller&quot;;</span>
-<span class="fc bfc" id="L272" title="All 2 branches covered.">        } else if (heaterOnState) {</span>
-<span class="fc" id="L273">            hvacSetting = &quot;Heater&quot;;</span>
+        // only set hvacSetting if not already set by user
+<span class="pc bpc" id="L252" title="2 of 4 branches missed.">        if (hvacSetting == null || hvacSetting.isEmpty()) {</span>
+<span class="nc bnc" id="L253" title="All 2 branches missed.">            if (chillerOnState) {</span>
+<span class="nc" id="L254">                hvacSetting = &quot;Chiller&quot;;</span>
+<span class="nc bnc" id="L255" title="All 2 branches missed.">            } else if (heaterOnState) {</span>
+<span class="nc" id="L256">                hvacSetting = &quot;Heater&quot;;</span>
+            }
         }
         // manage the HVAC control
 
-<span class="fc bfc" id="L277" title="All 2 branches covered.">        if (hvacSetting.equals(&quot;Heater&quot;)) {</span>
+<span class="fc bfc" id="L261" title="All 2 branches covered.">        if (hvacSetting.equals(&quot;Heater&quot;)) {</span>
 
-<span class="pc bpc" id="L279" title="1 of 2 branches missed.">            if (chillerOnState == true) {</span>
-<span class="nc" id="L280">                log.append(formatLogEntry(&quot;Turning off air conditioner&quot;));</span>
+<span class="fc bfc" id="L263" title="All 2 branches covered.">            if (chillerOnState == true) {</span>
+<span class="fc" id="L264">                log.append(formatLogEntry(&quot;Turning off air conditioner&quot;));</span>
             }
 
-<span class="fc" id="L283">            chillerOnState = false; // can't run AC</span>
-<span class="fc" id="L284">            humidifierState = false; // can't run dehumidifier with heater</span>
+<span class="fc" id="L267">            chillerOnState = false; // can't run AC</span>
+<span class="fc" id="L268">            humidifierState = false; // can't run dehumidifier with heater</span>
         }
 
-<span class="fc bfc" id="L287" title="All 2 branches covered.">        if (hvacSetting.equals(&quot;Chiller&quot;)) {</span>
+<span class="fc bfc" id="L271" title="All 2 branches covered.">        if (hvacSetting.equals(&quot;Chiller&quot;)) {</span>
 
-<span class="pc bpc" id="L289" title="1 of 2 branches missed.">            if (heaterOnState == true) {</span>
-<span class="nc" id="L290">                log.append(formatLogEntry(&quot;Turning off heater&quot;));</span>
+<span class="fc bfc" id="L273" title="All 2 branches covered.">            if (heaterOnState == true) {</span>
+<span class="fc" id="L274">                log.append(formatLogEntry(&quot;Turning off heater&quot;));</span>
             }
 
-<span class="fc" id="L293">            heaterOnState = false; // can't run heater when the A/C is on</span>
+<span class="fc" id="L277">            heaterOnState = false; // can't run heater when the A/C is on</span>
         }
         
-<span class="pc bpc" id="L296" title="1 of 4 branches missed.">        if (humidifierState &amp;&amp; hvacSetting.equals(&quot;Chiller&quot;)) {</span>
-<span class="fc" id="L297">            log.append(formatLogEntry(&quot;Enabled Dehumidifier&quot;));</span>
+<span class="pc bpc" id="L280" title="1 of 4 branches missed.">        if (humidifierState &amp;&amp; hvacSetting.equals(&quot;Chiller&quot;)) {</span>
+<span class="fc" id="L281">            log.append(formatLogEntry(&quot;Enabled Dehumidifier&quot;));</span>
         } else {
-<span class="fc" id="L299">            log.append(formatLogEntry(&quot;Automatically disabled dehumidifier when running heater&quot;));</span>
-<span class="fc" id="L300">            humidifierState = false;</span>
+<span class="fc" id="L283">            log.append(formatLogEntry(&quot;Automatically disabled dehumidifier when running heater&quot;));</span>
+<span class="fc" id="L284">            humidifierState = false;</span>
         }
 
-<span class="fc" id="L303">        Map&lt;String, Object&gt; newState = new Hashtable&lt;&gt;();</span>
-<span class="fc" id="L304">        newState.put(IoTValues.DOOR_STATE, doorState);</span>
-<span class="fc" id="L305">        newState.put(IoTValues.AWAY_TIMER, awayTimerState);</span>
-<span class="fc" id="L306">        newState.put(IoTValues.LIGHT_STATE, lightState);</span>
-<span class="fc" id="L307">        newState.put(IoTValues.PROXIMITY_STATE, proximityState);</span>
-<span class="fc" id="L308">        newState.put(IoTValues.ALARM_STATE, alarmState);</span>
-<span class="fc" id="L309">        newState.put(IoTValues.HUMIDIFIER_STATE, humidifierState);</span>
-<span class="fc" id="L310">        newState.put(IoTValues.HEATER_STATE, heaterOnState);</span>
-<span class="fc" id="L311">        newState.put(IoTValues.CHILLER_STATE, chillerOnState);</span>
-<span class="fc" id="L312">        newState.put(IoTValues.ALARM_ACTIVE, alarmActiveState);</span>
-<span class="fc" id="L313">        newState.put(IoTValues.HVAC_MODE, hvacSetting);</span>
-<span class="fc" id="L314">        newState.put(IoTValues.ALARM_PASSCODE, alarmPassCode);</span>
-<span class="fc" id="L315">        newState.put(IoTValues.GIVEN_PASSCODE, givenPassCode);</span>
-<span class="fc bfc" id="L316" title="All 2 branches covered.">        if (lockState != null) {</span>
-<span class="fc" id="L317">            newState.put(IoTValues.LOCK_STATE, lockState);</span>
+        // Smart lock priority logic
+        // Priority: Intruder &gt; Keyless &gt; Night
+<span class="fc bfc" id="L289" title="All 2 branches covered.">        if (intruderActive) {</span>
+<span class="fc bfc" id="L290" title="All 2 branches covered.">            if (!lockState) {</span>
+<span class="fc" id="L291">                lockState = true;</span>
+<span class="fc" id="L292">                log.append(formatLogEntry(&quot;Possible intruder detected: locking door&quot;));</span>
+            } else {
+<span class="fc" id="L294">                log.append(formatLogEntry(&quot;Possible intruder detected: door already locked&quot;));</span>
+            }
+        } else {
+<span class="fc" id="L297">            KeylessEntry.Result kr = KeylessEntry.apply(inState, lockState, log);</span>
+<span class="fc" id="L298">            lockState = kr.lockState;</span>
+
+            // Only apply Night Lock if Keyless did NOT trigger
+<span class="fc bfc" id="L301" title="All 4 branches covered.">            if (!kr.triggered &amp;&amp; nightActive) {</span>
+<span class="fc bfc" id="L302" title="All 2 branches covered.">                if (!lockState) {</span>
+<span class="fc" id="L303">                    lockState = true;</span>
+<span class="fc" id="L304">                    log.append(formatLogEntry(&quot;Night lock: locking door&quot;));</span>
+                }
+            }
         }
 
-<span class="fc" id="L320">        return newState; </span>
+
+<span class="fc" id="L310">        Map&lt;String, Object&gt; newState = new Hashtable&lt;&gt;();</span>
+<span class="fc" id="L311">        newState.put(IoTValues.DOOR_STATE, doorState);</span>
+<span class="fc" id="L312">        newState.put(IoTValues.AWAY_TIMER, awayTimerState);</span>
+<span class="fc" id="L313">        newState.put(IoTValues.LIGHT_STATE, lightState);</span>
+<span class="fc" id="L314">        newState.put(IoTValues.PROXIMITY_STATE, proximityState);</span>
+<span class="fc" id="L315">        newState.put(IoTValues.ALARM_STATE, alarmState);</span>
+<span class="fc" id="L316">        newState.put(IoTValues.HUMIDIFIER_STATE, humidifierState);</span>
+<span class="fc" id="L317">        newState.put(IoTValues.HEATER_STATE, heaterOnState);</span>
+<span class="fc" id="L318">        newState.put(IoTValues.CHILLER_STATE, chillerOnState);</span>
+<span class="fc" id="L319">        newState.put(IoTValues.ALARM_ACTIVE, alarmActiveState);</span>
+<span class="fc" id="L320">        newState.put(IoTValues.HVAC_MODE, hvacSetting);</span>
+<span class="fc" id="L321">        newState.put(IoTValues.ALARM_PASSCODE, alarmPassCode);</span>
+<span class="fc" id="L322">        newState.put(IoTValues.GIVEN_PASSCODE, givenPassCode);</span>
+<span class="fc" id="L323">        newState.put(IoTValues.LOCK_STATE, lockState);</span>
+
+<span class="fc" id="L325">        return newState; </span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

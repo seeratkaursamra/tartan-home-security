@@ -23,7 +23,7 @@
 <tr>
 <td>
 <div class="infoBox" id="tests">
-<div class="counter">14</div>
+<div class="counter">20</div>
 <p>tests</p>
 </div>
 </td>
@@ -41,7 +41,7 @@
 </td>
 <td>
 <div class="infoBox" id="duration">
-<div class="counter">0.048s</div>
+<div class="counter">0.013s</div>
 <p>duration</p>
 </div>
 </td>
@@ -79,27 +79,57 @@
 </tr>
 </thead>
 <tr>
+<td class="success">isNightTime: Boundary — hour == end → false</td>
+<td class="success">testIsNightTime_Boundary_HourEqualsEnd()</td>
+<td class="success">0.001s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">isNightTime: Boundary — hour == start → true</td>
+<td class="success">testIsNightTime_Boundary_HourEqualsStart()</td>
+<td class="success">0s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">isNightTime: Midnight crossing — hour 23, start=22, end=6 → true</td>
+<td class="success">testIsNightTime_MidnightCrossing_Hour23()</td>
+<td class="success">0s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">isNightTime: Midnight crossing — hour 3, start=22, end=6 → true</td>
+<td class="success">testIsNightTime_MidnightCrossing_Hour3()</td>
+<td class="success">0s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">isNightTime: Midnight crossing — hour 7, start=22, end=6 → false</td>
+<td class="success">testIsNightTime_MidnightCrossing_Hour7()</td>
+<td class="success">0.001s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">isNightTime: Non-crossing range — start=8, end=18, hour=10 → true</td>
+<td class="success">testIsNightTime_NonCrossing_InRange()</td>
+<td class="success">0s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">isNightTime: Non-crossing range — start=8, end=18, hour=20 → false</td>
+<td class="success">testIsNightTime_NonCrossing_OutOfRange()</td>
+<td class="success">0.001s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
 <td class="success">Night Lock: Already locked — no duplicate log entry</td>
 <td class="success">testNightLock_AlreadyLocked_NoDoubleLog()</td>
-<td class="success">0.001s</td>
-<td class="success">passed</td>
-</tr>
-<tr>
-<td class="success">Night Lock: Boundary — hour == end → NOT locked</td>
-<td class="success">testNightLock_Boundary_HourEqualsEnd_NotLocked()</td>
-<td class="success">0.001s</td>
-<td class="success">passed</td>
-</tr>
-<tr>
-<td class="success">Night Lock: Boundary — hour == start → locked</td>
-<td class="success">testNightLock_Boundary_HourEqualsStart_Locked()</td>
-<td class="success">0.001s</td>
+<td class="success">0s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">Night Lock: Disabled feature does not lock door at night</td>
 <td class="success">testNightLock_Disabled_NoEffect()</td>
-<td class="success">0.001s</td>
+<td class="success">0s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
@@ -111,55 +141,61 @@
 <tr>
 <td class="success">Night Lock: Door is locked automatically during night hours</td>
 <td class="success">testNightLock_DuringNight_LocksDoor()</td>
-<td class="success">0.003s</td>
+<td class="success">0.001s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">Night Lock Integration: Evaluator output includes lock state for full pipeline</td>
 <td class="success">testNightLock_Integration_EvaluatorPipeline()</td>
-<td class="success">0.002s</td>
+<td class="success">0s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">Night Lock Integration: TartanHome fields round-trip through state conversion</td>
 <td class="success">testNightLock_Integration_TartanHomeFields()</td>
-<td class="success">0.003s</td>
-<td class="success">passed</td>
-</tr>
-<tr>
-<td class="success">Night Lock: Midnight crossing — hour 23, start=22, end=6 → locked</td>
-<td class="success">testNightLock_MidnightCrossing_Hour23_Locked()</td>
 <td class="success">0.001s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
-<td class="success">Night Lock: Midnight crossing — hour 3, start=22, end=6 → locked</td>
-<td class="success">testNightLock_MidnightCrossing_Hour3_Locked()</td>
+<td class="success">Night Lock: Intruder takes priority over night lock</td>
+<td class="success">testNightLock_IntruderPriority()</td>
 <td class="success">0.001s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
-<td class="success">Night Lock: Midnight crossing — hour 7, start=22, end=6 → NOT locked</td>
-<td class="success">testNightLock_MidnightCrossing_Hour7_NotLocked()</td>
-<td class="success">0.029s</td>
+<td class="success">Night Lock: Night lock engages when keyless does not trigger</td>
+<td class="success">testNightLock_KeylessNotTriggered_NightLockEngages()</td>
+<td class="success">0.001s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
-<td class="success">Night Lock: Non-crossing range — start=8, end=18, hour=10 → locked</td>
-<td class="success">testNightLock_NonCrossingRange_DuringRange_Locked()</td>
+<td class="success">Night Lock: Keyless entry takes priority over night lock</td>
+<td class="success">testNightLock_KeylessPriority()</td>
+<td class="success">0.001s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">Night Lock: Night active at early morning hour locks door</td>
+<td class="success">testNightLock_NightActive_EarlyMorning_LocksDoor()</td>
 <td class="success">0s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
-<td class="success">Night Lock: Non-crossing range — start=8, end=18, hour=20 → NOT locked</td>
-<td class="success">testNightLock_NonCrossingRange_OutsideRange_NotLocked()</td>
+<td class="success">Night Lock: Night active at late hour locks door</td>
+<td class="success">testNightLock_NightActive_LocksDoor()</td>
+<td class="success">0.001s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">Night Lock: Night not active keeps door unlocked</td>
+<td class="success">testNightLock_NightNotActive_DoorStaysUnlocked()</td>
 <td class="success">0.002s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">Night Lock: Unlocked door during night is re-locked</td>
 <td class="success">testNightLock_UnlockedDuringNight_Relocks()</td>
-<td class="success">0.002s</td>
+<td class="success">0.001s</td>
 <td class="success">passed</td>
 </tr>
 </table>
@@ -168,7 +204,6 @@
 <h2>Standard output</h2>
 <span class="code">
 <pre>Evaluating new state statically
-Evaluating new state statically
 Evaluating new state statically
 Evaluating new state statically
 Evaluating new state statically
@@ -191,7 +226,7 @@ Evaluating new state statically
 <input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
 </label>
 </div>Generated by 
-<a href="http://www.gradle.org">Gradle 8.6</a> at Feb 11, 2026, 10:48:47 p.m.</p>
+<a href="http://www.gradle.org">Gradle 8.6</a> at Feb 12, 2026, 10:03:15 p.m.</p>
 </div>
 </div>
 </body>

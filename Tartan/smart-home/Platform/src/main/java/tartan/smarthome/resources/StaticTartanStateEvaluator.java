@@ -56,11 +56,15 @@ public class StaticTartanStateEvaluator implements TartanStateEvaluator {
         String alarmPassCode = null;
         String hvacSetting = null; // the HVAC mode setting, either Heater or Chiller
         String givenPassCode = "";
-        Boolean lockState = null;
-        Boolean nightLockEnabled = null;
-        Integer nightLockStart = null;
-        Integer nightLockEnd = null;
-        Integer currentHour = null;
+
+        //again more behaviour for keylessentry
+        // this one will have defaults to hopefully not cause any errors or require a refactor
+        Boolean lockState = (Boolean) inState.getOrDefault(IoTValues.LOCK_STATE, true);
+        Boolean keylessEnabled = (Boolean) inState.getOrDefault(IoTValues.KEYLESS_ENABLED, false);
+        Boolean authorizedApproach = (Boolean) inState.getOrDefault(IoTValues.AUTHORIZED_APPROACH, false);
+        Boolean intruderActive = (Boolean) inState.getOrDefault(IoTValues.INTRUDER_ACTIVE, false);
+        Boolean nightActive = (Boolean) inState.getOrDefault(IoTValues.NIGHT_ACTIVE, false);
+
 
         System.out.println("Evaluating new state statically");
 
@@ -98,16 +102,6 @@ public class StaticTartanStateEvaluator implements TartanStateEvaluator {
                 awayTimerState = (Boolean) inState.getOrDefault(key, false);
              } else if (key.equals(IoTValues.ALARM_ACTIVE)) {
                 alarmActiveState = (Boolean) inState.get(key);
-            } else if (key.equals(IoTValues.LOCK_STATE)) {
-                lockState = (Boolean) inState.get(key);
-            } else if (key.equals(IoTValues.NIGHT_LOCK_ENABLED)) {
-                nightLockEnabled = (Boolean) inState.get(key);
-            } else if (key.equals(IoTValues.NIGHT_LOCK_START)) {
-                nightLockStart = (Integer) inState.get(key);
-            } else if (key.equals(IoTValues.NIGHT_LOCK_END)) {
-                nightLockEnd = (Integer) inState.get(key);
-            } else if (key.equals(IoTValues.CURRENT_HOUR)) {
-                currentHour = (Integer) inState.get(key);
             }
         }
 
@@ -120,7 +114,7 @@ public class StaticTartanStateEvaluator implements TartanStateEvaluator {
             else {
                 log.append(formatLogEntry("Light on"));
             }        
-        } else if (lightState) {
+        } else{ // potential bug
             log.append(formatLogEntry("Light off"));
         }
 
@@ -227,18 +221,6 @@ public class StaticTartanStateEvaluator implements TartanStateEvaluator {
             log.append(formatLogEntry("Warning: Not enough information to evaluate alarm"));
         }
 
-        // Night Lock — auto-lock the door during configured night hours
-        if (nightLockEnabled != null && nightLockEnabled
-                && nightLockStart != null && nightLockEnd != null
-                && currentHour != null && lockState != null) {
-            if (isNightTime(currentHour, nightLockStart, nightLockEnd)) {
-                if (!lockState) {
-                    lockState = true;
-                    log.append(formatLogEntry("Night Lock: Door locked automatically during night hours"));
-                }
-            }
-        }
-
         // Is the heater needed?
         if (tempReading < targetTempSetting) {
             log.append(formatLogEntry("Turning on heater, target temperature = " + targetTempSetting
@@ -265,12 +247,14 @@ public class StaticTartanStateEvaluator implements TartanStateEvaluator {
         else {
             chillerOnState = false;
         }
-        
 
-        if (chillerOnState) {
-            hvacSetting = "Chiller";
-        } else if (heaterOnState) {
-            hvacSetting = "Heater";
+        // only set hvacSetting if not already set by user
+        if (hvacSetting == null || hvacSetting.isEmpty()) {
+            if (chillerOnState) {
+                hvacSetting = "Chiller";
+            } else if (heaterOnState) {
+                hvacSetting = "Heater";
+            }
         }
         // manage the HVAC control
 
@@ -300,6 +284,29 @@ public class StaticTartanStateEvaluator implements TartanStateEvaluator {
             humidifierState = false;
         }
 
+        // Smart lock priority logic
+        // Priority: Intruder > Keyless > Night
+        if (intruderActive) {
+            if (!lockState) {
+                lockState = true;
+                log.append(formatLogEntry("Possible intruder detected: locking door"));
+            } else {
+                log.append(formatLogEntry("Possible intruder detected: door already locked"));
+            }
+        } else {
+            KeylessEntry.Result kr = KeylessEntry.apply(inState, lockState, log);
+            lockState = kr.lockState;
+
+            // Only apply Night Lock if Keyless did NOT trigger
+            if (!kr.triggered && nightActive) {
+                if (!lockState) {
+                    lockState = true;
+                    log.append(formatLogEntry("Night lock: locking door"));
+                }
+            }
+        }
+
+
         Map<String, Object> newState = new Hashtable<>();
         newState.put(IoTValues.DOOR_STATE, doorState);
         newState.put(IoTValues.AWAY_TIMER, awayTimerState);
@@ -313,9 +320,7 @@ public class StaticTartanStateEvaluator implements TartanStateEvaluator {
         newState.put(IoTValues.HVAC_MODE, hvacSetting);
         newState.put(IoTValues.ALARM_PASSCODE, alarmPassCode);
         newState.put(IoTValues.GIVEN_PASSCODE, givenPassCode);
-        if (lockState != null) {
-            newState.put(IoTValues.LOCK_STATE, lockState);
-        }
+        newState.put(IoTValues.LOCK_STATE, lockState);
 
         return newState; 
     }

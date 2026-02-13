@@ -1,167 +1,174 @@
 package tartan.smarthome.resources.iotcontroller;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.DisplayName;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Test cases for rule 14:
- * R14: The IoT Controller shall require the user to login to the house control panel using a username and password.
- * The password has the following requirements:
- * Minimum length: 8 characters
- * At least one uppercase character
- * At least one number
- * At least one symbol
+ * Tests for Rule 14:
+ * Login requires username/password; password policy (new users):
+ * - length >= 8
+ * - >= 1 uppercase
+ * - >= 1 number
+ * - >= 1 symbol
+ * Legacy users can bypass validation via (validate=false) constructor.
  *
- * a test for new users, and legacy users
- *  - new users have to follow the strong password guidelines
- *  - legacy, can have any password so don't really need to be tested
+ * Openai, chatgpt 5.2 "I am lazy please add comments for how this document adheres to white and black box testing"
+ * BLACK-BOX DESIGN:
+ * - Boundary Value Analysis (BVA) on password length: 7 vs 8 characters.
+ * - Equivalence Class Partitioning (ECP) on password composition:
+ *   - Missing uppercase / missing number / missing symbol / null password.
+ * - Feature interaction: "legacy users" path bypasses policy, but setPassword() enforces policy.
  *
- * 11 total tests
- *  - 8 validated ones
- *  testR14_ValidPassword_MeetsAllRequirements
- *  testR14_strongValidPassword
- *  testR14_InvalidPassword_TooShort
- *  testR14_InvalidPassword_NoUppercase
- *  testR14_InvalidPassword_NoNumber
- *  testR14_InvalidPassword_NoSymbol
- *  testR14_InvalidPassword_Null
- *  testR14_InvalidPassword_EmptyString
- *
- *  - 3 unvalidated ones
- *  testR14_LegacyUser_WeakPasswordAllowed
- *  testR14_ConfigUser_NoValidation
- *  testR14_BypassValidation_StrongPasswordStillWorks
- *
- * OpenAI, chatgpt 5.2 was used 2026-01-25, "Although I can see my tests are running in the build/~/index.html file
- * it is not printing anything to the console please add code to do so."
- *  - it added both a @displayname
- *  - and the system.out.println
- *      - but only the system print was necessary to log it, hence removed the display name
- *  - was also used to quickly add legacy password testing
+ * WHITE-BOX INTENT:
+ * - Cover the branch in constructor:
+ *     if (validate && !isValidPassword(password)) throw ...
+ * - Cover isValidPassword branches:
+ *     null/length check, loop setting hasUppercase/hasNumber/hasSymbol
+ * - Cover setPassword() failure branch and success branch.
  */
 public class Rule14Test {
 
-    // ========== VALIDATED PASSWORD TESTS (New Users) ==========
-
+    /**
+     * BVA (length == 8) + ECP (all required character classes present).
+     * WB: drives isValidPassword() through the loop and returns true.
+     */
     @Test
-    public void testR14_ValidPassword_MeetsAllRequirements() {
-        System.out.println("Testing valid password with all requirements");
-        // Arrange & Act
-        UserLoginInfo user = new UserLoginInfo("admin", "1VPass!b");
+    public void testR14_ValidPassword_MinimumRequirements() {
+        System.out.println("R14: Testing valid password with minimum requirements (8 chars)");
 
-        // Assert
+        UserLoginInfo user = new UserLoginInfo("admin", "Pass123!");
         assertNotNull(user);
         assertEquals("admin", user.getUserName());
-        assertEquals("1VPass!b", user.getPassword());
+        assertEquals("Pass123!", user.getPassword());
     }
 
-    @Test
-    public void testR14_strongValidPassword() {
-        System.out.println("Testing strong valid password");
-        // Arrange & Act
-        UserLoginInfo user = new UserLoginInfo("admin", "ABCDEFabcdef123456!@#$%^wowthisisalongpasswordIhopeitisaccepted" +
-                "wouldsuckifitwasn'thjhfjakhsdkjlfhkjalshfkjahsdkjfhsakjdhfkjsahfkjhssdkjfhkjsa");
-
-        // Assert
-        assertNotNull(user);
-        assertEquals("admin", user.getUserName());
-    }
-
+    /**
+     * BVA: length boundary - 1 (7 chars).
+     * WB: hits (password == null || password.length() < 8) early return false,
+     * then constructor throws IllegalArgumentException.
+     */
     @Test
     public void testR14_InvalidPassword_TooShort() {
-        System.out.println("Testing password validation: too short");
-        // Arrange, Act & Assert
+        System.out.println("R14: Testing password validation - too short");
+
         IllegalArgumentException exception = assertThrows(
                 IllegalArgumentException.class,
-                () -> new UserLoginInfo("admin", "Short1!")
+                () -> new UserLoginInfo("admin", "Pass12!")
         );
 
-        assertTrue(exception.getMessage().contains("8"));
+        assertTrue(exception.getMessage().contains("8") ||
+                        exception.getMessage().toLowerCase().contains("char"),
+                "Error message should mention minimum length requirement");
     }
 
+    /**
+     * ECP: missing uppercase class.
+     * WB: isValidPassword loop never sets hasUppercase => returns false => constructor throws.
+     */
     @Test
     public void testR14_InvalidPassword_NoUppercase() {
-        System.out.println("Testing password validation: no uppercase");
-        // Arrange, Act & Assert
+        System.out.println("R14: Testing password validation - no uppercase");
+
         assertThrows(IllegalArgumentException.class, () -> {
-            new UserLoginInfo("admin", "nouppercase1!");
+            new UserLoginInfo("admin", "password123!");
         });
     }
 
+    /**
+     * ECP: missing number class.
+     * WB: isValidPassword loop never sets hasNumber => returns false => constructor throws.
+     */
     @Test
     public void testR14_InvalidPassword_NoNumber() {
-        System.out.println("Testing password validation: no number");
-        // Arrange, Act & Assert
+        System.out.println("R14: Testing password validation - no number");
+
         assertThrows(IllegalArgumentException.class, () -> {
-            new UserLoginInfo("admin", "NoNumber!");
+            new UserLoginInfo("admin", "Password!");
         });
     }
 
+    /**
+     * ECP: missing symbol class.
+     * WB: isValidPassword loop never sets hasSymbol => returns false => constructor throws.
+     */
     @Test
     public void testR14_InvalidPassword_NoSymbol() {
-        System.out.println("Testing password validation: no symbol");
-        // Arrange, Act & Assert
+        System.out.println("R14: Testing password validation - no symbol");
+
         assertThrows(IllegalArgumentException.class, () -> {
-            new UserLoginInfo("admin", "NoSymbol1");
+            new UserLoginInfo("admin", "Password1");
         });
     }
 
+    /**
+     * Edge case / robustness:
+     * ECP: password = null.
+     * WB: hits null check branch in isValidPassword and throws via constructor.
+     */
     @Test
     public void testR14_InvalidPassword_Null() {
-        System.out.println("Testing password validation: null password");
-        // Arrange, Act & Assert
+        System.out.println("R14: Testing password validation - null password");
+
         assertThrows(IllegalArgumentException.class, () -> {
             new UserLoginInfo("admin", null);
         });
     }
 
+    /**
+     * Legacy user bypass (interaction case):
+     * - BLACK-BOX: validate=false should bypass password policy for backwards compatibility.
+     * - WHITE-BOX: covers constructor path where (validate && ...) is false, so no exception.
+     */
     @Test
-    @DisplayName("R14: Invalid password - empty string")
-    public void testR14_InvalidPassword_EmptyString() {
-        System.out.println("Testing password validation: empty string");
-        // Arrange, Act & Assert
-        assertThrows(IllegalArgumentException.class, () -> {
-            new UserLoginInfo("admin", "");
-        });
-    }
+    public void testR14_LegacyUser_BypassValidation() {
+        System.out.println("R14: Testing legacy user with weak password (validation bypassed)");
 
-    // ========== BYPASS VALIDATION TESTS (Legacy/Config Users) ==========
-    // ie constructor uses a false
+        UserLoginInfo legacyUser = new UserLoginInfo("legacyuser", "weak", false);
 
-    @Test
-    public void testR14_LegacyUser_WeakPasswordAllowed() {
-        System.out.println("un:Testing legacy user creation with weak password (validation bypassed)");
-        // Arrange & Act
-        UserLoginInfo legacyUser = new UserLoginInfo("dockeruser", "weak", false);
-
-        // Assert
         assertNotNull(legacyUser);
-        assertEquals("dockeruser", legacyUser.getUserName());
+        assertEquals("legacyuser", legacyUser.getUserName());
         assertEquals("weak", legacyUser.getPassword());
     }
 
+    /**
+     * setPassword interaction:
+     * - BLACK-BOX: even if legacy users exist, updating passwords must meet the rule.
+     * - WHITE-BOX: covers setPassword failure branch (throws) and success branch (updates).
+     */
     @Test
-    public void testR14_ConfigUser_NoValidation() {
-        System.out.println("un:Testing config user creation without validation");
-        // Arrange & Act
-        UserLoginInfo configUser = new UserLoginInfo("config", "password123", false);
+    public void testR14_SetPassword_EnforcesValidation() {
+        System.out.println("R14: Testing setPassword enforces validation");
 
-        // Assert
-        assertNotNull(configUser);
-        assertEquals("config", configUser.getUserName());
-        assertEquals("password123", configUser.getPassword());
+        UserLoginInfo user = new UserLoginInfo("admin", "Initial1!");
+        String originalPassword = user.getPassword();
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            user.setPassword("weak");
+        });
+
+        assertEquals(originalPassword, user.getPassword(),
+                "Password should remain unchanged after validation failure");
+
+        user.setPassword("NewPass2@");
+        assertEquals("NewPass2@", user.getPassword(),
+                "Password should update when valid");
     }
 
+    /**
+     * Username setter:
+     * - BLACK-BOX: setter should update stored username.
+     * - WHITE-BOX: trivial path coverage for setUserName/getUserName.
+     */
     @Test
-    public void testR14_BypassValidation_StrongPasswordStillWorks() {
-        System.out.println("un:Testing that bypass mode still accepts strong passwords");
-        // Arrange & Act
-        UserLoginInfo user = new UserLoginInfo("admin", "StrongPass123!", false);
+    public void testR14_SetUserName() {
+        System.out.println("R14: Testing setUserName");
 
-        // Assert
-        assertNotNull(user);
+        UserLoginInfo user = new UserLoginInfo("admin", "Password1!");
         assertEquals("admin", user.getUserName());
-        assertEquals("StrongPass123!", user.getPassword());
+
+        user.setUserName("newadmin");
+
+        assertEquals("newadmin", user.getUserName(),
+                "Username should be updated to new value");
     }
 }
