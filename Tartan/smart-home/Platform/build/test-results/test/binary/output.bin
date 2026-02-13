@@ -1,54 +1,111 @@
-!Evaluating new state statically
-!Evaluating new state statically
-!Evaluating new state statically
-!Evaluating new state statically
-	!Evaluating new state statically
-
-!Evaluating new state statically
-!Evaluating new state statically
-!Evaluating new state statically
-!Evaluating new state statically
-!Evaluating new state statically
-!Evaluating new state statically
-!Evaluating new state statically
-5STSE: Testing door open with someone home (allowed)
-!Evaluating new state statically
-,STSE: Testing chillerState null is handled
-!Evaluating new state statically
-2STSE: Testing switch from Heater to Chiller mode
-!Evaluating new state statically
-2STSE: Testing break-in detection via closed door
-!Evaluating new state statically
-;STSE: Testing away timer starts when house becomes vacant
-!Evaluating new state statically
--STSE: Testing auto-light when arriving home
-!Evaluating new state statically
-,STSE: Testing light forced off when vacant
-!Evaluating new state statically
-@STSE: Testing door open + vacant + alarm disabled = close door
-!Evaluating new state statically
-#STSE: Testing away timer autolock
-!Evaluating new state statically
-9STSE: Testing AC turns on when temperature above target
-!Evaluating new state statically
-=STSE: Testing door open + vacant + alarm enabled = break-in
-!Evaluating new state statically
--STSE: Testing valid passcode disables alarm
-!Evaluating new state statically
-3STSE: Testing invalid passcode keeps alarm active
-!Evaluating new state statically
- 9STSE: Testing cannot disable alarm when house is vacant
- !Evaluating new state statically
-!@STSE: Testing light on when someone is home (normal operation)
-!!Evaluating new state statically
-"=STSE: Testing heater turns on when temperature below target
-"!Evaluating new state statically
-$#.R14: Testing setPassword enforces validation
-$%2R14: Testing password validation - null password
-$&.R14: Testing password validation - no symbol
-$'1R14: Testing password validation - no uppercase
-$(CR14: Testing legacy user with weak password (validation bypassed)
-$).R14: Testing password validation - too short
-$*R14: Testing setUserName
-$+AR14: Testing valid password with minimum requirements (8 chars)
-$,.R14: Testing password validation - no number
+ Evaluating new state statically
+ Evaluating new state statically
+ Evaluating new state statically
+ Evaluating new state statically
+ Evaluating new state statically
+ Evaluating new state statically
+ Evaluating new state statically
+ Evaluating new state statically
+ Evaluating new state statically
+ Evaluating new state statically
+ Evaluating new state statically
+ Evaluating new state statically
+ Evaluating new state statically
+ Evaluating new state statically
+ Evaluating new state statically
+ Evaluating new state statically
+  Evaluating new state statically
+$ Evaluating new state statically
+% Evaluating new state statically
+)( Evaluating new state statically
+)* Evaluating new state statically
+)+ Evaluating new state statically
+), Evaluating new state statically
+)- Evaluating new state statically
+). Evaluating new state statically
+0/ Evaluating new state statically
+21 Evaluating new state statically
+43 Evaluating new state statically
+45 Evaluating new state statically
+46 Evaluating new state statically
+47 Evaluating new state statically
+48 Evaluating new state statically
+49 Evaluating new state statically
+4: Evaluating new state statically
+4; Evaluating new state statically
+4< Evaluating new state statically
+4= Evaluating new state statically
+4> Evaluating new state statically
+4? Evaluating new state statically
+4@ Evaluating new state statically
+4A Evaluating new state statically
+4B Evaluating new state statically
+DC Evaluating new state statically
+DE Evaluating new state statically
+DF Evaluating new state statically
+DG Evaluating new state statically
+IH Evaluating new state statically
+IJ Evaluating new state statically
+IK Evaluating new state statically
+IL Evaluating new state statically
+IM Evaluating new state statically
+IN Evaluating new state statically
+IO Evaluating new state statically
+IP Evaluating new state statically
+RQ4STSE: Testing door open with someone home (allowed)
+RQ Evaluating new state statically
+RS+STSE: Testing chillerState null is handled
+RS Evaluating new state statically
+RT1STSE: Testing switch from Heater to Chiller mode
+RT Evaluating new state statically
+RU+STSE: Testing door closed normal condition
+RU Evaluating new state statically
+RV1STSE: Testing break-in detection via closed door
+RV Evaluating new state statically
+RW<STSE: Testing door open with someone home and alarm enabled
+RW Evaluating new state statically
+RX:STSE: Testing away timer starts when house becomes vacant
+RX Evaluating new state statically
+RY Evaluating new state statically
+RZ,STSE: Testing auto-light when arriving home
+RZ Evaluating new state statically
+R[+STSE: Testing light forced off when vacant
+R[ Evaluating new state statically
+R\?STSE: Testing door open + vacant + alarm disabled = close door
+R\ Evaluating new state statically
+R]"STSE: Testing away timer autolock
+R] Evaluating new state statically
+R^ Evaluating new state statically
+R_:STSE: Testing chiller already on, no redundant activation
+R_ Evaluating new state statically
+R`8STSE: Testing AC turns on when temperature above target
+R` Evaluating new state statically
+Ra<STSE: Testing door open + vacant + alarm enabled = break-in
+Ra Evaluating new state statically
+Rb,STSE: Testing valid passcode disables alarm
+Rb Evaluating new state statically
+Rc2STSE: Testing invalid passcode keeps alarm active
+Rc Evaluating new state statically
+Rd8STSE: Testing cannot disable alarm when house is vacant
+Rd Evaluating new state statically
+Re?STSE: Testing light on when someone is home (normal operation)
+Re Evaluating new state statically
+Rf1STSE: Testing temp equals target, no HVAC needed
+Rf Evaluating new state statically
+Rg<STSE: Testing heater turns on when temperature below target
+Rg Evaluating new state statically
+RhBSTSE: Testing alarm active with empty passcode (hits else branch)
+Rh Evaluating new state statically
+Ri2STSE: Testing no auto-light when alarm is enabled
+Ri Evaluating new state statically
+Rj2STSE: Testing no auto-light when light already on
+Rj Evaluating new state statically
+lk-R14: Testing setPassword enforces validation
+lm1R14: Testing password validation - null password
+ln-R14: Testing password validation - no symbol
+lo0R14: Testing password validation - no uppercase
+lpBR14: Testing legacy user with weak password (validation bypassed)
+lq-R14: Testing password validation - too short
+lrR14: Testing setUserName
+ls@R14: Testing valid password with minimum requirements (8 chars)
+lt-R14: Testing password validation - no number

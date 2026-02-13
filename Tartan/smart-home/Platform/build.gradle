@@ -77,4 +77,35 @@ jacocoTestReport {
         csv.required = false
         html.outputLocation = layout.buildDirectory.dir('jacocoHtml')
     }
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it, includes: [
+                'tartan/smarthome/resources/StaticTartanStateEvaluator.class',
+                'tartan/smarthome/resources/iotcontroller/UserLoginInfo.class',
+                'tartan/smarthome/resources/iotcontroller/IoTControlManager.class'
+            ])
+        }))
+    }
+}
+
+jacocoTestCoverageVerification {
+    dependsOn jacocoTestReport
+    violationRules {
+        rule {
+            element = 'CLASS'
+            includes = [
+                'tartan.smarthome.resources.StaticTartanStateEvaluator'
+            ]
+            limit {
+                counter = 'LINE'
+                value = 'COVEREDRATIO'
+                minimum = 0.80
+            }
+            limit {
+                counter = 'BRANCH'
+                value = 'COVEREDRATIO'
+                minimum = 0.80
+            }
+        }
+    }
 }

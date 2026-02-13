@@ -2,6 +2,7 @@
 
 import java.io.*;
 import java.text.SimpleDateFormat;
+import java.time.LocalTime;
 import java.util.*;
 
 import tartan.smarthome.resources.TartanStateEvaluator;
@@ -23,7 +24,7 @@ public class IoTControlManager {
     /** the user settings */
     private Hashtable&lt;String, Object&gt; userSettings;
 
-<span class="nc" id="L26">    private Vector&lt;UserLoginInfo&gt; users = new Vector&lt;UserLoginInfo&gt;();</span>
+<span class="nc" id="L27">    private Vector&lt;UserLoginInfo&gt; users = new Vector&lt;UserLoginInfo&gt;();</span>
 
     /** the path to user settings and credentials */
     private String settingsPath;
@@ -47,26 +48,26 @@ public class IoTControlManager {
      * @param user     the user name
      * @param password the password
      */
-<span class="nc" id="L50">    public IoTControlManager(String user, String password, TartanStateEvaluator evaluator) {</span>
+<span class="nc" id="L51">    public IoTControlManager(String user, String password, TartanStateEvaluator evaluator) {</span>
 
-<span class="nc" id="L52">        logMessages = new Vector&lt;String&gt;();</span>
+<span class="nc" id="L53">        logMessages = new Vector&lt;String&gt;();</span>
 
-<span class="nc" id="L54">        userSettings = new Hashtable&lt;String, Object&gt;();</span>
+<span class="nc" id="L55">        userSettings = new Hashtable&lt;String, Object&gt;();</span>
 
-<span class="nc" id="L56">        settingsPath = null;</span>
+<span class="nc" id="L57">        settingsPath = null;</span>
 
         //this was causing problems with docker as docker doesn't have strong password names
         // added this as a way to 'grandfather' in the old users but still require the new users to have strong passwords
-<span class="nc" id="L60">        users.add(new UserLoginInfo(user, password, false)); // bypass validation for the config users</span>
+<span class="nc" id="L61">        users.add(new UserLoginInfo(user, password, false)); // bypass validation for the config users</span>
 
-<span class="nc" id="L62">        this.stateEvaluator = evaluator;</span>
+<span class="nc" id="L63">        this.stateEvaluator = evaluator;</span>
 
-<span class="nc" id="L64">        loginHandler = new LoginHandler(this.users);</span>
+<span class="nc" id="L65">        loginHandler = new LoginHandler(this.users);</span>
 
-<span class="nc" id="L66">        connMgr = null;</span>
+<span class="nc" id="L67">        connMgr = null;</span>
 
-<span class="nc" id="L68">        lastState = new Hashtable&lt;&gt;();</span>
-<span class="nc" id="L69">    }</span>
+<span class="nc" id="L69">        lastState = new Hashtable&lt;&gt;();</span>
+<span class="nc" id="L70">    }</span>
 
     /**
      * Load the registered users from a database (file).
@@ -74,53 +75,53 @@ public class IoTControlManager {
      * @return the set of valid users
      */
     public Vector&lt;UserLoginInfo&gt; loadUsers() {
-<span class="nc" id="L77">        Vector&lt;UserLoginInfo&gt; users = new Vector&lt;UserLoginInfo&gt;();</span>
+<span class="nc" id="L78">        Vector&lt;UserLoginInfo&gt; users = new Vector&lt;UserLoginInfo&gt;();</span>
 
         try {
-<span class="nc" id="L80">            File file = new File(settingsPath + File.separator + IoTValues.USERS_DB);</span>
+<span class="nc" id="L81">            File file = new File(settingsPath + File.separator + IoTValues.USERS_DB);</span>
 
-<span class="nc" id="L82">            BufferedReader br = new BufferedReader(new FileReader(file));</span>
+<span class="nc" id="L83">            BufferedReader br = new BufferedReader(new FileReader(file));</span>
 
             String line;
-<span class="nc bnc" id="L85" title="All 2 branches missed.">            while ((line = br.readLine()) != null) {</span>
-<span class="nc" id="L86">                String[] entry = line.split(&quot;=&quot;);</span>
-<span class="nc" id="L87">                users.add(new UserLoginInfo(entry[0], entry[1], false)); //bypass validation for file loaded users</span>
-<span class="nc" id="L88">            }</span>
-<span class="nc" id="L89">        } catch (Exception e) {</span>
-<span class="nc" id="L90">            e.printStackTrace();</span>
-<span class="nc" id="L91">        }</span>
-<span class="nc" id="L92">        return users;</span>
+<span class="nc bnc" id="L86" title="All 2 branches missed.">            while ((line = br.readLine()) != null) {</span>
+<span class="nc" id="L87">                String[] entry = line.split(&quot;=&quot;);</span>
+<span class="nc" id="L88">                users.add(new UserLoginInfo(entry[0], entry[1], false)); //bypass validation for file loaded users</span>
+<span class="nc" id="L89">            }</span>
+<span class="nc" id="L90">        } catch (Exception e) {</span>
+<span class="nc" id="L91">            e.printStackTrace();</span>
+<span class="nc" id="L92">        }</span>
+<span class="nc" id="L93">        return users;</span>
     }
 
     /**
      * Load the user preferences from a database (file).
      */
     public void loadSettings() {
-<span class="nc" id="L99">        Properties props = new Properties();</span>
-<span class="nc" id="L100">        InputStream is = null;</span>
+<span class="nc" id="L100">        Properties props = new Properties();</span>
+<span class="nc" id="L101">        InputStream is = null;</span>
 
         // First try loading from the current directory
         try {
-<span class="nc" id="L104">            File f = new File(settingsPath + File.separator + IoTValues.SETTINGS_FILE);</span>
-<span class="nc" id="L105">            is = new FileInputStream(f);</span>
-<span class="nc" id="L106">            props.load(is);</span>
-<span class="nc" id="L107">        } catch (Exception e) {</span>
-<span class="nc" id="L108">            e.printStackTrace();</span>
-<span class="nc" id="L109">        }</span>
+<span class="nc" id="L105">            File f = new File(settingsPath + File.separator + IoTValues.SETTINGS_FILE);</span>
+<span class="nc" id="L106">            is = new FileInputStream(f);</span>
+<span class="nc" id="L107">            props.load(is);</span>
+<span class="nc" id="L108">        } catch (Exception e) {</span>
+<span class="nc" id="L109">            e.printStackTrace();</span>
+<span class="nc" id="L110">        }</span>
 
-<span class="nc" id="L111">        String alarmPassCode = props.getProperty(IoTValues.ALARM_PASSCODE, &quot;passcode&quot;);</span>
-<span class="nc" id="L112">        Integer alarmDelay = Integer.parseInt(props.getProperty(IoTValues.ALARM_DELAY, &quot;5&quot;));</span>
+<span class="nc" id="L112">        String alarmPassCode = props.getProperty(IoTValues.ALARM_PASSCODE, &quot;passcode&quot;);</span>
+<span class="nc" id="L113">        Integer alarmDelay = Integer.parseInt(props.getProperty(IoTValues.ALARM_DELAY, &quot;5&quot;));</span>
 
-<span class="nc" id="L114">        Map&lt;String, Object&gt; initialSettings = new Hashtable&lt;String, Object&gt;();</span>
-<span class="nc" id="L115">        initialSettings.put(IoTValues.ALARM_DELAY, alarmDelay);</span>
-<span class="nc" id="L116">        initialSettings.put(IoTValues.ALARM_PASSCODE, alarmPassCode);</span>
+<span class="nc" id="L115">        Map&lt;String, Object&gt; initialSettings = new Hashtable&lt;String, Object&gt;();</span>
+<span class="nc" id="L116">        initialSettings.put(IoTValues.ALARM_DELAY, alarmDelay);</span>
+<span class="nc" id="L117">        initialSettings.put(IoTValues.ALARM_PASSCODE, alarmPassCode);</span>
         
         // The away timer is not set to start
-<span class="nc" id="L119">        lastState.put(IoTValues.AWAY_TIMER, false);</span>
+<span class="nc" id="L120">        lastState.put(IoTValues.AWAY_TIMER, false);</span>
 
         // update the settings
-<span class="nc" id="L122">        updateSettings(initialSettings);</span>
-<span class="nc" id="L123">    }</span>
+<span class="nc" id="L123">        updateSettings(initialSettings);</span>
+<span class="nc" id="L124">    }</span>
 
     /**
      * Update user settings (the alarm delay)
@@ -128,10 +129,10 @@ public class IoTControlManager {
      * @param newSettings the new user settings.
      */
     public void updateSettings(Map&lt;String, Object&gt; newSettings) {
-<span class="nc bnc" id="L131" title="All 4 branches missed.">        if (userSettings != null &amp;&amp; newSettings != null) {</span>
-<span class="nc" id="L132">            userSettings.putAll(newSettings);</span>
+<span class="nc bnc" id="L132" title="All 4 branches missed.">        if (userSettings != null &amp;&amp; newSettings != null) {</span>
+<span class="nc" id="L133">            userSettings.putAll(newSettings);</span>
         }
-<span class="nc" id="L134">    }</span>
+<span class="nc" id="L135">    }</span>
 
     /**
      * Fetch the user settings
@@ -139,11 +140,11 @@ public class IoTControlManager {
      * @return the user settings
      */
     public Hashtable&lt;String, Object&gt; getUserSettings() {
-<span class="nc" id="L142">        return userSettings;</span>
+<span class="nc" id="L143">        return userSettings;</span>
     }
 
     public Thread getUpdateThread() {
-<span class="nc" id="L146">        return updateThread;</span>
+<span class="nc" id="L147">        return updateThread;</span>
     }
 
     /**
@@ -152,22 +153,22 @@ public class IoTControlManager {
      */
     public void processStateUpdate(Map&lt;String, Object&gt; stateUpdate) {
 
-<span class="nc" id="L155">        StringBuffer log = new StringBuffer();</span>
+<span class="nc" id="L156">        StringBuffer log = new StringBuffer();</span>
 
         // User settings are part of the state
-<span class="nc" id="L158">        Map&lt;String, Object&gt; completeState = new Hashtable&lt;&gt;();</span>
-<span class="nc" id="L159">        completeState.putAll(fetchState());</span>
-<span class="nc" id="L160">        completeState.putAll(stateUpdate);     </span>
-<span class="nc" id="L161">        Map&lt;String, Object&gt; newState = stateEvaluator.evaluateState(completeState, log);</span>
-<span class="nc" id="L162">        logMessages.add(log.toString());</span>
-<span class="nc" id="L163">        synchronized(connMgr) {</span>
-<span class="nc" id="L164">            connMgr.setState(newState);</span>
-<span class="nc" id="L165">        }</span>
-<span class="nc" id="L166">        this.lastState.putAll(newState);</span>
-<span class="nc" id="L167">    }</span>
+<span class="nc" id="L159">        Map&lt;String, Object&gt; completeState = new Hashtable&lt;&gt;();</span>
+<span class="nc" id="L160">        completeState.putAll(fetchState());</span>
+<span class="nc" id="L161">        completeState.putAll(stateUpdate);     </span>
+<span class="nc" id="L162">        Map&lt;String, Object&gt; newState = stateEvaluator.evaluateState(completeState, log);</span>
+<span class="nc" id="L163">        logMessages.add(log.toString());</span>
+<span class="nc" id="L164">        synchronized(connMgr) {</span>
+<span class="nc" id="L165">            connMgr.setState(newState);</span>
+<span class="nc" id="L166">        }</span>
+<span class="nc" id="L167">        this.lastState.putAll(newState);</span>
+<span class="nc" id="L168">    }</span>
 
     public Map&lt;String, Object&gt; getCurrentState() {
-<span class="nc" id="L170">        return fetchState();</span>
+<span class="nc" id="L171">        return fetchState();</span>
     }
 
     /**
@@ -176,20 +177,23 @@ public class IoTControlManager {
      */
     private Map&lt;String, Object&gt; fetchState() {
         // Map&lt;String, Object&gt; state = null;
-<span class="nc" id="L179">        synchronized (connMgr) {</span>
-<span class="nc bnc" id="L180" title="All 2 branches missed.">            if (connMgr.isConnected() == false) {</span>
-<span class="nc" id="L181">                return null;</span>
+<span class="nc" id="L180">        synchronized (connMgr) {</span>
+<span class="nc bnc" id="L181" title="All 2 branches missed.">            if (connMgr.isConnected() == false) {</span>
+<span class="nc" id="L182">                return null;</span>
             }
-<span class="nc" id="L183">            lastState = connMgr.getState();</span>
-<span class="nc" id="L184">        }</span>
+<span class="nc" id="L184">            lastState = connMgr.getState();</span>
+<span class="nc" id="L185">        }</span>
 
         // The away timer is controlled here
-<span class="nc" id="L187">        lastState.put(IoTValues.AWAY_TIMER, false);</span>
+<span class="nc" id="L188">        lastState.put(IoTValues.AWAY_TIMER, false);</span>
 
-        // The state includes the user settings 
-<span class="nc" id="L190">        lastState.putAll(userSettings);</span>
-        // lastState.putAll(state);
-<span class="nc" id="L192">        return lastState;</span>
+        // The state includes the user settings
+<span class="nc" id="L191">        lastState.putAll(userSettings);</span>
+
+        // Inject current hour for night lock
+<span class="nc" id="L194">        lastState.put(IoTValues.CURRENT_HOUR, LocalTime.now().getHour());</span>
+
+<span class="nc" id="L196">        return lastState;</span>
     }
 
     /**
@@ -197,59 +201,59 @@ public class IoTControlManager {
      */
     private void startHouseUpdateThread() {
 
-<span class="nc" id="L200">        updateThread = new Thread(new Runnable() {</span>
+<span class="nc" id="L204">        updateThread = new Thread(new Runnable() {</span>
             @Override
             public void run() {
 
-<span class="nc" id="L204">                Integer missedUpdates = 0;</span>
+                Integer missedUpdates = 0;
                 while (true) {
 
-<span class="nc" id="L207">                    Map&lt;String, Object&gt; currentState = fetchState();</span>
-<span class="nc bnc" id="L208" title="All 2 branches missed.">                    if (currentState != null) {</span>
+                    Map&lt;String, Object&gt; currentState = fetchState();
+                    if (currentState != null) {
 
-<span class="nc" id="L210">                        StringBuffer log = new StringBuffer();</span>
-<span class="nc" id="L211">                        Map&lt;String, Object&gt; newState = stateEvaluator.evaluateState(currentState, log);</span>
-<span class="nc" id="L212">                        logMessages.add(log.toString());</span>
+                        StringBuffer log = new StringBuffer();
+                        Map&lt;String, Object&gt; newState = stateEvaluator.evaluateState(currentState, log);
+                        logMessages.add(log.toString());
                         
                         // save this state 
-<span class="nc" id="L215">                        IoTControlManager.this.lastState.putAll(newState);</span>
+                        IoTControlManager.this.lastState.putAll(newState);
 
-<span class="nc" id="L217">                        synchronized (connMgr) {</span>
-<span class="nc" id="L218">                            connMgr.setState(newState);</span>
-<span class="nc" id="L219">                        }</span>
+                        synchronized (connMgr) {
+                            connMgr.setState(newState);
+                        }
                         
                         // Must handle away timer here
-<span class="nc bnc" id="L222" title="All 2 branches missed.">                        if (true == (Boolean) newState.getOrDefault(IoTValues.AWAY_TIMER, false)) {</span>
-<span class="nc" id="L223">                            startAwayTimer();</span>
+                        if (true == (Boolean) newState.getOrDefault(IoTValues.AWAY_TIMER, false)) {
+                            startAwayTimer();
                         }
                         else 
-<span class="nc" id="L226">                        missedUpdates = 0;</span>
+                        missedUpdates = 0;
 
-<span class="nc" id="L228">                    } else {</span>
-<span class="nc" id="L229">                        missedUpdates++;</span>
+                    } else {
+                        missedUpdates++;
                     }
 
-<span class="nc bnc" id="L232" title="All 2 branches missed.">                    if (missedUpdates &gt; 6) { // 6 missed updates is 30 seconds</span>
-<span class="nc" id="L233">                        revertState();</span>
+                    if (missedUpdates &gt; 6) { // 6 missed updates is 30 seconds
+                        revertState();
                     }
 
                     // currently a 5sec delay
                     try {
-<span class="nc" id="L238">                        Thread.sleep(5000);</span>
-<span class="nc" id="L239">                    } catch (InterruptedException ie) {</span>
-<span class="nc" id="L240">                    }</span>
-<span class="nc" id="L241">                }</span>
+                        Thread.sleep(5000);
+                    } catch (InterruptedException ie) {
+                    }
+                }
             }
         });
-<span class="nc" id="L244">        updateThread.start();</span>
-<span class="nc" id="L245">        updateLog(&quot;Started update monitor&quot;);</span>
-<span class="nc" id="L246">    }</span>
+<span class="nc" id="L248">        updateThread.start();</span>
+<span class="nc" id="L249">        updateLog(&quot;Started update monitor&quot;);</span>
+<span class="nc" id="L250">    }</span>
 
     private void revertState() {
-<span class="nc" id="L249">        synchronized (connMgr) {</span>
-<span class="nc" id="L250">            connMgr.setState(this.lastState);</span>
-<span class="nc" id="L251">        }</span>
-<span class="nc" id="L252">    }</span>
+<span class="nc" id="L253">        synchronized (connMgr) {</span>
+<span class="nc" id="L254">            connMgr.setState(this.lastState);</span>
+<span class="nc" id="L255">        }</span>
+<span class="nc" id="L256">    }</span>
 
     /**
      * Connect to a house
@@ -259,33 +263,33 @@ public class IoTControlManager {
      * @return true if connected, false otherwise
      */
     public Boolean connectToHouse(String houseAddress, Integer housePort, String user, String password) {
-<span class="nc" id="L262">        updateLog(&quot;Connecting&quot;);</span>
+<span class="nc" id="L266">        updateLog(&quot;Connecting&quot;);</span>
         try {
-<span class="nc" id="L264">            loginHandler.authenticate(user, password);</span>
-<span class="nc" id="L265">        } catch (LoginAttemptsExceededException e) {</span>
-<span class="nc" id="L266">            return false;</span>
-<span class="nc" id="L267">        }</span>
+<span class="nc" id="L268">            loginHandler.authenticate(user, password);</span>
+<span class="nc" id="L269">        } catch (LoginAttemptsExceededException e) {</span>
+<span class="nc" id="L270">            return false;</span>
+<span class="nc" id="L271">        }</span>
 
-<span class="nc" id="L269">        IoTConnection conn = new IoTConnection(houseAddress, housePort);</span>
-<span class="nc" id="L270">        conn.connect();</span>
-<span class="nc" id="L271">        connMgr = new IoTConnectManager(conn);</span>
+<span class="nc" id="L273">        IoTConnection conn = new IoTConnection(houseAddress, housePort);</span>
+<span class="nc" id="L274">        conn.connect();</span>
+<span class="nc" id="L275">        connMgr = new IoTConnectManager(conn);</span>
 
-<span class="nc bnc" id="L273" title="All 2 branches missed.">        if (connMgr.isConnected()) {</span>
-<span class="nc" id="L274">            startHouseUpdateThread();</span>
-<span class="nc" id="L275">            return true;</span>
+<span class="nc bnc" id="L277" title="All 2 branches missed.">        if (connMgr.isConnected()) {</span>
+<span class="nc" id="L278">            startHouseUpdateThread();</span>
+<span class="nc" id="L279">            return true;</span>
         }
-<span class="nc" id="L277">        updateLog(&quot;Connected!&quot;);</span>
-<span class="nc" id="L278">        return false;</span>
+<span class="nc" id="L281">        updateLog(&quot;Connected!&quot;);</span>
+<span class="nc" id="L282">        return false;</span>
     }
 
     /**
      * Disconnect from a house
      */
     public void disconnectFromHouse() {
-<span class="nc bnc" id="L285" title="All 2 branches missed.">        if (connMgr.isConnected()) {</span>
-<span class="nc" id="L286">            connMgr.disconnectFromHouse();</span>
+<span class="nc bnc" id="L289" title="All 2 branches missed.">        if (connMgr.isConnected()) {</span>
+<span class="nc" id="L290">            connMgr.disconnectFromHouse();</span>
         }
-<span class="nc" id="L288">    }</span>
+<span class="nc" id="L292">    }</span>
 
     /**
      * Add a log entry
@@ -293,13 +297,13 @@ public class IoTControlManager {
      * @param logEntry the new log entry
      */
     public void updateLog(String logEntry) {
-<span class="nc" id="L296">        Long timeStamp = System.currentTimeMillis();</span>
-<span class="nc" id="L297">        SimpleDateFormat sdf = new SimpleDateFormat(&quot;MMM dd,yyyy HH:mm&quot;);</span>
-<span class="nc" id="L298">        logMessages.add(&quot;[&quot; + sdf.format(new Date(timeStamp)) + &quot;]: &quot; + logEntry + &quot;\n&quot;);</span>
-<span class="nc" id="L299">    }</span>
+<span class="nc" id="L300">        Long timeStamp = System.currentTimeMillis();</span>
+<span class="nc" id="L301">        SimpleDateFormat sdf = new SimpleDateFormat(&quot;MMM dd,yyyy HH:mm&quot;);</span>
+<span class="nc" id="L302">        logMessages.add(&quot;[&quot; + sdf.format(new Date(timeStamp)) + &quot;]: &quot; + logEntry + &quot;\n&quot;);</span>
+<span class="nc" id="L303">    }</span>
 
     public Vector&lt;String&gt; getLogMessages() {
-<span class="nc" id="L302">        return logMessages;</span>
+<span class="nc" id="L306">        return logMessages;</span>
     }
 
     /**
@@ -307,11 +311,11 @@ public class IoTControlManager {
      * the house down
      */
     private void startAwayTimer() {
-<span class="nc" id="L310">        Timer t = new Timer();</span>
+<span class="nc" id="L314">        Timer t = new Timer();</span>
 
-<span class="nc" id="L312">        Integer awayTimeout = (Integer) userSettings.get(IoTValues.ALARM_DELAY);</span>
+<span class="nc" id="L316">        Integer awayTimeout = (Integer) userSettings.get(IoTValues.ALARM_DELAY);</span>
 
-<span class="nc" id="L314">        t.schedule(new TimerTask() {</span>
+<span class="nc" id="L318">        t.schedule(new TimerTask() {</span>
 
             /**
              * This anonymous thread updates the state when the house is vacant
@@ -320,19 +324,19 @@ public class IoTControlManager {
             public void run() {
 
                 // signal that the away timer has fired
-<span class="nc" id="L323">                IoTControlManager.this.lastState.put(IoTValues.AWAY_TIMER, true);</span>
+                IoTControlManager.this.lastState.put(IoTValues.AWAY_TIMER, true);
 
-<span class="nc" id="L325">                synchronized (connMgr) {</span>
+                synchronized (connMgr) {
 
-<span class="nc" id="L327">                    StringBuffer log = new StringBuffer();</span>
-<span class="nc" id="L328">                    Map&lt;String, Object&gt; newState = stateEvaluator.evaluateState(IoTControlManager.this.lastState, log);</span>
-<span class="nc" id="L329">                    logMessages.add(log.toString());</span>
-<span class="nc" id="L330">                    connMgr.setState(newState);</span>
-<span class="nc" id="L331">                    IoTControlManager.this.lastState.putAll(newState);</span>
-<span class="nc" id="L332">                }</span>
-<span class="nc" id="L333">            }</span>
-<span class="nc" id="L334">        }, awayTimeout * 1000);</span>
-<span class="nc" id="L335">    }</span>
+                    StringBuffer log = new StringBuffer();
+                    Map&lt;String, Object&gt; newState = stateEvaluator.evaluateState(IoTControlManager.this.lastState, log);
+                    logMessages.add(log.toString());
+                    connMgr.setState(newState);
+                    IoTControlManager.this.lastState.putAll(newState);
+                }
+            }
+<span class="nc" id="L338">        }, awayTimeout * 1000);</span>
+<span class="nc" id="L339">    }</span>
 
     /**
      * Get the connected state
@@ -340,10 +344,10 @@ public class IoTControlManager {
      * @return true if connected to the house, false otherwise
      */
     public Boolean isConnected() {
-<span class="nc bnc" id="L343" title="All 2 branches missed.">        if (connMgr == null) {</span>
-<span class="nc" id="L344">            return false;</span>
+<span class="nc bnc" id="L347" title="All 2 branches missed.">        if (connMgr == null) {</span>
+<span class="nc" id="L348">            return false;</span>
         }
-<span class="nc" id="L346">        return connMgr.isConnected();</span>
+<span class="nc" id="L350">        return connMgr.isConnected();</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

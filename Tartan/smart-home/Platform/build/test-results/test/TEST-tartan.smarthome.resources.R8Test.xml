@@ -1,12 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="tartan.smarthome.resources.R8Test" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-02-10T03:27:07" hostname="MOOSELAPTOPTWO" time="0.017">
+<testsuite name="tartan.smarthome.resources.R8Test" tests="15" skipped="0" failures="0" errors="0" timestamp="2026-02-13T05:03:15" hostname="Abdulrahmans-MacBook-Air-2.local" time="0.011">
   <properties/>
-  <testcase name="R8: Empty passcode in person does NOT disable alarm" classname="tartan.smarthome.resources.R8Test" time="0.002"/>
-  <testcase name="R8: Wrong passcode in person does NOT disable alarm" classname="tartan.smarthome.resources.R8Test" time="0.003"/>
-  <testcase name="R8: Alarm already disabled remains disabled even with correct passcode" classname="tartan.smarthome.resources.R8Test" time="0.002"/>
-  <testcase name="R8: Correct passcode in person successfully disables the alarm" classname="tartan.smarthome.resources.R8Test" time="0.002"/>
-  <testcase name="R8: Alarm must NOT be disabled remotely, even with correct passcode" classname="tartan.smarthome.resources.R8Test" time="0.002"/>
+  <testcase name="R8: Door closed, someone home, alarm enabled — break-in detected" classname="tartan.smarthome.resources.R8Test" time="0.0"/>
+  <testcase name="R8: Empty passcode in person does NOT disable alarm" classname="tartan.smarthome.resources.R8Test" time="0.0"/>
+  <testcase name="R8: Passcode just above boundary (1235 vs 1234) — documents behavior" classname="tartan.smarthome.resources.R8Test" time="0.001"/>
+  <testcase name="R8: Away timer fires — auto-lock activates alarm" classname="tartan.smarthome.resources.R8Test" time="0.0"/>
+  <testcase name="R8: Away, alarm enabled, not sounding, empty passcode — alarm stays enabled" classname="tartan.smarthome.resources.R8Test" time="0.001"/>
+  <testcase name="R8: Wrong passcode in person does NOT disable alarm" classname="tartan.smarthome.resources.R8Test" time="0.001"/>
+  <testcase name="R8: Door open, nobody home, alarm enabled — break-in detected" classname="tartan.smarthome.resources.R8Test" time="0.001"/>
+  <testcase name="R8: Alarm already disabled remains disabled even with correct passcode" classname="tartan.smarthome.resources.R8Test" time="0.001"/>
+  <testcase name="R8: Proximity home, alarm disabled — light turns on automatically" classname="tartan.smarthome.resources.R8Test" time="0.0"/>
+  <testcase name="R8: Alarm enabled, door open, nobody home — alarm activates (line 194)" classname="tartan.smarthome.resources.R8Test" time="0.0"/>
+  <testcase name="R8: Empty passcode with alarm active — documents actual behavior" classname="tartan.smarthome.resources.R8Test" time="0.0"/>
+  <testcase name="R8: Invalid passcode (lexicographically less) rejects disable" classname="tartan.smarthome.resources.R8Test" time="0.001"/>
+  <testcase name="R8: Correct passcode in person successfully disables the alarm" classname="tartan.smarthome.resources.R8Test" time="0.0"/>
+  <testcase name="R8: Alarm must NOT be disabled remotely, even with correct passcode" classname="tartan.smarthome.resources.R8Test" time="0.0"/>
+  <testcase name="R8: Passcode lexicographically greater — documents actual behavior" classname="tartan.smarthome.resources.R8Test" time="0.0"/>
   <system-out><![CDATA[Evaluating new state statically
+Evaluating new state statically
+Evaluating new state statically
+Evaluating new state statically
+Evaluating new state statically
+Evaluating new state statically
+Evaluating new state statically
+Evaluating new state statically
+Evaluating new state statically
+Evaluating new state statically
+Evaluating new state statically
 Evaluating new state statically
 Evaluating new state statically
 Evaluating new state statically

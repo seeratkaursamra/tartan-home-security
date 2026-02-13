@@ -67,12 +67,16 @@ public abstract class IoTValues {
     public static final String USERS_DB = "users.txt";
 	public static final String AWAY_TIMER = "AW";
 
-    // This is being added because we need it in order for the keyless lock to work.
     // Smart Door Lock
     public static final String LOCK_STATE = "lockState";                 // Boolean: true=locked, false=unlocked
     public static final String KEYLESS_ENABLED = "keylessEnabled";        // Boolean: feature toggle
     public static final String AUTHORIZED_APPROACH = "authorizedApproach";// Boolean: sensors say authorized resident is approaching
     public static final String INTRUDER_ACTIVE = "intruderActive";        // Boolean: intruder detection active
-    public static final String NIGHT_ACTIVE = "nightActive";              // Boolean: “night window” currently active
+    public static final String NIGHT_ACTIVE = "nightActive";              // Boolean: "night window" currently active
 
+    // Night Lock configuration
+    public static final String NIGHT_LOCK_ENABLED = "NLE";
+    public static final String NIGHT_LOCK_START = "NLS";
+    public static final String NIGHT_LOCK_END = "NLEND";
+    public static final String CURRENT_HOUR = "CH";
 }

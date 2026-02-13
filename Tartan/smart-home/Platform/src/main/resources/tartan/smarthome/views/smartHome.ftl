@@ -21,8 +21,11 @@ See -->
                 var armAlarm = $('#armAlarm').val();
                 var passcode = $('#alarmPasscode').val();
                 var hvacMode = $('#hvacMode').val();
+                var nightLockEnabled = $('#nightLockEnabled').val();
+                var nightLockStart = $('#nightLockStart').val();
+                var nightLockEnd = $('#nightLockEnd').val();
 
-                return JSON.stringify({"door":door,"light":light,"targetTemp":targetTemp,"humidifier":humidifier,"alarmArmed":armAlarm,"alarmDelay":alarmDelay,"alarmPasscode":passcode});
+                return JSON.stringify({"door":door,"light":light,"targetTemp":targetTemp,"humidifier":humidifier,"alarmArmed":armAlarm,"alarmDelay":alarmDelay,"alarmPasscode":passcode,"nightLockEnabled":nightLockEnabled,"nightLockStart":nightLockStart,"nightLockEnd":nightLockEnd});
             }
 
             // Auto scroll
@@ -180,6 +183,36 @@ div {
     <p>
         <strong>
             Alarm delay: <input id="alarmDelay" type="number" value="${tartanHome.alarmDelay}" /> seconds
+        </strong>
+    </p>
+    <hr>
+    <h3>Night Lock</h3>
+    <p>
+        <strong>Lock status:
+        <#if (tartanHome.lockState)?? && tartanHome.lockState == "locked">
+            <font color="green">Locked</font>
+        <#else>
+            <font color="red">Unlocked</font>
+        </#if>
+        </strong>
+    </p>
+    <p>
+        <strong><label for="nightLockEnabled">Night Lock:</label></strong>
+        <select name="slider-flip-m" id="nightLockEnabled" data-role="slider" data-mini="true">
+            <option value="false">disabled</option>
+            <option value="true" <#if (tartanHome.nightLockEnabled)?? && tartanHome.nightLockEnabled == "true">selected="true"</#if>>enabled</option>
+        </select>
+    </p>
+    <p>
+        <strong>
+            <label for="nightLockStart">Night start hour (0-23): </label>
+            <input id="nightLockStart" type="number" value="${(tartanHome.nightLockStart)!'22'}" min="0" max="23" />
+        </strong>
+    </p>
+    <p>
+        <strong>
+            <label for="nightLockEnd">Night end hour (0-23): </label>
+            <input id="nightLockEnd" type="number" value="${(tartanHome.nightLockEnd)!'6'}" min="0" max="23" />
         </strong>
     </p>
     <hr>

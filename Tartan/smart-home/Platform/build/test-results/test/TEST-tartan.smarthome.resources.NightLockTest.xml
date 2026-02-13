@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="tartan.smarthome.resources.NightLockTest" tests="20" skipped="0" failures="0" errors="0" timestamp="2026-02-13T05:03:15" hostname="Abdulrahmans-MacBook-Air-2.local" time="0.02">
+  <properties/>
+  <testcase name="Night Lock: Night not active keeps door unlocked" classname="tartan.smarthome.resources.NightLockTest" time="0.002"/>
+  <testcase name="Night Lock: Door is locked automatically during night hours" classname="tartan.smarthome.resources.NightLockTest" time="0.001"/>
+  <testcase name="Night Lock: Night active at late hour locks door" classname="tartan.smarthome.resources.NightLockTest" time="0.001"/>
+  <testcase name="isNightTime: Boundary — hour == start → true" classname="tartan.smarthome.resources.NightLockTest" time="0.0"/>
+  <testcase name="Night Lock: Unlocked door during night is re-locked" classname="tartan.smarthome.resources.NightLockTest" time="0.001"/>
+  <testcase name="Night Lock: Keyless entry takes priority over night lock" classname="tartan.smarthome.resources.NightLockTest" time="0.001"/>
+  <testcase name="isNightTime: Non-crossing range — start=8, end=18, hour=10 → true" classname="tartan.smarthome.resources.NightLockTest" time="0.0"/>
+  <testcase name="Night Lock: Already locked — no duplicate log entry" classname="tartan.smarthome.resources.NightLockTest" time="0.0"/>
+  <testcase name="isNightTime: Boundary — hour == end → false" classname="tartan.smarthome.resources.NightLockTest" time="0.001"/>
+  <testcase name="Night Lock: During day, unlocked door stays unlocked" classname="tartan.smarthome.resources.NightLockTest" time="0.001"/>
+  <testcase name="Night Lock: Night lock engages when keyless does not trigger" classname="tartan.smarthome.resources.NightLockTest" time="0.001"/>
+  <testcase name="Night Lock: Intruder takes priority over night lock" classname="tartan.smarthome.resources.NightLockTest" time="0.001"/>
+  <testcase name="Night Lock: Night active at early morning hour locks door" classname="tartan.smarthome.resources.NightLockTest" time="0.0"/>
+  <testcase name="isNightTime: Midnight crossing — hour 3, start=22, end=6 → true" classname="tartan.smarthome.resources.NightLockTest" time="0.0"/>
+  <testcase name="isNightTime: Midnight crossing — hour 7, start=22, end=6 → false" classname="tartan.smarthome.resources.NightLockTest" time="0.001"/>
+  <testcase name="Night Lock Integration: TartanHome fields round-trip through state conversion" classname="tartan.smarthome.resources.NightLockTest" time="0.001"/>
+  <testcase name="Night Lock Integration: Evaluator output includes lock state for full pipeline" classname="tartan.smarthome.resources.NightLockTest" time="0.0"/>
+  <testcase name="Night Lock: Disabled feature does not lock door at night" classname="tartan.smarthome.resources.NightLockTest" time="0.0"/>
+  <testcase name="isNightTime: Non-crossing range — start=8, end=18, hour=20 → false" classname="tartan.smarthome.resources.NightLockTest" time="0.001"/>
+  <testcase name="isNightTime: Midnight crossing — hour 23, start=22, end=6 → true" classname="tartan.smarthome.resources.NightLockTest" time="0.0"/>
+  <system-out><![CDATA[Evaluating new state statically
+Evaluating new state statically
+Evaluating new state statically
+Evaluating new state statically
+Evaluating new state statically
+Evaluating new state statically
+Evaluating new state statically
+Evaluating new state statically
+Evaluating new state statically
+Evaluating new state statically
+Evaluating new state statically
+Evaluating new state statically
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

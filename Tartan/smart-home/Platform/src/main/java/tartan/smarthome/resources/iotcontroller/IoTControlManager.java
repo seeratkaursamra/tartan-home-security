@@ -2,6 +2,7 @@ package tartan.smarthome.resources.iotcontroller;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
+import java.time.LocalTime;
 import java.util.*;
 
 import tartan.smarthome.resources.TartanStateEvaluator;
@@ -186,9 +187,12 @@ public class IoTControlManager {
         // The away timer is controlled here
         lastState.put(IoTValues.AWAY_TIMER, false);
 
-        // The state includes the user settings 
+        // The state includes the user settings
         lastState.putAll(userSettings);
-        // lastState.putAll(state);
+
+        // Inject current hour for night lock
+        lastState.put(IoTValues.CURRENT_HOUR, LocalTime.now().getHour());
+
         return lastState;
     }
 
