@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Tests for the Night Lock feature.
- *
+ * The following from Claude's prompt: What type of tests would you write for the Night Lock feature?
  * Night Lock: During configured night hours, the door is automatically locked
  * and re-locked if unlocked. The feature can be enabled/disabled and supports
  * midnight-crossing schedules (e.g., start=22, end=6).
@@ -46,12 +46,11 @@ public class NightLockTest {
         state.put(IoTValues.ALARM_PASSCODE, "1234");
         state.put(IoTValues.GIVEN_PASSCODE, "");
         state.put(IoTValues.AWAY_TIMER, false);
-        // Night Lock defaults
-        state.put(IoTValues.LOCK_STATE, false);          // unlocked
-        state.put(IoTValues.NIGHT_LOCK_ENABLED, true);   // feature on
-        state.put(IoTValues.NIGHT_LOCK_START, 22);       // 10 PM
-        state.put(IoTValues.NIGHT_LOCK_END, 6);          // 6 AM
-        state.put(IoTValues.CURRENT_HOUR, 12);           // noon by default
+        state.put(IoTValues.LOCK_STATE, false);         
+        state.put(IoTValues.NIGHT_LOCK_ENABLED, true);  
+        state.put(IoTValues.NIGHT_LOCK_START, 22);    
+        state.put(IoTValues.NIGHT_LOCK_END, 6);        
+        state.put(IoTValues.CURRENT_HOUR, 12);        
         return state;
     }
 
@@ -78,8 +77,8 @@ public class NightLockTest {
     @DisplayName("Night Lock: Unlocked door during night is re-locked")
     void testNightLock_UnlockedDuringNight_Relocks() {
         Map<String, Object> state = createDefaultState();
-        state.put(IoTValues.LOCK_STATE, false);      // someone unlocked it
-        state.put(IoTValues.CURRENT_HOUR, 2);        // 2 AM — night time
+        state.put(IoTValues.LOCK_STATE, false);      
+        state.put(IoTValues.CURRENT_HOUR, 2);       
 
         Map<String, Object> newState = evaluator.evaluateState(state, log);
 
@@ -110,9 +109,9 @@ public class NightLockTest {
     @DisplayName("Night Lock: Disabled feature does not lock door at night")
     void testNightLock_Disabled_NoEffect() {
         Map<String, Object> state = createDefaultState();
-        state.put(IoTValues.NIGHT_LOCK_ENABLED, false); // feature off
-        state.put(IoTValues.LOCK_STATE, false);          // unlocked
-        state.put(IoTValues.CURRENT_HOUR, 23);           // night time
+        state.put(IoTValues.NIGHT_LOCK_ENABLED, false); 
+        state.put(IoTValues.LOCK_STATE, false);         
+        state.put(IoTValues.CURRENT_HOUR, 23);          
 
         Map<String, Object> newState = evaluator.evaluateState(state, log);
 
@@ -205,8 +204,8 @@ public class NightLockTest {
     @DisplayName("Night Lock: Already locked — no duplicate log entry")
     void testNightLock_AlreadyLocked_NoDoubleLog() {
         Map<String, Object> state = createDefaultState();
-        state.put(IoTValues.LOCK_STATE, true);       // already locked
-        state.put(IoTValues.CURRENT_HOUR, 23);       // night time
+        state.put(IoTValues.LOCK_STATE, true);     
+        state.put(IoTValues.CURRENT_HOUR, 23);      
 
         Map<String, Object> newState = evaluator.evaluateState(state, log);
 
@@ -251,7 +250,6 @@ public class NightLockTest {
     @Test
     @DisplayName("Night Lock Integration: TartanHome fields round-trip through state conversion")
     void testNightLock_Integration_TartanHomeFields() {
-        // Verify TartanHome has night lock fields and they serialize correctly
         tartan.smarthome.core.TartanHome home = new tartan.smarthome.core.TartanHome();
         home.setLockState(tartan.smarthome.core.TartanHomeValues.LOCKED);
         home.setNightLockEnabled("true");
@@ -280,7 +278,6 @@ public class NightLockTest {
 
         Map<String, Object> newState = evaluator.evaluateState(state, log);
 
-        // Verify the output map contains the lock state
         assertTrue(newState.containsKey(IoTValues.LOCK_STATE),
                 "Integration FAILED: Output state should contain LOCK_STATE");
         assertTrue((Boolean) newState.get(IoTValues.LOCK_STATE),
