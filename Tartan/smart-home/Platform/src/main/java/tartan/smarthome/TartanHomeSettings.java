@@ -41,6 +41,10 @@ public class TartanHomeSettings {
     @JsonProperty
     private String alarmPasscode;
 
+    @NotEmpty
+    @JsonProperty
+    private String lockPasscode;
+
     public String getTargetTemp() {
         return targetTemp;
     }
@@ -98,4 +102,8 @@ public class TartanHomeSettings {
     public String getAlarmPasscode() { return alarmPasscode;  }
 
     public void setAlarmPasscode(String alarmPasscode) { this.alarmPasscode = alarmPasscode;  }
+
+    public String getLockPasscode() { return lockPasscode; }
+
+    public void setLockPasscode(String lockPasscode) { this.lockPasscode = lockPasscode; }
 }

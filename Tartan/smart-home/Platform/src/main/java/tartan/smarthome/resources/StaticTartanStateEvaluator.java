@@ -63,8 +63,18 @@ public class StaticTartanStateEvaluator implements TartanStateEvaluator {
         Boolean keylessEnabled = (Boolean) inState.getOrDefault(IoTValues.KEYLESS_ENABLED, false);
         Boolean authorizedApproach = (Boolean) inState.getOrDefault(IoTValues.AUTHORIZED_APPROACH, false);
         Boolean intruderActive = (Boolean) inState.getOrDefault(IoTValues.INTRUDER_ACTIVE, false);
-        Boolean nightActive = (Boolean) inState.getOrDefault(IoTValues.NIGHT_ACTIVE, false);
-
+        // Compute nightActive from configuration (night window), or use NIGHT_ACTIVE if provided (e.g. by tests)
+        boolean nightActive;
+        if (inState.containsKey(IoTValues.NIGHT_ACTIVE)) {
+            Boolean fromState = (Boolean) inState.get(IoTValues.NIGHT_ACTIVE);
+            nightActive = fromState != null && fromState;
+        } else {
+            Boolean nightLockEnabled = (Boolean) inState.getOrDefault(IoTValues.NIGHT_LOCK_ENABLED, false);
+            int currentHour = inState.containsKey(IoTValues.CURRENT_HOUR) ? ((Number) inState.get(IoTValues.CURRENT_HOUR)).intValue() : 0;
+            int nightStart = inState.containsKey(IoTValues.NIGHT_LOCK_START) ? ((Number) inState.get(IoTValues.NIGHT_LOCK_START)).intValue() : 22;
+            int nightEnd = inState.containsKey(IoTValues.NIGHT_LOCK_END) ? ((Number) inState.get(IoTValues.NIGHT_LOCK_END)).intValue() : 6;
+            nightActive = nightLockEnabled != null && nightLockEnabled && isNightTime(currentHour, nightStart, nightEnd);
+        }
 
         System.out.println("Evaluating new state statically");
 

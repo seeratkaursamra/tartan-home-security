@@ -89,6 +89,19 @@ public class TartanHome {
     @JsonProperty
     private String nightLockEnd;
 
+    // Smart Door Lock: Keyless Entry, Electronic Operation, Intruder Defence
+    @JsonProperty
+    private String keylessEnabled;
+
+    @JsonProperty
+    private String lockPasscode;
+
+    @JsonProperty
+    private String lockAction;
+
+    @JsonProperty
+    private String intruderDetected;
+
     /**
      * Empty constructor needed by Jackson deserialization
      */
@@ -366,6 +379,18 @@ public class TartanHome {
 
     public String getNightLockEnd() { return nightLockEnd; }
     public void setNightLockEnd(String nightLockEnd) { this.nightLockEnd = nightLockEnd; }
+
+    public String getKeylessEnabled() { return keylessEnabled; }
+    public void setKeylessEnabled(String keylessEnabled) { this.keylessEnabled = keylessEnabled; }
+
+    public String getLockPasscode() { return lockPasscode; }
+    public void setLockPasscode(String lockPasscode) { this.lockPasscode = lockPasscode; }
+
+    public String getLockAction() { return lockAction; }
+    public void setLockAction(String lockAction) { this.lockAction = lockAction; }
+
+    public String getIntruderDetected() { return intruderDetected; }
+    public void setIntruderDetected(String intruderDetected) { this.intruderDetected = intruderDetected; }
 
     @Override
     public boolean equals(Object o) {
