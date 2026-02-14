@@ -12,12 +12,7 @@ import tartan.smarthome.resources.iotcontroller.IoTValues;
 
 /**
  * Cross-feature integration tests for StaticTartanStateEvaluator.
- *
- * These tests exercise interactions between multiple evaluator rules
- * that are not covered by per-rule test files (R1, R3, R8, etc.).
- * Primary focus:
- *   1. nightActive computation from config fields (evaluator lines 66-77)
- *   2. Multi-rule cascading scenarios (lock + alarm + light + door + HVAC)
+ * Openai, chatgpt 5.2, 2026-02-14 - "There was a bug related to the nightlock please ammend the tests so that it works with this new implementation"
  */
 public class STESLtest {
 
@@ -30,17 +25,11 @@ public class STESLtest {
         log = new StringBuffer();
     }
 
-    /**
-     * Helper: base state WITHOUT NIGHT_ACTIVE key so the evaluator
-     * falls through to the config-computation path (lines 71-76).
-     */
     private Map<String, Object> baseStateWithoutNightActive() {
         Map<String, Object> state = TestStateFactory.baseStateCopy();
         state.remove(IoTValues.NIGHT_ACTIVE);
         return state;
     }
-
-    // ===== nightActive computed from config fields =====
 
     @Test
     @DisplayName("Config path: night hour + enabled → nightActive=true, door locks")
@@ -50,7 +39,7 @@ public class STESLtest {
         state.put(IoTValues.NIGHT_LOCK_START, 22);
         state.put(IoTValues.NIGHT_LOCK_END, 6);
         state.put(IoTValues.CURRENT_HOUR, 23);
-        state.put(IoTValues.LOCK_STATE, false); // unlocked
+        state.put(IoTValues.LOCK_STATE, false);
 
         Map<String, Object> result = evaluator.evaluateState(state, log);
 
@@ -114,7 +103,6 @@ public class STESLtest {
     @DisplayName("Config path: no config keys at all → defaults, door stays unlocked")
     void configPath_defaultValues_noNightLockKey() {
         Map<String, Object> state = baseStateWithoutNightActive();
-        // No NIGHT_LOCK_ENABLED, NIGHT_LOCK_START, NIGHT_LOCK_END, CURRENT_HOUR
         state.put(IoTValues.LOCK_STATE, false);
 
         Map<String, Object> result = evaluator.evaluateState(state, log);
@@ -123,17 +111,16 @@ public class STESLtest {
                 "Door should stay unlocked when no config keys are present (defaults: disabled)");
     }
 
-    // ===== Multi-rule cascading scenarios =====
-
     @Test
     @DisplayName("Cascade: vacant + night + door open + light on → R1+R3+R12+night lock all fire")
     void vacantHouse_nightLock_awayTimer_allFire() {
         Map<String, Object> state = TestStateFactory.baseStateCopy();
-        state.put(IoTValues.PROXIMITY_STATE, false);   // vacant
-        state.put(IoTValues.NIGHT_ACTIVE, true);        // night
-        state.put(IoTValues.DOOR_STATE, true);           // open
-        state.put(IoTValues.LIGHT_STATE, true);          // on
-        state.put(IoTValues.LOCK_STATE, false);          // unlocked
+        state.put(IoTValues.PROXIMITY_STATE, false);
+        state.put(IoTValues.NIGHT_ACTIVE, true);
+        state.put(IoTValues.NIGHT_LOCK_ENABLED, true);
+        state.put(IoTValues.DOOR_STATE, true);
+        state.put(IoTValues.LIGHT_STATE, true);
+        state.put(IoTValues.LOCK_STATE, false);
         state.put(IoTValues.ALARM_STATE, false);
 
         Map<String, Object> result = evaluator.evaluateState(state, log);
@@ -153,8 +140,9 @@ public class STESLtest {
     void awayTimerFired_nightActive_lockAndAlarm() {
         Map<String, Object> state = TestStateFactory.baseStateCopy();
         state.put(IoTValues.PROXIMITY_STATE, false);
-        state.put(IoTValues.AWAY_TIMER, true);           // away timer fired
+        state.put(IoTValues.AWAY_TIMER, true);
         state.put(IoTValues.NIGHT_ACTIVE, true);
+        state.put(IoTValues.NIGHT_LOCK_ENABLED, true);
         state.put(IoTValues.LOCK_STATE, false);
         state.put(IoTValues.ALARM_STATE, false);
         state.put(IoTValues.LIGHT_STATE, false);
@@ -173,9 +161,10 @@ public class STESLtest {
         Map<String, Object> state = TestStateFactory.baseStateCopy();
         state.put(IoTValues.INTRUDER_ACTIVE, true);
         state.put(IoTValues.ALARM_STATE, true);
-        state.put(IoTValues.DOOR_STATE, true);           // open
-        state.put(IoTValues.PROXIMITY_STATE, false);      // vacant
+        state.put(IoTValues.DOOR_STATE, true);
+        state.put(IoTValues.PROXIMITY_STATE, false);
         state.put(IoTValues.NIGHT_ACTIVE, true);
+        state.put(IoTValues.NIGHT_LOCK_ENABLED, true);
         state.put(IoTValues.LOCK_STATE, false);
 
         Map<String, Object> result = evaluator.evaluateState(state, log);
@@ -198,6 +187,7 @@ public class STESLtest {
         state.put(IoTValues.ALARM_STATE, false);
         state.put(IoTValues.LIGHT_STATE, false);
         state.put(IoTValues.NIGHT_ACTIVE, true);
+        state.put(IoTValues.NIGHT_LOCK_ENABLED, true);
         state.put(IoTValues.LOCK_STATE, false);
 
         Map<String, Object> result = evaluator.evaluateState(state, log);
@@ -215,6 +205,7 @@ public class STESLtest {
         state.put(IoTValues.HVAC_MODE, "Heater");
         state.put(IoTValues.HUMIDIFIER_STATE, true);
         state.put(IoTValues.NIGHT_ACTIVE, true);
+        state.put(IoTValues.NIGHT_LOCK_ENABLED, true);
         state.put(IoTValues.LOCK_STATE, false);
 
         Map<String, Object> result = evaluator.evaluateState(state, log);
@@ -223,5 +214,19 @@ public class STESLtest {
                 "Humidifier should be off in heater mode (R10)");
         assertTrue((Boolean) result.get(IoTValues.LOCK_STATE),
                 "Night lock should still lock the door");
+    }
+
+    @Test
+    @DisplayName("nightActive_relocksIfUnlocked_whenNoKeylessTrigger")
+    void nightActive_relocksIfUnlocked_whenNoKeylessTrigger() {
+        Map<String, Object> state = TestStateFactory.baseStateCopy();
+        state.put(IoTValues.NIGHT_ACTIVE, true);
+        state.put(IoTValues.NIGHT_LOCK_ENABLED, true);
+        state.put(IoTValues.LOCK_STATE, false);
+
+        Map<String, Object> result = evaluator.evaluateState(state, log);
+
+        assertTrue((Boolean) result.get(IoTValues.LOCK_STATE),
+                "Night lock should lock when nightActive=true and enabled");
     }
 }

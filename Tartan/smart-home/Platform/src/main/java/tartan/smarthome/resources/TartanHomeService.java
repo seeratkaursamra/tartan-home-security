@@ -535,7 +535,14 @@ public class TartanHomeService {
      */
     private Map<String, Object> toIotState(TartanHome tartanHome) {
         Map<String, Object> state = new Hashtable<>();
-        
+
+        state.put(IoTValues.CURRENT_HOUR, java.time.LocalTime.now().getHour());
+
+
+        if (tartanHome.getNightActive() != null) {
+            state.put(IoTValues.NIGHT_ACTIVE, Boolean.parseBoolean(tartanHome.getNightActive()));
+        }
+
         if (tartanHome.getProximity()!=null) {
             state.put(IoTValues.PROXIMITY_STATE, toIoTProximityState(tartanHome));
         }
