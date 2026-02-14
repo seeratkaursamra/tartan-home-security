@@ -78,6 +78,9 @@ public class TartanHome {
 
     // Night Lock fields
     @JsonProperty
+    private String nightActive;
+
+    @JsonProperty
     private String lockState;
 
     @JsonProperty
@@ -361,6 +364,14 @@ public class TartanHome {
      * @return the passcode
      */
     public String getAlarmPasscode() { return alarmPasscode; }
+
+    public String getNightActive() {
+        return nightActive;
+    }
+
+    public void setNightActive(String nightActive) {
+        this.nightActive = nightActive;
+    }
 
     /**
      * Set the alarm passcode
