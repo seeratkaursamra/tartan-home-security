@@ -33,9 +33,13 @@ public class TartanHomeService {
     private Integer port;
     private String alarmDelay;
     private String alarmPasscode;
+    private String lockPasscode;
     private String targetTemp;
     private String user;
     private String password;
+
+    // Smart door lock: Electronic Operation (access panel)
+    private ElectronicOperation electronicOperation;
 
     // status parameters
     private HomeDAO homeDAO;
@@ -71,13 +75,15 @@ public class TartanHomeService {
         this.targetTemp = settings.getTargetTemp();
         this.alarmDelay = settings.getAlarmDelay();
         this.alarmPasscode = settings.getAlarmPasscode();
+        this.lockPasscode = settings.getLockPasscode() != null ? settings.getLockPasscode() : "1234";
 
         this.historyTimer = historyTimer*1000;
         this.logHistory = true;
 
         // Create and initialize the controller for this house
         this.controller = new IoTControlManager(user, password, new StaticTartanStateEvaluator());
-        
+        this.electronicOperation = new ElectronicOperation(this.lockPasscode);
+
         TartanHome temp = new TartanHome();
         temp.setAlarmDelay(alarmDelay);
 
@@ -314,7 +320,34 @@ public class TartanHomeService {
      */
     public Boolean setState(TartanHome h) {
         synchronized (controller) {
-                        
+            // Sync Electronic Operation with current system lock state
+            Map<String, Object> currentState = controller.getCurrentState();
+            if (currentState != null && electronicOperation != null) {
+                Boolean currentLock = (Boolean) currentState.getOrDefault(IoTValues.LOCK_STATE, true);
+                electronicOperation.setLocked(currentLock != null && currentLock);
+            }
+
+            // Access panel: lock/unlock with passcode (Electronic Operation)
+            String lockAction = h.getLockAction();
+            if (lockAction != null && !lockAction.isEmpty() && electronicOperation != null) {
+                String givenPasscode = h.getLockPasscode() != null ? h.getLockPasscode() : "";
+                String message;
+                if ("unlock".equalsIgnoreCase(lockAction)) {
+                    message = electronicOperation.requestUnlock(givenPasscode);
+                    if (message.contains("successfully")) {
+                        h.setLockState(TartanHomeValues.UNLOCKED);
+                    }
+                } else if ("lock".equalsIgnoreCase(lockAction)) {
+                    message = electronicOperation.requestLock(givenPasscode);
+                    if (message.contains("successfully")) {
+                        h.setLockState(TartanHomeValues.LOCKED);
+                    }
+                } else {
+                    message = "Unknown lock action: " + lockAction;
+                }
+                controller.updateLog("Access panel: " + message);
+            }
+
             Map<String, Object> userSettings = new Hashtable<String, Object>();
             if (h.getAlarmDelay()!=null) {
                 this.alarmDelay = h.getAlarmDelay();
@@ -371,6 +404,8 @@ public class TartanHomeService {
             tartanHome.setHvacMode(TartanHomeValues.UNKNOWN);
             tartanHome.setHvacState(TartanHomeValues.UNKNOWN);
             tartanHome.setLockState(TartanHomeValues.UNKNOWN);
+            tartanHome.setKeylessEnabled("false");
+            tartanHome.setIntruderDetected("false");
 
             return tartanHome;
         }
@@ -439,6 +474,21 @@ public class TartanHomeService {
                 } else {
                     tartanHome.setLockState(TartanHomeValues.UNLOCKED);
                 }
+            } else if (key.equals(IoTValues.KEYLESS_ENABLED)) {
+                Boolean keylessEnabled = (Boolean) state.get(key);
+                tartanHome.setKeylessEnabled(keylessEnabled != null && keylessEnabled ? "true" : "false");
+            } else if (key.equals(IoTValues.INTRUDER_ACTIVE)) {
+                Boolean intruderActive = (Boolean) state.get(key);
+                tartanHome.setIntruderDetected(intruderActive != null && intruderActive ? "true" : "false");
+            } else if (key.equals(IoTValues.NIGHT_LOCK_ENABLED)) {
+                Boolean nightLockEnabled = (Boolean) state.get(key);
+                tartanHome.setNightLockEnabled(nightLockEnabled != null && nightLockEnabled ? "true" : "false");
+            } else if (key.equals(IoTValues.NIGHT_LOCK_START)) {
+                Object val = state.get(key);
+                if (val != null) tartanHome.setNightLockStart(String.valueOf(val));
+            } else if (key.equals(IoTValues.NIGHT_LOCK_END)) {
+                Object val = state.get(key);
+                if (val != null) tartanHome.setNightLockEnd(String.valueOf(val));
             } else if (key.equals(IoTValues.HVAC_MODE)) {
                 if (state.get(key).equals("Heater")) {
                     tartanHome.setHvacMode(TartanHomeValues.HEAT);
@@ -457,6 +507,22 @@ public class TartanHomeService {
                     tartanHome.setHvacState(TartanHomeValues.OFF);
                 }
             }
+        }
+
+        if (tartanHome.getKeylessEnabled() == null) {
+            tartanHome.setKeylessEnabled("false");
+        }
+        if (tartanHome.getIntruderDetected() == null) {
+            tartanHome.setIntruderDetected("false");
+        }
+        if (tartanHome.getNightLockEnabled() == null) {
+            tartanHome.setNightLockEnabled("false");
+        }
+        if (tartanHome.getNightLockStart() == null) {
+            tartanHome.setNightLockStart("22");
+        }
+        if (tartanHome.getNightLockEnd() == null) {
+            tartanHome.setNightLockEnd("6");
         }
         
         return tartanHome;
@@ -534,6 +600,12 @@ public class TartanHomeService {
         }
         if (tartanHome.getNightLockEnd() != null) {
             state.put(IoTValues.NIGHT_LOCK_END, Integer.parseInt(tartanHome.getNightLockEnd()));
+        }
+        if (tartanHome.getKeylessEnabled() != null) {
+            state.put(IoTValues.KEYLESS_ENABLED, Boolean.parseBoolean(tartanHome.getKeylessEnabled()));
+        }
+        if (tartanHome.getIntruderDetected() != null) {
+            state.put(IoTValues.INTRUDER_ACTIVE, Boolean.parseBoolean(tartanHome.getIntruderDetected()));
         }
 
         for (Map.Entry<String,Object> e : state.entrySet()) {

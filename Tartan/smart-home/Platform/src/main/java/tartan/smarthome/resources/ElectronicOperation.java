@@ -34,6 +34,14 @@ public class ElectronicOperation {
     }
 
     /**
+     * Set the lock state (e.g. to sync with system lock state from other features).
+     * @param locked true for locked, false for unlocked
+     */
+    public void setLocked(boolean locked) {
+        this.locked = locked;
+    }
+
+    /**
      * Request to unlock from the access panel. Validates the passcode first.
      *
      * @param givenPasscode the passcode entered by the user

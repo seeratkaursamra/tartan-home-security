@@ -21,6 +21,9 @@ houses:
     # and the super secret passcode to disable the alarm
     alarmPasscode: stop
 
+    # passcode for smart door lock (Electronic Operation)
+    lockPasscode: "1234"
+
     # Next house
   - name: cmu
     address: localhost
@@ -31,6 +34,7 @@ houses:
     targetTemp: 70
     alarmDelay: 30
     alarmPasscode: quit
+    lockPasscode: "5678"
 
 # how many seconds between database snapshots
 historyTimer: 5

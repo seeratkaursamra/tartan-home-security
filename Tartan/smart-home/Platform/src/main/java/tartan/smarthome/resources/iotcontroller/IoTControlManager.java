@@ -165,6 +165,22 @@ public class IoTControlManager {
             connMgr.setState(newState);
         }
         this.lastState.putAll(newState);
+        // Preserve user preference keys that evaluator does not output
+        if (stateUpdate.containsKey(IoTValues.KEYLESS_ENABLED)) {
+            this.lastState.put(IoTValues.KEYLESS_ENABLED, stateUpdate.get(IoTValues.KEYLESS_ENABLED));
+        }
+        if (stateUpdate.containsKey(IoTValues.INTRUDER_ACTIVE)) {
+            this.lastState.put(IoTValues.INTRUDER_ACTIVE, stateUpdate.get(IoTValues.INTRUDER_ACTIVE));
+        }
+        if (stateUpdate.containsKey(IoTValues.NIGHT_LOCK_ENABLED)) {
+            this.lastState.put(IoTValues.NIGHT_LOCK_ENABLED, stateUpdate.get(IoTValues.NIGHT_LOCK_ENABLED));
+        }
+        if (stateUpdate.containsKey(IoTValues.NIGHT_LOCK_START)) {
+            this.lastState.put(IoTValues.NIGHT_LOCK_START, stateUpdate.get(IoTValues.NIGHT_LOCK_START));
+        }
+        if (stateUpdate.containsKey(IoTValues.NIGHT_LOCK_END)) {
+            this.lastState.put(IoTValues.NIGHT_LOCK_END, stateUpdate.get(IoTValues.NIGHT_LOCK_END));
+        }
     }
 
     public Map<String, Object> getCurrentState() {
@@ -181,7 +197,10 @@ public class IoTControlManager {
             if (connMgr.isConnected() == false) {
                 return null;
             }
-            lastState = connMgr.getState();
+            Map<String, Object> houseState = connMgr.getState();
+            if (houseState != null) {
+                lastState.putAll(houseState);
+            }
         }
 
         // The away timer is controlled here
