@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="tartan.smarthome.resources.R12Test" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-02-13T05:03:15" hostname="Abdulrahmans-MacBook-Air-2.local" time="0.005">
+<testsuite name="tartan.smarthome.resources.R12Test" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-02-14T09:44:43" hostname="Abdulrahmans-MacBook-Air-2.local" time="0.005">
   <properties/>
   <testcase name="R12: House empty (proximity false) -&gt; away timer started" classname="tartan.smarthome.resources.R12Test" time="0.001"/>
-  <testcase name="R12 whitebox: if branch (house occupied) - no R12 effect" classname="tartan.smarthome.resources.R12Test" time="0.001"/>
-  <testcase name="R12: House empty with door open -&gt; away timer still started (door closed by other rule first)" classname="tartan.smarthome.resources.R12Test" time="0.001"/>
-  <testcase name="R12: House empty with away timer already true -&gt; still true after R12 (reset then set again)" classname="tartan.smarthome.resources.R12Test" time="0.0"/>
-  <testcase name="R12 whitebox: else branch (house vacant) covered by house-empty tests above" classname="tartan.smarthome.resources.R12Test" time="0.0"/>
+  <testcase name="R12 whitebox: if branch (house occupied) - no R12 effect" classname="tartan.smarthome.resources.R12Test" time="0.0"/>
+  <testcase name="R12: House empty with door open -&gt; away timer still started (door closed by other rule first)" classname="tartan.smarthome.resources.R12Test" time="0.0"/>
+  <testcase name="R12: House empty with away timer already true -&gt; still true after R12 (reset then set again)" classname="tartan.smarthome.resources.R12Test" time="0.001"/>
+  <testcase name="R12 whitebox: else branch (house vacant) covered by house-empty tests above" classname="tartan.smarthome.resources.R12Test" time="0.001"/>
   <testcase name="R12: House occupied (proximity true) -&gt; away timer not started by R12" classname="tartan.smarthome.resources.R12Test" time="0.0"/>
   <system-out><![CDATA[Evaluating new state statically
 Evaluating new state statically

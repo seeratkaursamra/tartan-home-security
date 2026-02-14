@@ -49,12 +49,11 @@ public class NightLockTest {
         state.put(IoTValues.ALARM_PASSCODE, "1234");
         state.put(IoTValues.GIVEN_PASSCODE, "");
         state.put(IoTValues.AWAY_TIMER, false);
-        // Smart lock defaults
-        state.put(IoTValues.LOCK_STATE, false);              // unlocked
-        state.put(IoTValues.KEYLESS_ENABLED, false);          // keyless off
-        state.put(IoTValues.AUTHORIZED_APPROACH, false);      // no one approaching
-        state.put(IoTValues.INTRUDER_ACTIVE, false);          // no intruder
-        state.put(IoTValues.NIGHT_ACTIVE, false);             // daytime by default
+        state.put(IoTValues.LOCK_STATE, false);             
+        state.put(IoTValues.KEYLESS_ENABLED, false);         
+        state.put(IoTValues.AUTHORIZED_APPROACH, false);     
+        state.put(IoTValues.INTRUDER_ACTIVE, false);        
+        state.put(IoTValues.NIGHT_ACTIVE, false);            
         return state;
     }
 
@@ -64,8 +63,8 @@ public class NightLockTest {
     @DisplayName("Night Lock: Door is locked automatically during night hours")
     void testNightLock_DuringNight_LocksDoor() {
         Map<String, Object> state = createDefaultState();
-        state.put(IoTValues.LOCK_STATE, false);        // unlocked
-        state.put(IoTValues.NIGHT_ACTIVE, true);       // night time
+        state.put(IoTValues.LOCK_STATE, false);        
+        state.put(IoTValues.NIGHT_ACTIVE, true);     
 
         Map<String, Object> newState = evaluator.evaluateState(state, log);
 
@@ -81,8 +80,8 @@ public class NightLockTest {
     @DisplayName("Night Lock: Unlocked door during night is re-locked")
     void testNightLock_UnlockedDuringNight_Relocks() {
         Map<String, Object> state = createDefaultState();
-        state.put(IoTValues.LOCK_STATE, false);        // someone unlocked it
-        state.put(IoTValues.NIGHT_ACTIVE, true);       // night time
+        state.put(IoTValues.LOCK_STATE, false);     
+        state.put(IoTValues.NIGHT_ACTIVE, true);      
 
         Map<String, Object> newState = evaluator.evaluateState(state, log);
 
@@ -96,8 +95,8 @@ public class NightLockTest {
     @DisplayName("Night Lock: During day, unlocked door stays unlocked")
     void testNightLock_DuringDay_DoesNotForceLock() {
         Map<String, Object> state = createDefaultState();
-        state.put(IoTValues.LOCK_STATE, false);        // unlocked
-        state.put(IoTValues.NIGHT_ACTIVE, false);      // daytime
+        state.put(IoTValues.LOCK_STATE, false);       
+        state.put(IoTValues.NIGHT_ACTIVE, false);     
 
         Map<String, Object> newState = evaluator.evaluateState(state, log);
 
@@ -113,8 +112,8 @@ public class NightLockTest {
     @DisplayName("Night Lock: Disabled feature does not lock door at night")
     void testNightLock_Disabled_NoEffect() {
         Map<String, Object> state = createDefaultState();
-        state.put(IoTValues.NIGHT_ACTIVE, false);      // night lock not active
-        state.put(IoTValues.LOCK_STATE, false);        // unlocked
+        state.put(IoTValues.NIGHT_ACTIVE, false);      
+        state.put(IoTValues.LOCK_STATE, false);        
 
         Map<String, Object> newState = evaluator.evaluateState(state, log);
 
@@ -171,8 +170,8 @@ public class NightLockTest {
     @DisplayName("Night Lock: Already locked — no duplicate log entry")
     void testNightLock_AlreadyLocked_NoDoubleLog() {
         Map<String, Object> state = createDefaultState();
-        state.put(IoTValues.LOCK_STATE, true);         // already locked
-        state.put(IoTValues.NIGHT_ACTIVE, true);       // night time
+        state.put(IoTValues.LOCK_STATE, true);         
+        state.put(IoTValues.NIGHT_ACTIVE, true);   
 
         Map<String, Object> newState = evaluator.evaluateState(state, log);
 
@@ -186,9 +185,9 @@ public class NightLockTest {
     @DisplayName("Night Lock: Intruder takes priority over night lock")
     void testNightLock_IntruderPriority() {
         Map<String, Object> state = createDefaultState();
-        state.put(IoTValues.LOCK_STATE, false);        // unlocked
-        state.put(IoTValues.NIGHT_ACTIVE, true);       // night time
-        state.put(IoTValues.INTRUDER_ACTIVE, true);    // intruder detected
+        state.put(IoTValues.LOCK_STATE, false);      
+        state.put(IoTValues.NIGHT_ACTIVE, true);     
+        state.put(IoTValues.INTRUDER_ACTIVE, true);   
 
         Map<String, Object> newState = evaluator.evaluateState(state, log);
 
@@ -202,10 +201,10 @@ public class NightLockTest {
     @DisplayName("Night Lock: Keyless entry takes priority over night lock")
     void testNightLock_KeylessPriority() {
         Map<String, Object> state = createDefaultState();
-        state.put(IoTValues.LOCK_STATE, true);         // locked
-        state.put(IoTValues.NIGHT_ACTIVE, true);       // night time
-        state.put(IoTValues.KEYLESS_ENABLED, true);    // keyless on
-        state.put(IoTValues.AUTHORIZED_APPROACH, true);// authorized person approaching
+        state.put(IoTValues.LOCK_STATE, true);       
+        state.put(IoTValues.NIGHT_ACTIVE, true);      
+        state.put(IoTValues.KEYLESS_ENABLED, true);   
+        state.put(IoTValues.AUTHORIZED_APPROACH, true);
 
         Map<String, Object> newState = evaluator.evaluateState(state, log);
 
@@ -220,9 +219,9 @@ public class NightLockTest {
     @DisplayName("Night Lock: Night lock engages when keyless does not trigger")
     void testNightLock_KeylessNotTriggered_NightLockEngages() {
         Map<String, Object> state = createDefaultState();
-        state.put(IoTValues.LOCK_STATE, false);        // unlocked
-        state.put(IoTValues.NIGHT_ACTIVE, true);       // night time
-        state.put(IoTValues.KEYLESS_ENABLED, false);   // keyless off
+        state.put(IoTValues.LOCK_STATE, false);   
+        state.put(IoTValues.NIGHT_ACTIVE, true);     
+        state.put(IoTValues.KEYLESS_ENABLED, false); 
         state.put(IoTValues.AUTHORIZED_APPROACH, false);
 
         Map<String, Object> newState = evaluator.evaluateState(state, log);
@@ -318,5 +317,97 @@ public class NightLockTest {
     void testIsNightTime_NonCrossing_OutOfRange() {
         assertFalse(evaluator.isNightTime(20, 8, 18),
                 "isNightTime FAILED: Hour 20 should NOT be in range [8,18)");
+    }
+
+    // ---- Integration: config-computed nightActive path ----
+
+    @Test
+    @DisplayName("Integration: config fields compute nightActive=true, door locks")
+    void testNightLock_withConfigComputation_locksAtNight() {
+        Map<String, Object> state = createDefaultState();
+        state.remove(IoTValues.NIGHT_ACTIVE); 
+        state.put(IoTValues.NIGHT_LOCK_ENABLED, true);
+        state.put(IoTValues.NIGHT_LOCK_START, 22);
+        state.put(IoTValues.NIGHT_LOCK_END, 6);
+        state.put(IoTValues.CURRENT_HOUR, 23);
+        state.put(IoTValues.LOCK_STATE, false);
+
+        Map<String, Object> newState = evaluator.evaluateState(state, log);
+
+        assertTrue((Boolean) newState.get(IoTValues.LOCK_STATE),
+                "Door should lock when config computes nightActive=true");
+    }
+
+    @Test
+    @DisplayName("Integration: config fields with disabled → no lock")
+    void testNightLock_withConfigComputation_disabledDoesNotLock() {
+        Map<String, Object> state = createDefaultState();
+        state.remove(IoTValues.NIGHT_ACTIVE);
+        state.put(IoTValues.NIGHT_LOCK_ENABLED, false);
+        state.put(IoTValues.NIGHT_LOCK_START, 22);
+        state.put(IoTValues.NIGHT_LOCK_END, 6);
+        state.put(IoTValues.CURRENT_HOUR, 23);
+        state.put(IoTValues.LOCK_STATE, false);
+
+        Map<String, Object> newState = evaluator.evaluateState(state, log);
+
+        assertFalse((Boolean) newState.get(IoTValues.LOCK_STATE),
+                "Door should stay unlocked when night lock is disabled via config");
+    }
+
+    // ---- Integration: multi-step state transitions ----
+
+    @Test
+    @DisplayName("Integration: occupied→vacant transition, night lock persists")
+    void testNightLock_occupiedVacantTransition() {
+        // Step 1: occupied + night → locked
+        Map<String, Object> state1 = createDefaultState();
+        state1.put(IoTValues.PROXIMITY_STATE, true);
+        state1.put(IoTValues.NIGHT_ACTIVE, true);
+        state1.put(IoTValues.LOCK_STATE, false);
+
+        Map<String, Object> result1 = evaluator.evaluateState(state1, log);
+        assertTrue((Boolean) result1.get(IoTValues.LOCK_STATE),
+                "Night lock should lock when occupied at night");
+
+        StringBuffer log2 = new StringBuffer();
+        Map<String, Object> state2 = createDefaultState();
+        state2.put(IoTValues.PROXIMITY_STATE, false);   
+        state2.put(IoTValues.NIGHT_ACTIVE, true);
+        state2.put(IoTValues.LOCK_STATE, (Boolean) result1.get(IoTValues.LOCK_STATE));
+        state2.put(IoTValues.LIGHT_STATE, false);
+
+        Map<String, Object> result2 = evaluator.evaluateState(state2, log2);
+        assertTrue((Boolean) result2.get(IoTValues.LOCK_STATE),
+                "Door should remain locked after becoming vacant at night");
+        assertTrue((Boolean) result2.get(IoTValues.AWAY_TIMER),
+                "Away timer should start when vacant");
+    }
+
+    @Test
+    @DisplayName("Integration: keyless unlocks during night, next eval relocks")
+    void testNightLock_keylessUnlockThenNightRelocks() {
+        Map<String, Object> state1 = createDefaultState();
+        state1.put(IoTValues.NIGHT_ACTIVE, true);
+        state1.put(IoTValues.KEYLESS_ENABLED, true);
+        state1.put(IoTValues.AUTHORIZED_APPROACH, true);
+        state1.put(IoTValues.LOCK_STATE, true);
+
+        Map<String, Object> result1 = evaluator.evaluateState(state1, log);
+        assertFalse((Boolean) result1.get(IoTValues.LOCK_STATE),
+                "Keyless should unlock during night");
+
+        StringBuffer log2 = new StringBuffer();
+        Map<String, Object> state2 = createDefaultState();
+        state2.put(IoTValues.NIGHT_ACTIVE, true);
+        state2.put(IoTValues.KEYLESS_ENABLED, true);
+        state2.put(IoTValues.AUTHORIZED_APPROACH, false);
+        state2.put(IoTValues.LOCK_STATE, false); 
+
+        Map<String, Object> result2 = evaluator.evaluateState(state2, log2);
+        assertTrue((Boolean) result2.get(IoTValues.LOCK_STATE),
+                "Night lock should re-lock after keyless entry completes");
+        assertTrue(log2.toString().toLowerCase().contains("night lock"),
+                "Log should mention night lock on re-lock");
     }
 }
