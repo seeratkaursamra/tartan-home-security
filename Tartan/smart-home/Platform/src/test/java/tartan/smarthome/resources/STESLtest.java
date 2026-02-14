@@ -12,6 +12,7 @@ import tartan.smarthome.resources.iotcontroller.IoTValues;
 
 /**
  * Cross-feature integration tests for StaticTartanStateEvaluator.
+ * Openai, chatgpt 5.2, 2026-02-14 - "There was a bug related to the nightlock please ammend the tests so that it works with this new implementation"
  */
 public class STESLtest {
 

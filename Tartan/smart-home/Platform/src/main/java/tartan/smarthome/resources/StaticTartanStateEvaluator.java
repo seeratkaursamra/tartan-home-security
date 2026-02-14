@@ -8,6 +8,7 @@ import java.util.Set;
 import tartan.smarthome.resources.iotcontroller.IoTValues;
 import java.time.LocalTime;
 
+//openai chatgpt 5.2-2026-02-14, "I think there is a bug in these tests, please check them, and note any error you find"
 public class StaticTartanStateEvaluator implements TartanStateEvaluator {
 
     /**

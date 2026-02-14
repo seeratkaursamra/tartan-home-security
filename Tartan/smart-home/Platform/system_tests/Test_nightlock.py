@@ -9,7 +9,9 @@ AUTH = ("admin", "1234")
 
 STATE_URL  = f"{BASE}/smarthome/state/{HOUSE}"
 UPDATE_URL = f"{BASE}/smarthome/update/{HOUSE}"
-//openai chatgpt 5.2-2026-02-14, "I think there is a bug in these tests, please check them, and fix any error you find."
+
+#openai chatgpt 5.2-2026-02-14, "I think there is a bug in these tests, please check them, and fix any error you find."
+
 def post_update(payload):
     """Send update and return response"""
     print(f"\n→ POST {UPDATE_URL}")
