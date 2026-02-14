@@ -52,6 +52,19 @@ jobs:
         run: |
           docker compose up -d --build
 
+      - name: Wait for MySQL to be ready
+        run: |
+          echo "Waiting for MySQL..."
+          for i in {1..30}; do
+            if docker exec smart-home-mysql-container-1 mysqladmin ping -h localhost --silent 2>/dev/null; then
+              echo "MySQL is ready!"
+              break
+            fi
+            echo "MySQL not ready yet... ($i/30)"
+            sleep 2
+          done
+          sleep 5  # Extra buffer for Hibernate to initialize
+
       - name: Wait for platform (treat 200/401 as ready)
         run: |
           for i in {1..60}; do
