@@ -13,9 +13,12 @@ services:
       context: Platform/
       no_cache: true
     depends_on:
-     - "mysql-container"
-     - "house-cmu"
-     - "house-mse"
+      mysql-container:
+        condition: service_healthy
+      house-cmu:
+        condition: service_started
+      house-mse:
+        condition: service_started
     ports:
      - "8080:8080"
   mysql-container:
@@ -24,7 +27,12 @@ services:
      - "3306:3306"
     volumes:
      - mysql-storage:/var/lib/mysql
-
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
 
 volumes:
   mysql-storage:
