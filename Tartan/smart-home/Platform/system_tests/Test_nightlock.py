@@ -163,8 +163,8 @@ def test_nightlock_configuration_is_saved():
     assert state['lockState'] == 'unlocked'
 
     print("✓ Night lock configuration saved correctly")
-    def test_nightlock_during_night_hours():
-        """Night lock should re-lock door when nightActive is true"""
+def test_nightlock_during_night_hours():
+    """Night lock should re-lock door when nightActive is true"""
 
     print(f"\n=== Test: Night Lock Active ===")
 
