@@ -23,7 +23,7 @@
 <tr>
 <td>
 <div class="infoBox" id="tests">
-<div class="counter">25</div>
+<div class="counter">36</div>
 <p>tests</p>
 </div>
 </td>
@@ -41,7 +41,7 @@
 </td>
 <td>
 <div class="infoBox" id="duration">
-<div class="counter">0.016s</div>
+<div class="counter">0.013s</div>
 <p>duration</p>
 </div>
 </td>
@@ -79,21 +79,51 @@
 </thead>
 <tr>
 <td class="success">testACTurnsOnWhenTempAboveTarget()</td>
+<td class="success">0s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testAlarmActivationCondition_doorClosedOccupied_alarmEnabled_logsTwice()</td>
+<td class="success">0.001s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testAlarmActivationCondition_doorOpenVacant_alarmEnabled_logsTwice()</td>
+<td class="success">0s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testAlarmActivationCondition_nearMiss_doorClosedVacant_noActivation()</td>
 <td class="success">0.001s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">testAlarmActiveEmptyPasscodeFallsToElseBranch()</td>
-<td class="success">0.001s</td>
-<td class="success">passed</td>
-</tr>
-<tr>
-<td class="success">testAlarmActiveInvalidPasscodeKeepsAlarmEnabled()</td>
 <td class="success">0s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
+<td class="success">testAlarmActiveInvalidPasscodeKeepsAlarmEnabled()</td>
+<td class="success">0.001s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
 <td class="success">testAlarmActiveValidPasscodeDisablesAlarmActive()</td>
+<td class="success">0s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testAlarmDisabled_logsAndClearsAlarmActive()</td>
+<td class="success">0s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testAutoHvacSetting_whenEmpty_andChillerNeeded_setsChiller()</td>
+<td class="success">0.001s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testAutoHvacSetting_whenEmpty_andHeaterNeeded_setsHeater()</td>
 <td class="success">0s</td>
 <td class="success">passed</td>
 </tr>
@@ -104,7 +134,7 @@
 </tr>
 <tr>
 <td class="success">testAwayTimerAutolockForcesSecureState()</td>
-<td class="success">0.001s</td>
+<td class="success">0s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
@@ -119,7 +149,7 @@
 </tr>
 <tr>
 <td class="success">testChillerAlreadyOnWhenTempAboveTarget()</td>
-<td class="success">0s</td>
+<td class="success">0.001s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
@@ -129,7 +159,7 @@
 </tr>
 <tr>
 <td class="success">testChillerStateNullHandledByElseBranch()</td>
-<td class="success">0.001s</td>
+<td class="success">0.002s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
@@ -139,7 +169,7 @@
 </tr>
 <tr>
 <td class="success">testDoorOpenSomeoneHomeAlarmEnabled()</td>
-<td class="success">0.001s</td>
+<td class="success">0s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
@@ -154,27 +184,47 @@
 </tr>
 <tr>
 <td class="success">testDoorOpenWithSomeoneHome()</td>
-<td class="success">0s</td>
+<td class="success">0.001s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testEvaluateStatePrintsStaticMessage()</td>
+<td class="success">0.001s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">testHeaterModeDisablesRunningChiller()</td>
-<td class="success">0.001s</td>
+<td class="success">0s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">testHeaterTurnsOnWhenTempBelowTarget()</td>
-<td class="success">0.001s</td>
+<td class="success">0s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testIsNightTime_crossMidnightWindow_boundaries()</td>
+<td class="success">0s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testIsNightTime_nonCrossingWindow_boundaries()</td>
+<td class="success">0s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testIsNightTime_startEqualsEnd_isNeverNight()</td>
+<td class="success">0s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">testLightOnWhenSomeoneHome()</td>
-<td class="success">0.001s</td>
+<td class="success">0s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">testLightOnWhenVacantForcesLightOff()</td>
-<td class="success">0.001s</td>
+<td class="success">0s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
@@ -184,21 +234,26 @@
 </tr>
 <tr>
 <td class="success">testProximityHomeLightAlreadyOnNoAutoLight()</td>
-<td class="success">0.003s</td>
-<td class="success">passed</td>
-</tr>
-<tr>
-<td class="success">testProximityStateStartsAwayTimer()</td>
-<td class="success">0.001s</td>
-<td class="success">passed</td>
-</tr>
-<tr>
-<td class="success">testSwitchingFromHeaterToChiller()</td>
 <td class="success">0s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
+<td class="success">testProximityStateStartsAwayTimer()</td>
+<td class="success">0s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testSwitchingFromHeaterToChiller()</td>
+<td class="success">0.001s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
 <td class="success">testTempEqualsTargetNoHVACNeeded()</td>
+<td class="success">0s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testTemperatureEqualsTarget_doesNotTurnOnAC()</td>
 <td class="success">0.001s</td>
 <td class="success">passed</td>
 </tr>
@@ -224,6 +279,8 @@ Evaluating new state statically
 Evaluating new state statically
 STSE: Testing auto-light when arriving home
 Evaluating new state statically
+Evaluating new state statically
+Evaluating new state statically
 STSE: Testing light forced off when vacant
 Evaluating new state statically
 STSE: Testing door open + vacant + alarm disabled = close door
@@ -237,6 +294,8 @@ STSE: Testing AC turns on when temperature above target
 Evaluating new state statically
 STSE: Testing door open + vacant + alarm enabled = break-in
 Evaluating new state statically
+Evaluating new state statically
+Evaluating new state statically
 STSE: Testing valid passcode disables alarm
 Evaluating new state statically
 STSE: Testing invalid passcode keeps alarm active
@@ -245,13 +304,16 @@ STSE: Testing cannot disable alarm when house is vacant
 Evaluating new state statically
 STSE: Testing light on when someone is home (normal operation)
 Evaluating new state statically
+Evaluating new state statically
 STSE: Testing temp equals target, no HVAC needed
 Evaluating new state statically
 STSE: Testing heater turns on when temperature below target
 Evaluating new state statically
 STSE: Testing alarm active with empty passcode (hits else branch)
 Evaluating new state statically
+Evaluating new state statically
 STSE: Testing no auto-light when alarm is enabled
+Evaluating new state statically
 Evaluating new state statically
 STSE: Testing no auto-light when light already on
 Evaluating new state statically
@@ -266,7 +328,7 @@ Evaluating new state statically
 <input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
 </label>
 </div>Generated by 
-<a href="http://www.gradle.org">Gradle 8.6</a> at Feb 12, 2026, 10:03:15 p.m.</p>
+<a href="http://www.gradle.org">Gradle 8.6</a> at Feb 14, 2026, 2:44:43 a.m.</p>
 </div>
 </div>
 </body>

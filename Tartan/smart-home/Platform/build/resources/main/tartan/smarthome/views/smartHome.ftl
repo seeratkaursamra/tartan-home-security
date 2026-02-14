@@ -12,7 +12,7 @@ See -->
                 window.location.reload();
              });
 
-            function updateState() {
+            function updateState(lockAction, lockPasscodeVal) {
                 var door = $('#door').val();
                 var light = $('#light').val();
                 var alarmDelay = $('#alarmDelay').val();
@@ -20,12 +20,16 @@ See -->
                 var humidifier = $('#humidifier').val();
                 var armAlarm = $('#armAlarm').val();
                 var passcode = $('#alarmPasscode').val();
-                var hvacMode = $('#hvacMode').val();
                 var nightLockEnabled = $('#nightLockEnabled').val();
                 var nightLockStart = $('#nightLockStart').val();
                 var nightLockEnd = $('#nightLockEnd').val();
+                var keylessEnabled = $('#keylessEnabled').val();
+                var intruderDetected = $('#intruderDetected').val();
 
-                return JSON.stringify({"door":door,"light":light,"targetTemp":targetTemp,"humidifier":humidifier,"alarmArmed":armAlarm,"alarmDelay":alarmDelay,"alarmPasscode":passcode,"nightLockEnabled":nightLockEnabled,"nightLockStart":nightLockStart,"nightLockEnd":nightLockEnd});
+                var payload = {"door":door,"light":light,"targetTemp":targetTemp,"humidifier":humidifier,"alarmArmed":armAlarm,"alarmDelay":alarmDelay,"alarmPasscode":passcode,"nightLockEnabled":nightLockEnabled,"nightLockStart":nightLockStart,"nightLockEnd":nightLockEnd,"keylessEnabled":keylessEnabled,"intruderDetected":intruderDetected};
+                if (lockAction) payload.lockAction = lockAction;
+                if (lockPasscodeVal !== undefined) payload.lockPasscode = lockPasscodeVal;
+                return JSON.stringify(payload);
             }
 
             // Auto scroll
@@ -45,6 +49,36 @@ See -->
                     },
                 });
 
+            });
+
+            $("#lock_btn").click(function(){
+                $.ajax({
+                    type: 'POST',
+                    contentType: 'application/json',
+                    url:  '/smarthome/update/${tartanHome.name}',
+                    data: updateState('lock', $('#lockPasscode').val()),
+                    success: function(data) {
+                        location.reload(true);
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        alert("Could not update ${tartanHome.name}");
+                    },
+                });
+            });
+
+            $("#unlock_btn").click(function(){
+                $.ajax({
+                    type: 'POST',
+                    contentType: 'application/json',
+                    url:  '/smarthome/update/${tartanHome.name}',
+                    data: updateState('unlock', $('#lockPasscode').val()),
+                    success: function(data) {
+                        location.reload(true);
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        alert("Could not update ${tartanHome.name}");
+                    },
+                });
             });
 
             $("#alarm_button").click(function(){
@@ -186,7 +220,7 @@ div {
         </strong>
     </p>
     <hr>
-    <h3>Night Lock</h3>
+    <h3>Smart Door Lock</h3>
     <p>
         <strong>Lock status:
         <#if (tartanHome.lockState)?? && tartanHome.lockState == "locked">
@@ -195,6 +229,27 @@ div {
             <font color="red">Unlocked</font>
         </#if>
         </strong>
+    </p>
+    <p>
+        <strong>Electronic Operation (access panel)</strong><br/>
+        <label for="lockPasscode">Passcode: </label>
+        <input id="lockPasscode" type="password" placeholder="Enter passcode" />
+        <button id="lock_btn">Lock</button>
+        <button id="unlock_btn">Unlock</button>
+    </p>
+    <p>
+        <strong><label for="keylessEnabled">Keyless Entry:</label></strong>
+        <select name="keylessEnabled" id="keylessEnabled" data-role="slider" data-mini="true">
+            <option value="false" <#if !((tartanHome.keylessEnabled)?? && tartanHome.keylessEnabled == "true")>selected="true"</#if>>disabled</option>
+            <option value="true" <#if (tartanHome.keylessEnabled)?? && tartanHome.keylessEnabled == "true">selected="true"</#if>>enabled</option>
+        </select>
+    </p>
+    <p>
+        <strong><label for="intruderDetected">Simulate Intruder Detected:</label></strong>
+        <select name="intruderDetected" id="intruderDetected" data-role="slider" data-mini="true">
+            <option value="false" <#if !((tartanHome.intruderDetected)?? && tartanHome.intruderDetected == "true")>selected="true"</#if>>no</option>
+            <option value="true" <#if (tartanHome.intruderDetected)?? && tartanHome.intruderDetected == "true">selected="true"</#if>>yes</option>
+        </select>
     </p>
     <p>
         <strong><label for="nightLockEnabled">Night Lock:</label></strong>

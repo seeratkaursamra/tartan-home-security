@@ -128,4 +128,56 @@ public class ElectronicOperationTest {
         assertTrue(result.toLowerCase().contains("already"),
             "Access panel message should say already locked");
     }
+
+    // ---- Integration: multi-step scenarios ----
+
+    @Test
+    @DisplayName("Integration: full unlock-then-lock cycle")
+    void unlockThenLock_fullCycle() {
+        assertTrue(lock.isLocked(), "Should start locked");
+
+        String unlockResult = lock.requestUnlock(LOCK_PASSCODE);
+        assertFalse(lock.isLocked(), "Should be unlocked after correct passcode");
+        assertTrue(unlockResult.toLowerCase().contains("unlocked"));
+
+        String lockResult = lock.requestLock(LOCK_PASSCODE);
+        assertTrue(lock.isLocked(), "Should be locked again");
+        assertTrue(lockResult.toLowerCase().contains("locked"));
+    }
+
+    @Test
+    @DisplayName("Integration: wrong passcode then correct passcode recovers")
+    void wrongPasscodeThenCorrect_recovers() {
+        String failResult = lock.requestUnlock("0000");
+        assertTrue(lock.isLocked(), "Should stay locked after wrong passcode");
+        assertTrue(failResult.toLowerCase().contains("denied") || failResult.toLowerCase().contains("invalid"));
+
+        String successResult = lock.requestUnlock(LOCK_PASSCODE);
+        assertFalse(lock.isLocked(), "Should unlock after correct passcode");
+        assertTrue(successResult.toLowerCase().contains("unlocked"));
+    }
+
+    @Test
+    @DisplayName("Integration: setLocked(false) then requestUnlock says already unlocked")
+    void setLockedDirectly_thenRequestUnlock() {
+        lock.setLocked(false); 
+        assertFalse(lock.isLocked());
+
+        String result = lock.requestUnlock(LOCK_PASSCODE);
+        assertFalse(lock.isLocked(), "Should remain unlocked");
+        assertTrue(result.toLowerCase().contains("already"),
+            "Should say already unlocked when programmatically set");
+    }
+
+    @Test
+    @DisplayName("Integration: setLocked(true) then requestLock says already locked")
+    void setLockedTrue_thenRequestLock_alreadyLocked() {
+        lock.setLocked(true);
+        assertTrue(lock.isLocked());
+
+        String result = lock.requestLock(LOCK_PASSCODE);
+        assertTrue(lock.isLocked(), "Should remain locked");
+        assertTrue(result.toLowerCase().contains("already"),
+            "Should say already locked when programmatically set");
+    }
 }

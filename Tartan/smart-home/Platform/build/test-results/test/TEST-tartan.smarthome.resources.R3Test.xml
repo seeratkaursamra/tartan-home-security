@@ -1,8 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="tartan.smarthome.resources.R3Test" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-02-13T05:03:15" hostname="Abdulrahmans-MacBook-Air-2.local" time="0.001">
+<testsuite name="tartan.smarthome.resources.R3Test" tests="14" skipped="0" failures="0" errors="0" timestamp="2026-02-14T09:44:43" hostname="Abdulrahmans-MacBook-Air-2.local" time="0.008">
   <properties/>
-  <testcase name="R3: If the house is vacant, then close the door" classname="tartan.smarthome.resources.R3Test" time="0.001"/>
+  <testcase name="R3+R1 Interaction: Vacant + door open + light on -&gt; door closes + light off" classname="tartan.smarthome.resources.R3Test" time="0.0"/>
+  <testcase name="R3+R1+R12 Full Interaction: All vacancy rules fire together" classname="tartan.smarthome.resources.R3Test" time="0.001"/>
+  <testcase name="R3+AwayTimer Interaction: Away timer forces door closed" classname="tartan.smarthome.resources.R3Test" time="0.0"/>
+  <testcase name="R3 EC2: Vacant + door open + alarm on -&gt; break-in detected (not R3)" classname="tartan.smarthome.resources.R3Test" time="0.001"/>
+  <testcase name="R3 EC5: Occupied + door open + alarm off -&gt; door stays open" classname="tartan.smarthome.resources.R3Test" time="0.001"/>
+  <testcase name="R3 EC7: Occupied + door closed + alarm off -&gt; normal" classname="tartan.smarthome.resources.R3Test" time="0.0"/>
+  <testcase name="R3 BVA: Vacant boundary + door open -&gt; door closes" classname="tartan.smarthome.resources.R3Test" time="0.001"/>
+  <testcase name="R3 EC6: Occupied + door open + alarm on -&gt; door stays open" classname="tartan.smarthome.resources.R3Test" time="0.0"/>
+  <testcase name="R3 EC1: Vacant + door open + alarm off -&gt; door closes" classname="tartan.smarthome.resources.R3Test" time="0.0"/>
+  <testcase name="R3 EC8: Occupied + door closed + alarm on -&gt; break-in detected" classname="tartan.smarthome.resources.R3Test" time="0.001"/>
+  <testcase name="R3 BVA: Occupied boundary + door open -&gt; door stays open" classname="tartan.smarthome.resources.R3Test" time="0.0"/>
+  <testcase name="R3+R12 Interaction: Vacant + door open -&gt; door closes AND away timer starts" classname="tartan.smarthome.resources.R3Test" time="0.001"/>
+  <testcase name="R3 EC3: Vacant + door already closed + alarm off -&gt; stays closed" classname="tartan.smarthome.resources.R3Test" time="0.0"/>
+  <testcase name="R3 EC4: Vacant + door closed + alarm on -&gt; no break-in, door stays closed" classname="tartan.smarthome.resources.R3Test" time="0.001"/>
   <system-out><![CDATA[Evaluating new state statically
+Evaluating new state statically
+Evaluating new state statically
+Evaluating new state statically
+Evaluating new state statically
+Evaluating new state statically
+Evaluating new state statically
+Evaluating new state statically
+Evaluating new state statically
+Evaluating new state statically
+Evaluating new state statically
+Evaluating new state statically
+Evaluating new state statically
+Evaluating new state statically
 ]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>

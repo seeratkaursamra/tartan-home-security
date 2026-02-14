@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>KeylessEntry.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">tartan</a> &gt; <a href="index.source.html" class="el_package">tartan.smarthome.resources</a> &gt; <span class="el_source">KeylessEntry.java</span></div><h1>KeylessEntry.java</h1><pre class="source lang-java linenums">package tartan.smarthome.resources;
+
+import java.sql.Date;
+import java.text.SimpleDateFormat;
+import java.util.Map;
+
+import tartan.smarthome.resources.iotcontroller.IoTValues;
+
+/**
+ * Openai, chatpgt 5.2 &quot;I have a bug in this code, please add easy to read documentation, and find and fix the bug.&quot;
+ *
+ * Keyless Entry logic for the Smart Door Lock.
+ *
+ * This class is intentionally limited to Keyless Entry only.
+ * Intruder Defence and Night Lock priority handling remains in StaticTartanStateEvaluator.
+ *
+ * Inputs (read from inState with defaults):
+ *  - IoTValues.KEYLESS_ENABLED (Boolean, default false)
+ *  - IoTValues.AUTHORIZED_APPROACH (Boolean, default false)
+ *
+ * Output:
+ *  - returns updated lockState + whether keyless triggered this evaluation tick.
+ *
+ * Logging:
+ *  - Appends timestamped log entries compatible with the existing STSE format.
+ */
+public final class KeylessEntry {
+
+    private KeylessEntry() {
+        // utility class
+    }
+
+    /** Result wrapper so STSE can know whether Keyless triggered (for rule ordering). */
+    public static final class Result {
+        public final boolean lockState;
+        public final boolean triggered;
+
+        public Result(boolean lockState, boolean triggered) {
+            this.lockState = lockState;
+            this.triggered = triggered;
+        }
+    }
+
+    /** Same log formatting style as StaticTartanStateEvaluator (timestamp + message + newline). */
+    private static String formatLogEntry(String entry) {
+<span class="fc" id="L46">        Long timeStamp = System.currentTimeMillis();</span>
+<span class="fc" id="L47">        SimpleDateFormat sdf = new SimpleDateFormat(&quot;MMM dd,yyyy HH:mm&quot;);</span>
+<span class="fc" id="L48">        return &quot;[&quot; + sdf.format(new Date(timeStamp)) + &quot;]: &quot; + entry + &quot;\n&quot;;</span>
+    }
+
+    /**
+     * Apply Keyless Entry behavior.
+     *
+     * @param inState    state map (may omit keyless keys; defaults are used)
+     * @param lockState  current lock state (true=locked, false=unlocked)
+     * @param log        system log buffer (shown on frontend)
+     * @return Result containing updated lockState and whether keyless triggered
+     */
+    public static Result apply(Map&lt;String, Object&gt; inState, boolean lockState, StringBuffer log) {
+<span class="fc" id="L60">        boolean keylessEnabled = (Boolean) inState.getOrDefault(IoTValues.KEYLESS_ENABLED, false);</span>
+<span class="fc" id="L61">        boolean authorizedApproach = (Boolean) inState.getOrDefault(IoTValues.AUTHORIZED_APPROACH, false);</span>
+
+<span class="fc bfc" id="L63" title="All 4 branches covered.">        if (authorizedApproach &amp;&amp; !keylessEnabled) {</span>
+<span class="fc" id="L64">            log.append(formatLogEntry(&quot;Keyless entry disabled: ignoring authorized approach&quot;));</span>
+<span class="fc" id="L65">            return new Result(lockState, false);</span>
+        }
+
+        // Only acts when keyless is enabled AND an authorized resident is detected approaching.
+<span class="fc bfc" id="L69" title="All 4 branches covered.">        if (keylessEnabled &amp;&amp; authorizedApproach) {</span>
+<span class="fc bfc" id="L70" title="All 2 branches covered.">            if (lockState) {</span>
+<span class="fc" id="L71">                log.append(formatLogEntry(&quot;Keyless entry: unlocking door&quot;));</span>
+<span class="fc" id="L72">                return new Result(false, true);</span>
+            } else {
+<span class="fc" id="L74">                log.append(formatLogEntry(&quot;Keyless entry: door already unlocked&quot;));</span>
+<span class="fc" id="L75">                return new Result(false, true);</span>
+            }
+        }
+
+        // No keyless action taken.
+<span class="fc" id="L80">        return new Result(lockState, false);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>
