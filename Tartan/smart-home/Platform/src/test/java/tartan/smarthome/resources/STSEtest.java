@@ -6,8 +6,12 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 
 import tartan.smarthome.resources.iotcontroller.IoTValues;
+
+
 
 /**
  * Comprehensive tests for StaticTartanStateEvaluator
@@ -58,6 +62,23 @@ public class STSEtest {
         evaluator = new StaticTartanStateEvaluator();
         log = new StringBuffer();
     }
+
+    /**
+     * Helper for mutation testing:
+     * We need a robust way to distinguish between different alarm logs.
+     * PIT has survivors on the composite alarm condition that gates whether "Activating alarm" is appended.
+     * Counting occurrences avoids false positives due to the earlier "Break in detected: Activating alarm" message.
+     */
+    private static int countOccurrences(String haystack, String needle) {
+        int count = 0;
+        int idx = 0;
+        while ((idx = haystack.indexOf(needle, idx)) != -1) {
+            count++;
+            idx += needle.length();
+        }
+        return count;
+    }
+
 
     /**
      * Baseline state acts as a default representative of the “normal” equivalence class.
@@ -600,4 +621,271 @@ public class STSEtest {
         assertFalse((Boolean) newState.get(IoTValues.HEATER_STATE),"Heater should be OFF when temp equals target");
         assertFalse((Boolean) newState.get(IoTValues.CHILLER_STATE), "Chiller should be OFF when temp equals target");
     }
+
+    // =========Mutation testing ========
+    // openai, chatgpt 5.2, 2026-02-13, "Please provide assistance with mutation testing."
+    // openai, chatgpt 5.2, 2026-02-13, "Here are my Mutation tests, can you please check them for any obvious errors and add comments to the tests that are already there?"
+
+    //This test was added but it technically only tests a system.out.println, technically this is a mutation but not the kind
+    // of thing we would normally mutation test, we can (and I will, because it is a mutation), but technically we should
+    // treat it differently.
+    /**
+     * - PIT survivor: VoidMethodCallMutator removed call to System.out.println at STSE line ~69.
+     *
+     * White-box: asserts a side-effect of the specific println line being executed.
+     * Note: this is not "good design" for production behavior, but it kills the surviving mutant.
+     */
+    @Test
+    public void testEvaluateStatePrintsStaticMessage() {
+        Map<String, Object> state = TestStateFactory.baseStateCopy();
+
+        PrintStream originalOut = System.out;
+        ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(outContent));
+        try {
+            evaluator.evaluateState(state, log);
+        } finally {
+            System.setOut(originalOut);
+        }
+
+        assertTrue(outContent.toString().contains("Evaluating new state statically"),
+                "Expected STSE to print its static evaluation banner (kills println removal mutant).");
+    }
+
+    /**
+     * MUTATION TARGET:
+     * - PIT survivors in isNightTime(): ConditionalsBoundaryMutator at lines ~17 and ~20.
+     *
+     * Key kill case:
+     * - nightStart == nightEnd must NOT be treated as "crossing midnight".
+     *   If mutated from '>' to '>=' it flips behavior to "always night" (because X>=start OR X<end with start=end).
+     */
+    @Test
+    public void testIsNightTime_startEqualsEnd_isNeverNight() {
+        // start == end should produce an empty night window (always false)
+        assertFalse(evaluator.isNightTime(0, 22, 22));
+        assertFalse(evaluator.isNightTime(21, 22, 22));
+        assertFalse(evaluator.isNightTime(22, 22, 22));
+        assertFalse(evaluator.isNightTime(23, 22, 22));
+    }
+
+    /**
+     * MUTATION TARGET:
+     * - PIT survivors in isNightTime(): boundary changes in the non-crossing case.
+     *
+     * We assert:
+     * - Inclusive start (hour == nightStart is night)
+     * - Exclusive end (hour == nightEnd is NOT night)
+     */
+    @Test
+    public void testIsNightTime_nonCrossingWindow_boundaries() {
+        int start = 20;
+        int end = 23;
+
+        assertTrue(evaluator.isNightTime(20, start, end), "Start boundary should be included.");
+        assertTrue(evaluator.isNightTime(22, start, end), "Interior hour should be night.");
+        assertFalse(evaluator.isNightTime(23, start, end), "End boundary should be excluded.");
+        assertFalse(evaluator.isNightTime(19, start, end), "Hour before start should be false.");
+    }
+
+    /**
+     * MUTATION TARGET:
+     * - Ensures the midnight-crossing branch is correct on both sides of midnight.
+     *
+     * Window: 22 -> 6
+     * - 22,23,0,5 should be night
+     * - 6,21 should not be night
+     */
+    @Test
+    public void testIsNightTime_crossMidnightWindow_boundaries() {
+        int start = 22;
+        int end = 6;
+
+        assertTrue(evaluator.isNightTime(22, start, end));
+        assertTrue(evaluator.isNightTime(23, start, end));
+        assertTrue(evaluator.isNightTime(0, start, end));
+        assertTrue(evaluator.isNightTime(5, start, end));
+
+        assertFalse(evaluator.isNightTime(6, start, end));
+        assertFalse(evaluator.isNightTime(21, start, end));
+    }
+
+    /**
+     * MUTATION TARGET:
+     * - PIT survivors: NegateConditionalsMutator at lines ~202 and ~206 (if (!alarmState)).
+     *
+     * Black-box: alarm disabled should log "Alarm disabled".
+     * White-box: alarmActiveState MUST be forced false when alarmState is false.
+     *
+     * We keep proximityState=true so STSE doesn't re-enable the alarm ("Cannot disable the alarm, house is empty").
+     */
+    @Test
+    public void testAlarmDisabled_logsAndClearsAlarmActive() {
+        Map<String, Object> state = TestStateFactory.baseStateCopy();
+
+        state.put(IoTValues.PROXIMITY_STATE, true);     // user is home
+        state.put(IoTValues.ALARM_STATE, false);        // alarm disabled request
+        state.put(IoTValues.ALARM_ACTIVE, true);        // ensure the clear-path is observable
+        state.put(IoTValues.ALARM_PASSCODE, "1234");
+        state.put(IoTValues.GIVEN_PASSCODE, "");        // avoids invalid-pass path due to length==0 behavior
+
+        Map<String, Object> newState = evaluator.evaluateState(state, log);
+
+        assertEquals(false, newState.get(IoTValues.ALARM_STATE), "Alarm should remain disabled.");
+        assertEquals(false, newState.get(IoTValues.ALARM_ACTIVE), "Alarm active must be cleared when alarm is disabled.");
+        assertTrue(log.toString().contains("Alarm disabled"), "Log should contain 'Alarm disabled' (kills negated condition mutant).");
+    }
+
+    /**
+     * MUTATION TARGET:
+     * - PIT survivors: multiple NegateConditionalsMutator instances on the composite condition at line ~215.
+     *
+     * Scenario: door OPEN, alarm ENABLED, house VACANT
+     * - Earlier logic logs "Break in detected: Activating alarm"
+     * - Composite condition should ALSO log "Activating alarm"
+     *
+     * We count occurrences to avoid substring ambiguity and to ensure line ~215 actually ran.
+     */
+    @Test
+    public void testAlarmActivationCondition_doorOpenVacant_alarmEnabled_logsTwice() {
+        Map<String, Object> state = TestStateFactory.baseStateCopy();
+
+        state.put(IoTValues.ALARM_STATE, true);
+        state.put(IoTValues.DOOR_STATE, true);          // open
+        state.put(IoTValues.PROXIMITY_STATE, false);    // vacant
+        state.put(IoTValues.ALARM_ACTIVE, false);
+
+        Map<String, Object> newState = evaluator.evaluateState(state, log);
+
+        assertEquals(true, newState.get(IoTValues.ALARM_ACTIVE), "Alarm should activate for door-open + vacant when armed.");
+
+        String s = log.toString();
+        int n = countOccurrences(s, "Activating alarm");
+        assertTrue(n >= 2,
+                "Expected at least 2 'Activating alarm' occurrences (break-in + composite condition). " +
+                        "Kills mutants that prevent the line~215 composite alarm activation branch.");
+    }
+
+    /**
+     * MUTATION TARGET:
+     * - Same PIT survivors at line ~215, but now for the "suddenly occupied" case:
+     *   alarm ENABLED, door CLOSED, house OCCUPIED.
+     */
+    @Test
+    public void testAlarmActivationCondition_doorClosedOccupied_alarmEnabled_logsTwice() {
+        Map<String, Object> state = TestStateFactory.baseStateCopy();
+
+        state.put(IoTValues.ALARM_STATE, true);
+        state.put(IoTValues.DOOR_STATE, false);         // closed
+        state.put(IoTValues.PROXIMITY_STATE, true);     // occupied
+        state.put(IoTValues.ALARM_ACTIVE, false);
+
+        Map<String, Object> newState = evaluator.evaluateState(state, log);
+
+        assertEquals(true, newState.get(IoTValues.ALARM_ACTIVE), "Alarm should activate for occupied + armed (break-in rule).");
+
+        String s = log.toString();
+        int n = countOccurrences(s, "Activating alarm");
+        assertTrue(n >= 2,
+                "Expected at least 2 'Activating alarm' occurrences (break-in + composite condition). " +
+                        "Kills mutants negating proximity/door checks in the composite condition.");
+    }
+
+    /**
+     * MUTATION TARGET:
+     * - Ensures the composite condition does NOT fire in a near-miss case.
+     * - This kills mutants that incorrectly negate parts of the condition and cause activation when it shouldn't.
+     *
+     * Scenario: alarm ENABLED, door CLOSED, house VACANT.
+     * Composite condition should be false; alarmActive should stay false (assuming no earlier rule triggers).
+     */
+    @Test
+    public void testAlarmActivationCondition_nearMiss_doorClosedVacant_noActivation() {
+        Map<String, Object> state = TestStateFactory.baseStateCopy();
+
+        state.put(IoTValues.ALARM_STATE, true);
+        state.put(IoTValues.DOOR_STATE, false);         // closed
+        state.put(IoTValues.PROXIMITY_STATE, false);    // vacant
+        state.put(IoTValues.ALARM_ACTIVE, false);
+
+        Map<String, Object> newState = evaluator.evaluateState(state, log);
+
+        assertEquals(false, newState.get(IoTValues.ALARM_ACTIVE),
+                "Alarm should NOT activate for door-closed + vacant (no break-in case).");
+
+        assertFalse(log.toString().contains("Activating alarm"),
+                "Log should not contain composite 'Activating alarm' in near-miss scenario (kills negation mutants).");
+    }
+
+    /**
+     * MUTATION TARGET:
+     * - PIT survivor: ConditionalsBoundaryMutator at line ~236 (tempReading > targetTempSetting).
+     *
+     * Boundary test: temp == target must NOT turn on AC.
+     * If mutated to >=, STSE would turn on AC and log "Turning on air conditioner".
+     */
+    @Test
+    public void testTemperatureEqualsTarget_doesNotTurnOnAC() {
+        Map<String, Object> state = TestStateFactory.baseStateCopy();
+
+        state.put(IoTValues.TEMP_READING, 70);
+        state.put(IoTValues.TARGET_TEMP, 70);
+        state.put(IoTValues.CHILLER_STATE, false);
+        state.put(IoTValues.HVAC_MODE, "Chiller"); // keep later hvacSetting.equals(...) from NPE
+
+        Map<String, Object> newState = evaluator.evaluateState(state, log);
+
+        assertEquals(false, newState.get(IoTValues.CHILLER_STATE), "AC should remain off when temp == target.");
+        assertFalse(log.toString().contains("Turning on air conditioner"),
+                "Log should NOT mention turning on AC at equality boundary (kills >= boundary mutant).");
+    }
+
+    /**
+     * MUTATION TARGET:
+     * - PIT NO_COVERAGE at lines ~253/255 where hvacSetting is auto-selected.
+     *
+     * Case: heater required (temp < target) and hvacSetting empty -> must set hvacSetting="Heater".
+     * This both adds coverage and kills the "negated conditional" mutants on those lines.
+     */
+    @Test
+    public void testAutoHvacSetting_whenEmpty_andHeaterNeeded_setsHeater() {
+        Map<String, Object> state = TestStateFactory.baseStateCopy();
+
+        state.put(IoTValues.TEMP_READING, 65);
+        state.put(IoTValues.TARGET_TEMP, 70);
+        state.put(IoTValues.HVAC_MODE, "");             // forces auto-select block
+        state.put(IoTValues.CHILLER_STATE, false);      // avoid null and avoid turning on AC
+
+        Map<String, Object> newState = evaluator.evaluateState(state, log);
+
+        assertEquals("Heater", newState.get(IoTValues.HVAC_MODE),
+                "Expected hvacSetting to auto-select Heater when temp < target and hvacSetting empty.");
+    }
+
+    /**
+     * MUTATION TARGET:
+     * - PIT NO_COVERAGE at lines ~253/255 (auto hvacSetting selection).
+     *
+     * Case: chiller required (temp > target) and hvacSetting empty -> must set hvacSetting="Chiller".
+     */
+    @Test
+    public void testAutoHvacSetting_whenEmpty_andChillerNeeded_setsChiller() {
+        Map<String, Object> state = TestStateFactory.baseStateCopy();
+
+        state.put(IoTValues.TEMP_READING, 75);
+        state.put(IoTValues.TARGET_TEMP, 70);
+        state.put(IoTValues.HVAC_MODE, "");             // forces auto-select block
+        state.put(IoTValues.CHILLER_STATE, false);      // allow STSE to flip it on
+
+        Map<String, Object> newState = evaluator.evaluateState(state, log);
+
+        assertEquals("Chiller", newState.get(IoTValues.HVAC_MODE),
+                "Expected hvacSetting to auto-select Chiller when temp > target and hvacSetting empty.");
+        assertEquals(true, newState.get(IoTValues.CHILLER_STATE),
+                "Chiller should be turned on when temp > target (supports the auto-select branch).");
+    }
+
+
+
+
 }
