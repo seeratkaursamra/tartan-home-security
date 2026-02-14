@@ -1,6 +1,7 @@
 plugins {
     id 'com.github.johnrengelman.shadow' version '8.1.1'
     id 'jacoco'
+    id 'info.solidsoft.pitest' version '1.15.0'
 }
 group 'Tartan'
 version '1.0-SNAPSHOT'
@@ -27,7 +28,8 @@ dependencies {
     implementation 'io.dropwizard:dropwizard-hibernate:4.0.7'
     implementation 'io.dropwizard:dropwizard-assets:4.0.7'
     implementation 'mysql:mysql-connector-java:8.0.33'
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
+    testImplementation platform('org.junit:junit-bom:5.10.2')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
 }
 run {
     args = ['server', 'config.yml']
@@ -80,9 +82,12 @@ jacocoTestReport {
     afterEvaluate {
         classDirectories.setFrom(files(classDirectories.files.collect {
             fileTree(dir: it, includes: [
-                'tartan/smarthome/resources/StaticTartanStateEvaluator.class',
+                'tartan/smarthome/resources/StaticTartanStateEvaluator.class', //part 1 mainly, but also used for part 2
                 'tartan/smarthome/resources/iotcontroller/UserLoginInfo.class',
-                'tartan/smarthome/resources/iotcontroller/IoTControlManager.class'
+
+                //'tartan/smarthome/resources/iotcontroller/IoTControlManager.class', //part 2 mainly (Stse above)
+                'tartan/smarthome/resources/KeylessEntry.class',
+                'tartan/smarthome/resources/ElectronicOperation.class'
             ])
         }))
     }
@@ -109,3 +114,16 @@ jacocoTestCoverageVerification {
         }
     }
 }
+pitest {
+    targetClasses = [
+            'tartan.smarthome.resources.StaticTartanStateEvaluator',
+            //'tartan.smarthome.resources.iotcontroller.UserLoginInfo', // part 1 not applicable here
+            'tartan.smarthome.resources.KeylessEntry',
+            'tartan.smarthome.resources.ElectronicOperation'
+    ]
+    targetTests = ['tartan.smarthome.*']
+    junit5PluginVersion = '1.2.1'
+    outputFormats = ['HTML', 'XML']
+    timestampedReports = false
+}
+
