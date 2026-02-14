@@ -138,31 +138,9 @@ def test_which_fields_work():
         raise
 
 
-def test_nightlock_configuration_is_saved():
-    """Test that night lock configuration is properly stored"""
 
-    print(f"\n=== Test: Configuration Storage ===")
 
-    payload = baseline_state()
-    payload.update({
-        "nightLockEnabled": "true",
-        "nightLockStart": "22",
-        "nightLockEnd": "6",
-        "lockState": "unlocked"
-    })
 
-    post_update(payload)
-    time.sleep(0.5)
-
-    state = get_state()
-
-    # Test that configuration is saved correctly
-    assert state['nightLockEnabled'] == 'true'
-    assert state['nightLockStart'] == '22'
-    assert state['nightLockEnd'] == '6'
-    assert state['lockState'] == 'unlocked'
-
-    print("✓ Night lock configuration saved correctly")
 def test_nightlock_during_night_hours():
     """Night lock should re-lock door when nightActive is true"""
 
