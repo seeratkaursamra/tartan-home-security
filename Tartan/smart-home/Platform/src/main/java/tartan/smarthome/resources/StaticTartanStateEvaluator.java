@@ -6,6 +6,7 @@ import java.util.Hashtable;
 import java.util.Map;
 import java.util.Set;
 import tartan.smarthome.resources.iotcontroller.IoTValues;
+import java.time.LocalTime;
 
 public class StaticTartanStateEvaluator implements TartanStateEvaluator {
 
@@ -70,9 +71,16 @@ public class StaticTartanStateEvaluator implements TartanStateEvaluator {
             nightActive = fromState != null && fromState;
         } else {
             Boolean nightLockEnabled = (Boolean) inState.getOrDefault(IoTValues.NIGHT_LOCK_ENABLED, false);
-            int currentHour = inState.containsKey(IoTValues.CURRENT_HOUR) ? ((Number) inState.get(IoTValues.CURRENT_HOUR)).intValue() : 0;
+
+            int currentHour = inState.containsKey(IoTValues.CURRENT_HOUR) ? ((Number) inState.get(IoTValues.CURRENT_HOUR)).intValue() : java.time.LocalTime.now().getHour();  // ← USE REAL TIME AS DEFAULT
             int nightStart = inState.containsKey(IoTValues.NIGHT_LOCK_START) ? ((Number) inState.get(IoTValues.NIGHT_LOCK_START)).intValue() : 22;
             int nightEnd = inState.containsKey(IoTValues.NIGHT_LOCK_END) ? ((Number) inState.get(IoTValues.NIGHT_LOCK_END)).intValue() : 6;
+
+            System.out.println("nightLockEnabled=" + nightLockEnabled +
+                    ", currentHour=" + currentHour +
+                    ", nightStart=" + nightStart +
+                    ", nightEnd=" + nightEnd);
+
             nightActive = nightLockEnabled != null && nightLockEnabled && isNightTime(currentHour, nightStart, nightEnd);
         }
 
@@ -309,9 +317,13 @@ public class StaticTartanStateEvaluator implements TartanStateEvaluator {
 
             // Only apply Night Lock if Keyless did NOT trigger
             if (!kr.triggered && nightActive) {
-                if (!lockState) {
-                    lockState = true;
-                    log.append(formatLogEntry("Night lock: locking door"));
+                // BUG FIX: Also check if night lock feature is enabled
+                Boolean nightLockEnabled = (Boolean) inState.getOrDefault(IoTValues.NIGHT_LOCK_ENABLED, false);
+                if (nightLockEnabled != null && nightLockEnabled) {
+                    if (!lockState) {
+                        lockState = true;
+                        log.append(formatLogEntry("Night lock: locking door"));
+                    }
                 }
             }
         }

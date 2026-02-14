@@ -535,7 +535,19 @@ public class TartanHomeService {
      */
     private Map<String, Object> toIotState(TartanHome tartanHome) {
         Map<String, Object> state = new Hashtable<>();
-        
+
+        state.put(IoTValues.CURRENT_HOUR, java.time.LocalTime.now().getHour());
+
+        System.out.println("=== DEBUG toIotState ===");
+        System.out.println("tartanHome.getNightActive() = " + tartanHome.getNightActive());
+        System.out.println("Is null? " + (tartanHome.getNightActive() == null));
+
+        if (tartanHome.getNightActive() != null) {
+            System.out.println("DEBUG: nightActive from TartanHome = " + tartanHome.getNightActive());
+            state.put(IoTValues.NIGHT_ACTIVE, Boolean.parseBoolean(tartanHome.getNightActive()));
+            System.out.println("DEBUG: nightActive parsed to Boolean = " + Boolean.parseBoolean(tartanHome.getNightActive()));
+        }
+
         if (tartanHome.getProximity()!=null) {
             state.put(IoTValues.PROXIMITY_STATE, toIoTProximityState(tartanHome));
         }

@@ -12,6 +12,7 @@ import tartan.smarthome.resources.iotcontroller.IoTValues;
 
 /**
  * Openai, chatgpt 5.2, 2026-02-11 - "I added some logic to this function, please generate a test suite to ensure the proper function of this logic"
+ * Openai, chatgpt 5.2, 2026-02-14 - "There was a bug related to the nightlock please ammend the tests so that it works with this new implementation"
  *
  * Unit tests for the Smart Lock logic added to StaticTartanStateEvaluator:
  * Priority: Intruder > Keyless > Night
@@ -94,6 +95,7 @@ public class STSESLtest {
 
         state.put(IoTValues.LOCK_STATE, false); // unlocked
         state.put(IoTValues.NIGHT_ACTIVE, true);
+        state.put(IoTValues.NIGHT_LOCK_ENABLED, true); // ADD THIS LINE
         state.put(IoTValues.KEYLESS_ENABLED, false);
         state.put(IoTValues.AUTHORIZED_APPROACH, false);
 
