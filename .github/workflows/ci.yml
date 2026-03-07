@@ -8,7 +8,7 @@ on:
 
 jobs:
   build-and-test:
-    runs-on: self-hosted  # CHANGED from ubuntu-latest
+    runs-on: ubuntu-latest
 
     defaults:
       run:
@@ -41,16 +41,24 @@ jobs:
           path: Tartan/smart-home/Platform/build/jacocoHtml/
 
   system-test:
-    runs-on: self-hosted  # CHANGED from ubuntu-latest
+    runs-on: self-hosted
     needs: build-and-test
 
     steps:
       - uses: actions/checkout@v4
 
+      - name: Clean up previous containers #hopefully fixes the issue of the test failing
+        run: |
+          cd Tartan/smart-home
+          docker compose down -v || true
+          docker system prune -f || true
+        continue-on-error: true
+
       - name: Run docker compose
         working-directory: Tartan/smart-home
         run: |
           docker compose up -d --build
+
 
       - name: Wait for MySQL to be ready
         run: |
@@ -101,7 +109,6 @@ jobs:
         run: |
           docker compose down -v
 
-  # needed for the continuous deployment
   deploy:
     needs: system-test
     runs-on: self-hosted
