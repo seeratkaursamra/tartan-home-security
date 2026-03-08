@@ -104,7 +104,7 @@ jobs:
       - name: Wait for platform (treat 200/401 as ready)
         run: |
           echo "Waiting for platform to be ready..."
-          for i in {1..180}; do       
+          for i in {1..90}; do       
             code=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/smarthome/state/mse || true)
             echo "Attempt $i/180: HTTP $code"
             if [ "$code" = "200" ] || [ "$code" = "401" ]; then
@@ -113,7 +113,7 @@ jobs:
             fi
             sleep 2
           done
-          echo "Platform did not become ready after 360 seconds"
+          echo "Platform did not become ready after 180 seconds"
           echo ""
           echo "=== Final Container Status ==="
           docker compose -f Tartan/smart-home/docker-compose.yml ps
