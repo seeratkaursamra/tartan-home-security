@@ -153,5 +153,8 @@ jobs:
           script: |
             set -e
             cd ~/prod/Tartan/smart-home
-            docker compose down || true
+            
+            ./save-backup.sh || echo "No previous deployment to backup" #save state before deploy
+            
+            docker compose down || true    #deploy new version
             docker compose up --build -d
