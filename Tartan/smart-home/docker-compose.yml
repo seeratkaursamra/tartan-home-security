@@ -33,7 +33,7 @@ services:
     volumes:
       - mysql-storage:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
+      test: ["CMD-SHELL", "mysql -u tartan -ptartan1234 -e 'SELECT 1' TartanHome || exit 1"]
       interval: 5s
       timeout: 5s
       retries: 20
