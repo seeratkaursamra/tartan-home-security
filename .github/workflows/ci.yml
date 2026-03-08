@@ -52,7 +52,7 @@ jobs:
           cd Tartan/smart-home
           docker compose down -v || true
           docker system prune -f || true
-          sleep 3
+          sleep 5
         continue-on-error: true
 
       - name: Run docker compose
@@ -60,31 +60,53 @@ jobs:
         run: |
           docker compose up -d --build
 
-      - name: Wait for MySQL to be ready
+      - name: Wait for MySQL to be healthy
         run: |
-          echo "Waiting for MySQL..."
-          for i in {1..30}; do
-            if docker exec smart-home-mysql-container-1 mysqladmin ping -h localhost --silent 2>/dev/null; then
-              echo "MySQL is ready!"
-              break
+          echo "Waiting for MySQL to be healthy..."
+          for i in {1..60}; do
+            # Check if container exists and is running
+            if docker ps --filter "name=smart-home-mysql-container-1" --filter "status=running" | grep -q mysql; then
+              # Check MySQL health
+              if docker exec smart-home-mysql-container-1 mysqladmin ping -h localhost -u root -proot --silent 2>/dev/null; then
+                echo "MySQL is healthy!"
+          
+                # Extra verification: try to connect to the database
+                if docker exec smart-home-mysql-container-1 mysql -u tartan -ptartan1234 -e "SELECT 1;" TartanHome >/dev/null 2>&1; then
+                  echo "MySQL database is accessible!"
+                  break
+                else
+                  echo "MySQL is up but database not ready yet... ($i/60)"
+                fi
+              else
+                echo "MySQL not responding to ping... ($i/60)"
+              fi
+            else
+              echo "MySQL container not running yet... ($i/60)"
             fi
-            echo "MySQL not ready yet... ($i/30)"
             sleep 2
           done
-          sleep 5
+          
+          # Additional wait to ensure MySQL is fully ready
+          echo "Waiting extra 10 seconds for MySQL to fully initialize..."
+          sleep 10
 
       - name: Check what containers are actually running
         run: |
           echo "=== Container Status ==="
           docker compose -f Tartan/smart-home/docker-compose.yml ps
+          echo ""
+          echo "=== MySQL Logs (last 30 lines) ==="
+          docker compose -f Tartan/smart-home/docker-compose.yml logs --tail=30 mysql-container
+          echo ""
           echo "=== Platform Logs (last 30 lines) ==="
           docker compose -f Tartan/smart-home/docker-compose.yml logs --tail=30 platform
 
       - name: Wait for platform (treat 200/401 as ready)
         run: |
+          echo "Waiting for platform to be ready..."
           for i in {1..180}; do       
             code=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/smarthome/state/mse || true)
-            echo "Attempt $i/60: HTTP $code"
+            echo "Attempt $i/180: HTTP $code"
             if [ "$code" = "200" ] || [ "$code" = "401" ]; then
               echo "Platform is up (HTTP $code)"
               exit 0
@@ -92,10 +114,15 @@ jobs:
             sleep 2
           done
           echo "Platform did not become ready after 360 seconds"
+          echo ""
           echo "=== Final Container Status ==="
           docker compose -f Tartan/smart-home/docker-compose.yml ps
+          echo ""
           echo "=== Full Platform Logs ==="
           docker compose -f Tartan/smart-home/docker-compose.yml logs platform
+          echo ""
+          echo "=== Full MySQL Logs ==="
+          docker compose -f Tartan/smart-home/docker-compose.yml logs mysql-container
           exit 1
 
       - name: Set up Python
@@ -111,7 +138,7 @@ jobs:
       - name: Run system tests
         working-directory: Tartan/smart-home/Platform/system_tests
         run: |
-          pytest -q
+          pytest -v
 
       - name: Bring server down
         if: always()
@@ -154,7 +181,30 @@ jobs:
             set -e
             cd ~/prod/Tartan/smart-home
             
-            ./save-backup.sh || echo "No previous deployment to backup" #save state before deploy
+            ./save-backup.sh || echo "No previous deployment to backup"
             
-            docker compose down || true    #deploy new version
+            docker compose down || true
             docker compose up --build -d
+            
+            # Wait for MySQL health
+            echo "Waiting for MySQL..."
+            for i in {1..60}; do
+              if docker exec smart-home-mysql-container-1 mysqladmin ping -h localhost -u root -proot --silent 2>/dev/null; then
+                echo "MySQL is ready!"
+                break
+              fi
+              sleep 2
+            done
+            
+            # Wait for platform
+            echo "Waiting for platform..."
+            for i in {1..60}; do
+              code=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/smarthome/state/mse || true)
+              if [ "$code" = "200" ] || [ "$code" = "401" ]; then
+                echo "Platform is ready!"
+                break
+              fi
+              sleep 2
+            done
+            
+            echo "Deployment complete!"

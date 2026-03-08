@@ -1,13 +1,13 @@
 version: '3'
 services:
-  house-cmu: 
+  house-cmu:
     build: HouseSimulator/
     ports:
-     - "5051:5050"
-  house-mse: 
+      - "5051:5050"
+  house-mse:
     build: HouseSimulator/
     ports:
-     - "5050:5050"
+      - "5050:5050"
   platform:
     build:
       context: Platform/
@@ -20,19 +20,24 @@ services:
       house-mse:
         condition: service_started
     ports:
-     - "8080:8080"
+      - "8080:8080"
   mysql-container:
     build: Database/
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: TartanHome
+      MYSQL_USER: tartan
+      MYSQL_PASSWORD: tartan1234
     ports:
-     - "3306:3306"
+      - "3306:3306"
     volumes:
-     - mysql-storage:/var/lib/mysql
+      - mysql-storage:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
       interval: 5s
-      timeout: 3s
-      retries: 10
-      start_period: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
 
 volumes:
   mysql-storage:
