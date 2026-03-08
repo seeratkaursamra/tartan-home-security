@@ -42,13 +42,13 @@ database:
     driverClass: com.mysql.cj.jdbc.Driver
 
     # the DB username
-    user: root
+    user: tartan
 
     # the DB password
-    password: tmp
+    password: tartan1234
 
     # the JDBC URL; the database is called TartanHome; #mysql-container
-    url: jdbc:mysql://mysql-container/TartanHome?useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC&enabledTLSProtocols=TLSv1.2
+    url: jdbc:mysql://mysql-container/TartanHome?useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC
 
     # Allow Hibernate to create tables
     properties:
