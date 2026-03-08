@@ -40,84 +40,84 @@ jobs:
           name: jacoco-coverage-report
           path: Tartan/smart-home/Platform/build/jacocoHtml/
 
-system-test:
-  runs-on: self-hosted
-  needs: build-and-test
+  system-test:
+    runs-on: self-hosted
+    needs: build-and-test
 
-  steps:
-    - uses: actions/checkout@v4
+    steps:
+      - uses: actions/checkout@v4
 
-    - name: Clean up previous containers
-      run: |
-        cd Tartan/smart-home
-        docker compose down -v || true
-        docker system prune -f || true
-        sleep 3
-      continue-on-error: true
+      - name: Clean up previous containers
+        run: |
+          cd Tartan/smart-home
+          docker compose down -v || true
+          docker system prune -f || true
+          sleep 3
+        continue-on-error: true
 
-    - name: Run docker compose
-      working-directory: Tartan/smart-home
-      run: |
-        docker compose up -d --build
+      - name: Run docker compose
+        working-directory: Tartan/smart-home
+        run: |
+          docker compose up -d --build
 
-    - name: Wait for MySQL to be ready
-      run: |
-        echo "Waiting for MySQL..."
-        for i in {1..30}; do
-          if docker exec smart-home-mysql-container-1 mysqladmin ping -h localhost --silent 2>/dev/null; then
-            echo "MySQL is ready!"
-            break
-          fi
-          echo "MySQL not ready yet... ($i/30)"
-          sleep 2
-        done
-        sleep 5
+      - name: Wait for MySQL to be ready
+        run: |
+          echo "Waiting for MySQL..."
+          for i in {1..30}; do
+            if docker exec smart-home-mysql-container-1 mysqladmin ping -h localhost --silent 2>/dev/null; then
+              echo "MySQL is ready!"
+              break
+            fi
+            echo "MySQL not ready yet... ($i/30)"
+            sleep 2
+          done
+          sleep 5
 
-    - name: Check what containers are actually running
-      run: |
-        echo "=== Container Status ==="
-        docker compose -f Tartan/smart-home/docker-compose.yml ps
-        echo "=== Platform Logs (last 30 lines) ==="
-        docker compose -f Tartan/smart-home/docker-compose.yml logs --tail=30 platform
+      - name: Check what containers are actually running
+        run: |
+          echo "=== Container Status ==="
+          docker compose -f Tartan/smart-home/docker-compose.yml ps
+          echo "=== Platform Logs (last 30 lines) ==="
+          docker compose -f Tartan/smart-home/docker-compose.yml logs --tail=30 platform
 
-    - name: Wait for platform (treat 200/401 as ready)
-      run: |
-        for i in {1..180}; do       
-          code=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/smarthome/state/mse || true)
-          echo "Attempt $i/60: HTTP $code"
-          if [ "$code" = "200" ] || [ "$code" = "401" ]; then
-            echo "Platform is up (HTTP $code)"
-            exit 0
-          fi
-          sleep 2
-        done
-        echo "Platform did not become ready after 360 seconds"
-        echo "=== Final Container Status ==="
-        docker compose -f Tartan/smart-home/docker-compose.yml ps
-        echo "=== Full Platform Logs ==="
-        docker compose -f Tartan/smart-home/docker-compose.yml logs platform
-        exit 1
+      - name: Wait for platform (treat 200/401 as ready)
+        run: |
+          for i in {1..180}; do       
+            code=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/smarthome/state/mse || true)
+            echo "Attempt $i/60: HTTP $code"
+            if [ "$code" = "200" ] || [ "$code" = "401" ]; then
+              echo "Platform is up (HTTP $code)"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "Platform did not become ready after 360 seconds"
+          echo "=== Final Container Status ==="
+          docker compose -f Tartan/smart-home/docker-compose.yml ps
+          echo "=== Full Platform Logs ==="
+          docker compose -f Tartan/smart-home/docker-compose.yml logs platform
+          exit 1
 
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.11'
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
 
-    - name: Install system test dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install pytest requests
+      - name: Install system test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest requests
 
-    - name: Run system tests
-      working-directory: Tartan/smart-home/Platform/system_tests
-      run: |
-        pytest -q
+      - name: Run system tests
+        working-directory: Tartan/smart-home/Platform/system_tests
+        run: |
+          pytest -q
 
-    - name: Bring server down
-      if: always()
-      working-directory: Tartan/smart-home
-      run: |
-        docker compose down -v
+      - name: Bring server down
+        if: always()
+        working-directory: Tartan/smart-home
+        run: |
+          docker compose down -v
 
   deploy:
     needs: system-test
