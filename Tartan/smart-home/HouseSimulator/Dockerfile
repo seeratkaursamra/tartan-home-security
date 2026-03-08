@@ -1,4 +1,4 @@
-FROM python:3.7
+FROM public.ecr.aws/docker/library/python:3.7
 WORKDIR /app
 COPY simple_server.py /app
 EXPOSE 5050

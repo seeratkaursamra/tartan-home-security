@@ -1,12 +1,12 @@
 # Get the Gradle image so we can build JAR file first
-FROM gradle:8.6-jdk21-jammy AS build
+FROM public.ecr.aws/docker/library/gradle:8.6-jdk21-jammy AS build
 
 COPY --chown=gradle:gradle . /home/gradle/src
 WORKDIR /home/gradle/src
 RUN gradle shadowJar
 
 # Get the Java image
-FROM eclipse-temurin:21
+FROM public.ecr.aws/docker/library/eclipse-temurin:21
 
 # Install JavaFX
 # Comment these out if you need to install it
