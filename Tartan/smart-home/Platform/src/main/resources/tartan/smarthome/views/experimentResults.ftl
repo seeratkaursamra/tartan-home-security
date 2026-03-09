@@ -18,18 +18,19 @@
 </head>
 <body>
     <h1>AB Experiment Results</h1>
-    <p>Which report variant was sent to which customer and how it affected light usage.</p>
+    <p>Which report variant was sent to which customer and how it affected light usage. Uses a <strong>baseline period</strong> (previous 30s) and <strong>treatment period</strong> (current 30s) aligned with the weekly report.</p>
     <p><strong>Config file:</strong> <code>${configFilePath}</code></p>
 
-    <h2>Per-house summary</h2>
+    <h2>Per-house summary (baseline vs treatment period)</h2>
     <table>
         <thead>
             <tr>
                 <th>House</th>
                 <th>Variant</th>
                 <th>Config File</th>
-                <th>Snapshots</th>
-                <th>Total light usage (ms)</th>
+                <th>Snapshots (treatment)</th>
+                <th>Baseline light usage (ms)</th>
+                <th>Treatment light usage (ms)</th>
                 <th>Avg light usage (ms)</th>
             </tr>
         </thead>
@@ -40,6 +41,7 @@
                 <td>${row.variant}</td>
                 <td><code>${configFilePath}</code></td>
                 <td>${row.snapshotCount}</td>
+                <td>${row.baselineLightsOnMs}</td>
                 <td>${row.totalLightsOnMs}</td>
                 <td>${row.avgLightsOnMs?string["0.00"]}</td>
             </tr>
@@ -47,7 +49,7 @@
         </tbody>
     </table>
 
-    <h2>Comparison by variant</h2>
+    <h2>Comparison by variant (treatment period)</h2>
     <div class="chart-container">
         <canvas id="variantChart" width="400" height="200"></canvas>
     </div>

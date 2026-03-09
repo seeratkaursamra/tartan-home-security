@@ -6,6 +6,7 @@ import org.hibernate.SessionException;
 import org.hibernate.SessionFactory;
 import tartan.smarthome.core.TartanHomeData;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -43,5 +44,20 @@ public class HomeDAO extends AbstractDAO<TartanHomeData> {
      */
     public List<TartanHomeData> findAll() {
         return currentSession().createQuery("from TartanHomeData", TartanHomeData.class).list();
+    }
+
+    /**
+     * Find snapshots within a time range (for baseline and treatment period analysis).
+     * Must be called within a UnitOfWork / transaction context.
+     * @param fromInclusive start of range (inclusive)
+     * @param toInclusive end of range (inclusive)
+     * @return snapshots with createTimeStamp in [from, to]
+     */
+    public List<TartanHomeData> findAllBetween(Date fromInclusive, Date toInclusive) {
+        return currentSession()
+                .createQuery("from TartanHomeData t where t.createTimeStamp >= :fromTime and t.createTimeStamp <= :toTime", TartanHomeData.class)
+                .setParameter("fromTime", fromInclusive)
+                .setParameter("toTime", toInclusive)
+                .list();
     }
 }

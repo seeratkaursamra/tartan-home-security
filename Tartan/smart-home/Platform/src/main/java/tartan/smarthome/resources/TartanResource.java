@@ -17,6 +17,7 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -144,64 +145,79 @@ public class TartanResource {
      * AB experiment results: which report variant was sent to which customer and how it affected light usage.
      * No auth required (admin/analyst page).
      */
+    /** Weekly report period (ms); same as TartanHomeService so baseline/treatment align with report. */
+    private static final long REPORT_PERIOD_MS = 30_000L;
+
     @GET
     @Produces(MediaType.TEXT_HTML)
     @Path("/experiment/results")
     @Timed
     @UnitOfWork
     public ExperimentResultsView experimentResults() {
-        List<TartanHomeData> all = homeDAO.findAll();
+        long now = System.currentTimeMillis();
+        Date baselineFrom = new Date(now - 2 * REPORT_PERIOD_MS);
+        Date baselineTo = new Date(now - REPORT_PERIOD_MS);
+        Date treatmentFrom = new Date(now - REPORT_PERIOD_MS);
+        Date treatmentTo = new Date(now);
 
-        // Group by home name: for each house, variant (first), count, total = max(minutesLightsOn) since cumulative, avg = mean(minutesLightsOn)
-        Map<String, List<TartanHomeData>> byHome = all.stream()
+        List<TartanHomeData> baselineSnapshots = homeDAO.findAllBetween(baselineFrom, baselineTo);
+        List<TartanHomeData> treatmentSnapshots = homeDAO.findAllBetween(treatmentFrom, treatmentTo);
+
+        Map<String, List<TartanHomeData>> baselineByHome = baselineSnapshots.stream()
+                .collect(Collectors.groupingBy(TartanHomeData::getHomeName));
+        Map<String, List<TartanHomeData>> treatmentByHome = treatmentSnapshots.stream()
                 .collect(Collectors.groupingBy(TartanHomeData::getHomeName));
 
         List<ExperimentResultsView.HouseExperimentRow> rows = new ArrayList<>();
-        List<Double> usageOnlyTotals = new ArrayList<>();
-        List<Double> costEstimateTotals = new ArrayList<>();
+        List<Double> usageOnlyTreatmentTotals = new ArrayList<>();
+        List<Double> costEstimateTreatmentTotals = new ArrayList<>();
 
-        for (Map.Entry<String, List<TartanHomeData>> e : byHome.entrySet()) {
+        for (Map.Entry<String, List<TartanHomeData>> e : treatmentByHome.entrySet()) {
             String houseName = e.getKey();
-            List<TartanHomeData> snapshots = e.getValue();
-            if (snapshots.isEmpty()) continue;
+            List<TartanHomeData> treatment = e.getValue();
+            if (treatment.isEmpty()) continue;
 
-            String variant = snapshots.stream()
+            String variant = treatment.stream()
                     .map(TartanHomeData::getReportVariant)
                     .filter(v -> v != null && !v.isEmpty())
                     .findFirst()
                     .orElse("usage_only");
 
-            int count = snapshots.size();
-            long totalMs = snapshots.stream()
+            long baselineMs = baselineByHome.getOrDefault(houseName, List.of()).stream()
                     .mapToLong(s -> s.getMinutesLightsOn() != null ? s.getMinutesLightsOn() : 0L)
                     .max()
                     .orElse(0L);
-            double avgMs = snapshots.stream()
+            int count = treatment.size();
+            long treatmentMs = treatment.stream()
+                    .mapToLong(s -> s.getMinutesLightsOn() != null ? s.getMinutesLightsOn() : 0L)
+                    .max()
+                    .orElse(0L);
+            double avgMs = treatment.stream()
                     .mapToLong(s -> s.getMinutesLightsOn() != null ? s.getMinutesLightsOn() : 0L)
                     .average()
                     .orElse(0.0);
 
-            rows.add(new ExperimentResultsView.HouseExperimentRow(houseName, variant, count, totalMs, avgMs));
+            rows.add(new ExperimentResultsView.HouseExperimentRow(houseName, variant, count, baselineMs, treatmentMs, avgMs));
 
             if ("cost_estimate".equals(variant)) {
-                costEstimateTotals.add((double) totalMs);
+                costEstimateTreatmentTotals.add((double) treatmentMs);
             } else {
-                usageOnlyTotals.add((double) totalMs);
+                usageOnlyTreatmentTotals.add((double) treatmentMs);
             }
         }
 
-        double usageOnlyAvgMs = usageOnlyTotals.isEmpty() ? 0.0 : usageOnlyTotals.stream().mapToDouble(Double::doubleValue).average().orElse(0.0);
-        double costEstimateAvgMs = costEstimateTotals.isEmpty() ? 0.0 : costEstimateTotals.stream().mapToDouble(Double::doubleValue).average().orElse(0.0);
+        double usageOnlyAvgMs = usageOnlyTreatmentTotals.isEmpty() ? 0.0 : usageOnlyTreatmentTotals.stream().mapToDouble(Double::doubleValue).average().orElse(0.0);
+        double costEstimateAvgMs = costEstimateTreatmentTotals.isEmpty() ? 0.0 : costEstimateTreatmentTotals.stream().mapToDouble(Double::doubleValue).average().orElse(0.0);
 
         String conclusion;
-        if (usageOnlyTotals.isEmpty() || costEstimateTotals.isEmpty()) {
-            conclusion = "Need data from both variants to compare. Run the system and let the historian collect snapshots.";
+        if (usageOnlyTreatmentTotals.isEmpty() || costEstimateTreatmentTotals.isEmpty()) {
+            conclusion = "Need data from both variants in the treatment period. Run the system for at least 60 seconds (baseline 30s + treatment 30s) so both periods have snapshots.";
         } else if (costEstimateAvgMs < usageOnlyAvgMs) {
-            conclusion = "Houses shown the cost estimate (Variant B) had lower average light usage than houses shown usage only (Variant A). Showing cost may encourage reduced consumption.";
+            conclusion = "In the treatment period, houses shown the cost estimate (Variant B) had lower average light usage than houses shown usage only (Variant A). Showing cost may encourage reduced consumption.";
         } else if (costEstimateAvgMs > usageOnlyAvgMs) {
-            conclusion = "Houses shown usage only (Variant A) had lower average light usage. In this run, the cost estimate variant did not reduce consumption.";
+            conclusion = "In the treatment period, houses shown usage only (Variant A) had lower average light usage. In this run, the cost estimate variant did not reduce consumption.";
         } else {
-            conclusion = "Both variants showed similar average light usage in this experiment.";
+            conclusion = "Both variants showed similar average light usage in the treatment period.";
         }
 
         String configFilePath = "Platform/config.docker.yml (Docker) / Platform/config.yml (local)";
