@@ -13,20 +13,16 @@ if [ ! -d "$BACKUP_DIR/previous_working" ]; then
     exit 1
 fi
 
-# Stop current containers
-echo "Stopping current containers..."
-cd "$PROD_DIR"
-docker compose down || true
-
-# Restore previous version
+# Restore previous version (do not stop house simulators)
 echo "Restoring previous version from backup..."
+cd "$PROD_DIR"
 rm -rf "$PROD_DIR"/*
 cp -r "$BACKUP_DIR/previous_working"/* "$PROD_DIR"/
 
-# Start restored version
-echo "Starting restored containers..."
+# Rebuild and restart only the platform so house simulators and MySQL keep running
+echo "Rebuilding and starting platform (previous version)..."
 cd "$PROD_DIR"
-docker compose up --build -d
+docker compose up -d --build platform
 
 # Wait for MySQL
 echo "Waiting for MySQL..."

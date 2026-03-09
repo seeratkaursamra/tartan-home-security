@@ -146,12 +146,14 @@ def test_nightlock_during_night_hours():
 
     print(f"\n=== Test: Night Lock Active ===")
 
-    # Combine baseline + night lock settings with nightActive=true
+    # Set nightLockStart/End to bracket the current hour so the server computes nightActive=true
+    current_hour = datetime.utcnow().hour
     payload = baseline_state()
     payload.update({
         "nightLockEnabled": "true",
         "lockState": "unlocked",
-        "nightActive": "true"  # Directly set night mode (bypasses time calculation)
+        "nightLockStart": str((current_hour - 1) % 24),
+        "nightLockEnd": str((current_hour + 1) % 24),
     })
 
     post_update(payload)
@@ -166,11 +168,11 @@ def test_nightlock_during_night_hours():
     assert state.get('nightLockEnabled') == 'true', \
         f"Night lock not enabled: got {state.get('nightLockEnabled')}"
 
-    # Should relock within 5 seconds
+    # Should relock within a couple of polling cycles (~10s)
     print("\n=== Waiting for auto-lock ===")
     final = wait_until(
         lambda s: s.get("lockState") == "locked",
-        timeout_s=5
+        timeout_s=15
     )
 
     assert final["lockState"] == "locked", \
@@ -182,12 +184,14 @@ def test_nightlock_outside_night_hours():
 
     print(f"\n=== Test: Night Lock Not Active ===")
 
-    # Combine baseline + night lock settings with nightActive=false
+    # Set nightLockStart/End to a window that does NOT include the current hour
+    current_hour = datetime.utcnow().hour
     payload = baseline_state()
     payload.update({
         "nightLockEnabled": "true",
         "lockState": "unlocked",
-        "nightActive": "false"  # Not night time
+        "nightLockStart": str((current_hour + 5) % 24),
+        "nightLockEnd": str((current_hour + 7) % 24),
     })
 
     post_update(payload)
@@ -204,12 +208,14 @@ def test_nightlock_disabled():
 
     print(f"\n=== Test: Night Lock Disabled ===")
 
-    # Combine baseline + night lock settings
+    # Set time window that includes current hour, but disable the feature
+    current_hour = datetime.utcnow().hour
     payload = baseline_state()
     payload.update({
-        "nightLockEnabled": "false",  # Feature disabled
+        "nightLockEnabled": "false",
         "lockState": "unlocked",
-        "nightActive": "true"  # Would be night time, but feature is off
+        "nightLockStart": str((current_hour - 1) % 24),
+        "nightLockEnd": str((current_hour + 1) % 24),
     })
 
     post_update(payload)

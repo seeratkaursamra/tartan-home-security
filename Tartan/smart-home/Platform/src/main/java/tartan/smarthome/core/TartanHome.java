@@ -109,6 +109,10 @@ public class TartanHome {
     @JsonProperty
     private Long minutesLightsOn;
 
+    /** AB test: which report variant this house sees (usage_only or cost_estimate) */
+    @JsonProperty
+    private String reportVariant;
+
     /**
      * Empty constructor needed by Jackson deserialization
      */
@@ -409,6 +413,9 @@ public class TartanHome {
 
     public Long getMinutesLightsOn() { return minutesLightsOn; }
     public void setMinutesLightsOn(Long minutesLightsOn) { this.minutesLightsOn = minutesLightsOn; }
+
+    public String getReportVariant() { return reportVariant; }
+    public void setReportVariant(String reportVariant) { this.reportVariant = reportVariant; }
 
     public void addMinutesLightsOn(Long duration) {
         if (this.minutesLightsOn == null) {

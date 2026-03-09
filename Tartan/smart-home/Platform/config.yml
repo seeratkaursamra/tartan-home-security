@@ -24,6 +24,9 @@ houses:
     # passcode for smart door lock (Electronic Operation)
     lockPasscode: "1234"
 
+    # AB test: report variant (usage_only = minutes only, cost_estimate = cost in CAD)
+    reportVariant: usage_only
+
     # Next house
   - name: cmu
     address: localhost
@@ -35,6 +38,31 @@ houses:
     alarmDelay: 30
     alarmPasscode: quit
     lockPasscode: "5678"
+    reportVariant: cost_estimate
+
+  - name: eng
+    address: localhost
+    port: 5052
+
+    user: eng
+    password: 1234
+    targetTemp: 70
+    alarmDelay: 30
+    alarmPasscode: stop
+    lockPasscode: "1234"
+    reportVariant: usage_only
+
+  - name: sci
+    address: localhost
+    port: 5053
+
+    user: sci
+    password: 5678
+    targetTemp: 70
+    alarmDelay: 30
+    alarmPasscode: quit
+    lockPasscode: "5678"
+    reportVariant: cost_estimate
 
 # how many seconds between database snapshots
 historyTimer: 5
