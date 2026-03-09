@@ -49,20 +49,22 @@ public class ExperimentResultsView extends View {
     }
 
     /**
-     * One row in the experiment table: one house's variant and outcome.
+     * One row in the experiment table: one house's variant, baseline and treatment period outcome.
      */
     public static class HouseExperimentRow {
         private final String houseName;
         private final String variant;
         private final int snapshotCount;
+        private final long baselineLightsOnMs;
         private final long totalLightsOnMs;
         private final double avgLightsOnMs;
 
         public HouseExperimentRow(String houseName, String variant, int snapshotCount,
-                                  long totalLightsOnMs, double avgLightsOnMs) {
+                                  long baselineLightsOnMs, long totalLightsOnMs, double avgLightsOnMs) {
             this.houseName = houseName;
             this.variant = variant != null ? variant : "usage_only";
             this.snapshotCount = snapshotCount;
+            this.baselineLightsOnMs = baselineLightsOnMs;
             this.totalLightsOnMs = totalLightsOnMs;
             this.avgLightsOnMs = avgLightsOnMs;
         }
@@ -70,6 +72,7 @@ public class ExperimentResultsView extends View {
         public String getHouseName() { return houseName; }
         public String getVariant() { return variant; }
         public int getSnapshotCount() { return snapshotCount; }
+        public long getBaselineLightsOnMs() { return baselineLightsOnMs; }
         public long getTotalLightsOnMs() { return totalLightsOnMs; }
         public double getAvgLightsOnMs() { return avgLightsOnMs; }
     }

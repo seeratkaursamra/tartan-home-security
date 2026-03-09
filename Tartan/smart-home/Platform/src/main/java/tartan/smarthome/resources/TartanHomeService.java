@@ -48,10 +48,15 @@ public class TartanHomeService {
     private Boolean logHistory;
     private int historyTimer = 60000;
 
-    // Reporting: cumulative light-on duration tracking
+    // Reporting: cumulative light-on duration tracking (used to compute weekly)
     private Long lightsOnDuration;
     private boolean prevLightState;
     private java.time.LocalTime timeLightMinutesUpdated;
+
+    /** Weekly report period: simulated as 30 seconds so the report rolls over without waiting 7 real days. */
+    private static final long REPORT_PERIOD_MS = 30_000L;
+    private long periodStartTimeMs;
+    private long periodStartLightsMs;
 
     /**
      * Create a new Tartan Home Service
@@ -84,6 +89,8 @@ public class TartanHomeService {
 
         this.lightsOnDuration = 0L;
         this.prevLightState = false;
+        this.periodStartTimeMs = System.currentTimeMillis();
+        this.periodStartLightsMs = 0L;
 
         this.historyTimer = historyTimer*1000;
         this.logHistory = true;
@@ -556,7 +563,14 @@ public class TartanHomeService {
         }
 
         tartanHome.setReportVariant(this.reportVariant);
-        tartanHome.setMinutesLightsOn(this.lightsOnDuration);
+        // Weekly report: usage in current period only; period = 30s (simulated week for demo)
+        long now = System.currentTimeMillis();
+        if (now - periodStartTimeMs >= REPORT_PERIOD_MS) {
+            periodStartLightsMs = lightsOnDuration;
+            periodStartTimeMs = now;
+        }
+        long weeklyLightsMs = Math.max(0L, lightsOnDuration - periodStartLightsMs);
+        tartanHome.setMinutesLightsOn(weeklyLightsMs);
 
         return tartanHome;
     }
