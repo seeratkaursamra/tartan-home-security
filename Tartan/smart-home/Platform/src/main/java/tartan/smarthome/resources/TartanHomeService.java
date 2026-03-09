@@ -15,19 +15,15 @@ import java.util.Hashtable;
 import java.util.Map;
 import java.util.Set;
 
-/***
- * The service layer for the Tartan Home System. Additional inputs and control mechanisms should be accessed here.
- * Currently, this is mainly a proxy to make the existing hardware RESTful.
- */
 public class TartanHomeService {
 
-    // the controller for the house
+   
     private IoTControlManager controller;
 
-    // a logging system
+    
     private static final Logger LOGGER = LoggerFactory.getLogger(TartanHomeService.class);
 
-    // Home configuration parameters
+    
     private String name;
     private String address;
     private Integer port;
@@ -38,10 +34,13 @@ public class TartanHomeService {
     private String user;
     private String password;
 
-    // Smart door lock: Electronic Operation (access panel)
+    /** AB test: report variant (usage_only or cost_estimate). Default usage_only. */
+    private String reportVariant;
+
+    
     private ElectronicOperation electronicOperation;
 
-    // status parameters
+    
     private HomeDAO homeDAO;
     private boolean authenticated;
 
@@ -49,10 +48,10 @@ public class TartanHomeService {
     private Boolean logHistory;
     private int historyTimer = 60000;
 
-    // Reporting feature: track light usage for reports
-    private Boolean prevLightState;
-    private java.time.LocalTime timeLightMinutesUpdated;
+    // Reporting: cumulative light-on duration tracking
     private Long lightsOnDuration;
+    private boolean prevLightState;
+    private java.time.LocalTime timeLightMinutesUpdated;
 
     /**
      * Create a new Tartan Home Service
@@ -81,6 +80,10 @@ public class TartanHomeService {
         this.alarmDelay = settings.getAlarmDelay();
         this.alarmPasscode = settings.getAlarmPasscode();
         this.lockPasscode = settings.getLockPasscode() != null ? settings.getLockPasscode() : "1234";
+        this.reportVariant = settings.getReportVariant() != null ? settings.getReportVariant() : "usage_only";
+
+        this.lightsOnDuration = 0L;
+        this.prevLightState = false;
 
         this.historyTimer = historyTimer*1000;
         this.logHistory = true;
@@ -97,11 +100,6 @@ public class TartanHomeService {
         userSettings.put(IoTValues.TARGET_TEMP, Integer.parseInt(this.targetTemp));
         userSettings.put(IoTValues.ALARM_PASSCODE, this.alarmPasscode);
         controller.updateSettings(userSettings);
-
-        // Reporting feature: initialize light tracking
-        this.timeLightMinutesUpdated = java.time.LocalTime.now();
-        this.lightsOnDuration = 0L;
-        this.prevLightState = false;
 
         LOGGER.info("House " + this.name + " configured");
     }
@@ -361,15 +359,15 @@ public class TartanHomeService {
             Map<String, Object> userSettings = new Hashtable<String, Object>();
             if (h.getAlarmDelay()!=null) {
                 this.alarmDelay = h.getAlarmDelay();
-                userSettings.put(IoTValues.ALARM_DELAY, Integer.parseInt(this.alarmDelay));
+                userSettings.put(IoTValues.ALARM_DELAY, Integer.parseInt(this.alarmDelay)); 
 
             }
             if (h.getTargetTemp()!=null) {
                 this.targetTemp = h.getTargetTemp();
-                userSettings.put(IoTValues.TARGET_TEMP, Integer.parseInt(this.targetTemp));
-            }
-            controller.updateSettings(userSettings);
-            controller.processStateUpdate(toIotState(h));
+                userSettings.put(IoTValues.TARGET_TEMP, Integer.parseInt(this.targetTemp)); 
+            }           
+            controller.updateSettings(userSettings);  
+            controller.processStateUpdate(toIotState(h));  
         }
         return true;
     }
@@ -393,7 +391,7 @@ public class TartanHomeService {
 
         Map<String, Object> state = null;
         synchronized (controller) {
-            state = controller.getCurrentState();
+            state = controller.getCurrentState();            
             for (String l : controller.getLogMessages()) {
                 LOGGER.info(l);
             }
@@ -416,6 +414,7 @@ public class TartanHomeService {
             tartanHome.setLockState(TartanHomeValues.UNKNOWN);
             tartanHome.setKeylessEnabled("false");
             tartanHome.setIntruderDetected("false");
+            tartanHome.setReportVariant(this.reportVariant);
 
             return tartanHome;
         }
@@ -455,20 +454,20 @@ public class TartanHomeService {
                     tartanHome.setLight(TartanHomeValues.OFF);
                 }
 
-                // Reporting: track light usage duration
+                // Track cumulative light-on duration for reporting
                 if (lightState) {
-                    if (this.prevLightState != lightState) {
+                    if (!this.prevLightState) {
                         this.timeLightMinutesUpdated = java.time.LocalTime.now();
                     } else {
                         java.time.LocalTime now = java.time.LocalTime.now();
-                        Long diff = this.timeLightMinutesUpdated.until(now, java.time.temporal.ChronoUnit.MILLIS);
+                        long diff = this.timeLightMinutesUpdated.until(now, java.time.temporal.ChronoUnit.MILLIS);
                         this.timeLightMinutesUpdated = now;
                         this.lightsOnDuration += diff;
                     }
                 } else {
-                    if (this.prevLightState != lightState) {
+                    if (this.prevLightState) {
                         java.time.LocalTime now = java.time.LocalTime.now();
-                        Long diff = this.timeLightMinutesUpdated.until(now, java.time.temporal.ChronoUnit.MILLIS);
+                        long diff = this.timeLightMinutesUpdated.until(now, java.time.temporal.ChronoUnit.MILLIS);
                         this.timeLightMinutesUpdated = now;
                         this.lightsOnDuration += diff;
                     }
@@ -556,7 +555,7 @@ public class TartanHomeService {
             tartanHome.setNightLockEnd("6");
         }
 
-        // Reporting: add cumulative light duration to the home object
+        tartanHome.setReportVariant(this.reportVariant);
         tartanHome.setMinutesLightsOn(this.lightsOnDuration);
 
         return tartanHome;
@@ -569,14 +568,7 @@ public class TartanHomeService {
      */
     private Map<String, Object> toIotState(TartanHome tartanHome) {
         Map<String, Object> state = new Hashtable<>();
-
-        state.put(IoTValues.CURRENT_HOUR, java.time.LocalTime.now().getHour());
-
-
-        if (tartanHome.getNightActive() != null) {
-            state.put(IoTValues.NIGHT_ACTIVE, Boolean.parseBoolean(tartanHome.getNightActive()));
-        }
-
+        
         if (tartanHome.getProximity()!=null) {
             state.put(IoTValues.PROXIMITY_STATE, toIoTProximityState(tartanHome));
         }
@@ -629,7 +621,7 @@ public class TartanHomeService {
                 }
             }
         }
-
+        
         if (tartanHome.getLockState() != null) {
             state.put(IoTValues.LOCK_STATE, toIoTLockState(tartanHome));
         }

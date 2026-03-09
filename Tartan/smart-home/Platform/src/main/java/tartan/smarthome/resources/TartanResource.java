@@ -8,7 +8,9 @@ import org.slf4j.LoggerFactory;
 import tartan.smarthome.TartanHomeSettings;
 import tartan.smarthome.auth.TartanUser;
 import tartan.smarthome.core.TartanHome;
+import tartan.smarthome.core.TartanHomeData;
 import tartan.smarthome.db.HomeDAO;
+import tartan.smarthome.views.ExperimentResultsView;
 import tartan.smarthome.views.SmartHomeView;
 
 import jakarta.ws.rs.*;
@@ -16,6 +18,8 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * The resource class implements the HTTP handlers via Jersey.
@@ -29,6 +33,7 @@ public class TartanResource {
 
     // There is one service per home
     private ArrayList<TartanHomeService> services;
+    private final HomeDAO homeDAO;
 
     /**
      * Create and connect to a list of houses
@@ -37,7 +42,7 @@ public class TartanResource {
      * @param historyTimer how often to log history
      */
     public TartanResource(List<TartanHomeSettings> houses, HomeDAO homeDAO, Integer historyTimer) {
-
+        this.homeDAO = homeDAO;
         this.services = new ArrayList<>(houses.size());
         for (TartanHomeSettings homeSettings : houses) {
             TartanHomeService service = new TartanHomeService(homeDAO);
@@ -133,6 +138,74 @@ public class TartanResource {
         return Response
                 .status(Response.Status.UNAUTHORIZED)
                 .build();
+    }
+
+    /**
+     * AB experiment results: which report variant was sent to which customer and how it affected light usage.
+     * No auth required (admin/analyst page).
+     */
+    @GET
+    @Produces(MediaType.TEXT_HTML)
+    @Path("/experiment/results")
+    @Timed
+    @UnitOfWork
+    public ExperimentResultsView experimentResults() {
+        List<TartanHomeData> all = homeDAO.findAll();
+
+        // Group by home name: for each house, variant (first), count, total = max(minutesLightsOn) since cumulative, avg = mean(minutesLightsOn)
+        Map<String, List<TartanHomeData>> byHome = all.stream()
+                .collect(Collectors.groupingBy(TartanHomeData::getHomeName));
+
+        List<ExperimentResultsView.HouseExperimentRow> rows = new ArrayList<>();
+        List<Double> usageOnlyTotals = new ArrayList<>();
+        List<Double> costEstimateTotals = new ArrayList<>();
+
+        for (Map.Entry<String, List<TartanHomeData>> e : byHome.entrySet()) {
+            String houseName = e.getKey();
+            List<TartanHomeData> snapshots = e.getValue();
+            if (snapshots.isEmpty()) continue;
+
+            String variant = snapshots.stream()
+                    .map(TartanHomeData::getReportVariant)
+                    .filter(v -> v != null && !v.isEmpty())
+                    .findFirst()
+                    .orElse("usage_only");
+
+            int count = snapshots.size();
+            long totalMs = snapshots.stream()
+                    .mapToLong(s -> s.getMinutesLightsOn() != null ? s.getMinutesLightsOn() : 0L)
+                    .max()
+                    .orElse(0L);
+            double avgMs = snapshots.stream()
+                    .mapToLong(s -> s.getMinutesLightsOn() != null ? s.getMinutesLightsOn() : 0L)
+                    .average()
+                    .orElse(0.0);
+
+            rows.add(new ExperimentResultsView.HouseExperimentRow(houseName, variant, count, totalMs, avgMs));
+
+            if ("cost_estimate".equals(variant)) {
+                costEstimateTotals.add((double) totalMs);
+            } else {
+                usageOnlyTotals.add((double) totalMs);
+            }
+        }
+
+        double usageOnlyAvgMs = usageOnlyTotals.isEmpty() ? 0.0 : usageOnlyTotals.stream().mapToDouble(Double::doubleValue).average().orElse(0.0);
+        double costEstimateAvgMs = costEstimateTotals.isEmpty() ? 0.0 : costEstimateTotals.stream().mapToDouble(Double::doubleValue).average().orElse(0.0);
+
+        String conclusion;
+        if (usageOnlyTotals.isEmpty() || costEstimateTotals.isEmpty()) {
+            conclusion = "Need data from both variants to compare. Run the system and let the historian collect snapshots.";
+        } else if (costEstimateAvgMs < usageOnlyAvgMs) {
+            conclusion = "Houses shown the cost estimate (Variant B) had lower average light usage than houses shown usage only (Variant A). Showing cost may encourage reduced consumption.";
+        } else if (costEstimateAvgMs > usageOnlyAvgMs) {
+            conclusion = "Houses shown usage only (Variant A) had lower average light usage. In this run, the cost estimate variant did not reduce consumption.";
+        } else {
+            conclusion = "Both variants showed similar average light usage in this experiment.";
+        }
+
+        String configFilePath = "Platform/config.docker.yml (Docker) / Platform/config.yml (local)";
+        return new ExperimentResultsView(rows, usageOnlyAvgMs, costEstimateAvgMs, conclusion, configFilePath);
     }
 }
 

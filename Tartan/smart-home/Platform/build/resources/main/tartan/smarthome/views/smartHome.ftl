@@ -271,6 +271,33 @@ div {
         </strong>
     </p>
     <hr>
+    <h3>Weekly Energy Report</h3>
+    <div id="reporting_wrapper">
+        <#assign lightsMs = (tartanHome.minutesLightsOn)!0>
+        <#assign totalMinutes = (lightsMs / (60 * 1000))>
+        <#assign displayMinutes = totalMinutes?floor>
+        <#assign displaySeconds = ((lightsMs / 1000) % 60)?floor>
+        <#assign costCAD = totalMinutes * 0.00025>
+
+        <p style="font-size: 0.85em; color: #888;">
+            <em>Report period: weekly summary (100W equivalent @ $0.15/kWh Alberta rate)</em>
+        </p>
+
+        <#if (tartanHome.reportVariant)!?has_content && tartanHome.reportVariant == "cost_estimate">
+            <p><strong>Estimated Electricity Cost:</strong>
+                <span style="color: #d9534f; font-weight: bold; font-size: 1.2em;">$${costCAD?string["0.0000"]} CAD</span>
+            </p>
+            <p style="font-size: 0.9em; color: #666;">
+                <em>Tip: Turning lights off when you leave can save you money each month.</em>
+            </p>
+        <#else>
+            <p><strong>Lights on this period:</strong> ${displayMinutes} minutes, ${displaySeconds} seconds</p>
+            <p style="font-size: 0.9em; color: #666;">
+                <em>Tip: Reducing usage helps the environment. Consider turning lights off in empty rooms.</em>
+            </p>
+        </#if>
+    </div>
+    <hr>
     <h3> Event log</h3>
     <textarea id="log" rows="15" cols="150">
     <#list tartanHome.eventLog as i>

@@ -4,10 +4,18 @@ services:
     build: HouseSimulator/
     ports:
       - "5051:5050"
+  house-eng:
+    build: HouseSimulator/
+    ports:
+      - "5052:5050"
   house-mse:
     build: HouseSimulator/
     ports:
       - "5050:5050"
+  house-sci:
+    build: HouseSimulator/
+    ports:
+      - "5053:5050"
   platform:
     build:
       context: Platform/
@@ -17,7 +25,11 @@ services:
         condition: service_healthy
       house-cmu:
         condition: service_started
+      house-eng:
+        condition: service_started
       house-mse:
+        condition: service_started
+      house-sci:
         condition: service_started
     ports:
       - "8080:8080"

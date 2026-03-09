@@ -45,6 +45,10 @@ public class TartanHomeSettings {
     @JsonProperty
     private String lockPasscode;
 
+    /** AB test: report variant - usage_only (minutes only) or cost_estimate (cost in CAD). Optional; defaults to usage_only. */
+    @JsonProperty
+    private String reportVariant;
+
     public String getTargetTemp() {
         return targetTemp;
     }
@@ -106,4 +110,8 @@ public class TartanHomeSettings {
     public String getLockPasscode() { return lockPasscode; }
 
     public void setLockPasscode(String lockPasscode) { this.lockPasscode = lockPasscode; }
+
+    public String getReportVariant() { return reportVariant; }
+
+    public void setReportVariant(String reportVariant) { this.reportVariant = reportVariant; }
 }

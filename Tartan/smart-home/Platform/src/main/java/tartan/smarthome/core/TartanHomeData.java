@@ -78,6 +78,16 @@ public class TartanHomeData {
     @Column(name = "minutes_lights_on")
     private Long minutesLightsOn;
 
+    // AB test: which report variant (usage_only or cost_estimate)
+    @Column(name = "report_variant")
+    private String reportVariant;
+
+    /**
+     * No-arg constructor required by Hibernate for entity loading.
+     */
+    public TartanHomeData() {
+    }
+
     /**
      * Create a mew data set from a TartanHome model
      * @param h the home model
@@ -100,6 +110,9 @@ public class TartanHomeData {
 
         // Reporting: track light usage
         this.minutesLightsOn = h.getMinutesLightsOn();
+
+        // AB test: report variant
+        this.reportVariant = h.getReportVariant();
 
         // Remember when this record is created
         this.createTimeStamp = new Date();
@@ -341,6 +354,20 @@ public class TartanHomeData {
      */
     public void setMinutesLightsOn(Long minutesLightsOn) {
         this.minutesLightsOn = minutesLightsOn;
+    }
+
+    /**
+     * Get the report variant (usage_only or cost_estimate)
+     */
+    public String getReportVariant() {
+        return reportVariant;
+    }
+
+    /**
+     * Set the report variant
+     */
+    public void setReportVariant(String reportVariant) {
+        this.reportVariant = reportVariant;
     }
 
     /**
