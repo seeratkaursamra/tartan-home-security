@@ -183,8 +183,9 @@ jobs:
             
             ./save-backup.sh || echo "No previous deployment to backup"
             
-            docker compose down || true
-            docker compose up --build -d
+            # Bring up all services if not already running (first deploy); then rebuild/restart only platform so house simulators keep running
+            docker compose up -d
+            docker compose up -d --build platform
             
             # Wait for MySQL health
             echo "Waiting for MySQL..."

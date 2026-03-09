@@ -31,7 +31,7 @@ The system automatically deploys when code is pushed to the repository and passe
    2. system-test - runs docker containers and executes the system test
    3. deploy - deploys to production server (only if tests pass)
 4. Previous version is automatically backed up before deployment
-5. Docker containers are rebuilt and restarted
+5. Only the platform container is rebuilt and restarted; house simulators and MySQL keep running
 
 
 ### Manual Deployment
@@ -40,9 +40,10 @@ If you need to deploy manually, SSH into the production server:
 ```bash
 ssh -i ~/.ssh/id_rsa ubuntu@10.2.4.125
 cd ~/prod/Tartan/smart-home
-docker compose down
-docker compose up --build -d
+docker compose up -d
+docker compose up -d --build platform
 ```
+(Use `docker compose up -d --build` for a full restart of all services.)
 
 ## Rollback System
 The platform includes a rollback mechanism to quickly recover from failed deployments /
@@ -69,11 +70,10 @@ Has an expected time of 1-2 minutes \
 
 #### What the rollback script does:
 1. Verifies that a previous backup exists
-2. Stops current Docker containers
-3. Restores files from ~/backup/previous_working
-4. Rebuilds and starts containers with previous version
-5. Waits for MySQL and platform to be ready
-6. Reports completion status
+2. Restores files from ~/backup/previous_working (house simulators and MySQL are not stopped)
+3. Rebuilds and restarts only the platform container with the previous version
+4. Waits for MySQL and platform to be ready
+5. Reports completion status
 
 
 To rollback up to 5 versions from a saved timestamped backup :
