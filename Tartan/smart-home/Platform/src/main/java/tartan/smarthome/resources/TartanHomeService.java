@@ -49,6 +49,11 @@ public class TartanHomeService {
     private Boolean logHistory;
     private int historyTimer = 60000;
 
+    // Reporting feature: track light usage for reports
+    private Boolean prevLightState;
+    private java.time.LocalTime timeLightMinutesUpdated;
+    private Long lightsOnDuration;
+
     /**
      * Create a new Tartan Home Service
      * @param dao handle to a database
@@ -92,6 +97,11 @@ public class TartanHomeService {
         userSettings.put(IoTValues.TARGET_TEMP, Integer.parseInt(this.targetTemp));
         userSettings.put(IoTValues.ALARM_PASSCODE, this.alarmPasscode);
         controller.updateSettings(userSettings);
+
+        // Reporting feature: initialize light tracking
+        this.timeLightMinutesUpdated = java.time.LocalTime.now();
+        this.lightsOnDuration = 0L;
+        this.prevLightState = false;
 
         LOGGER.info("House " + this.name + " configured");
     }
@@ -351,15 +361,15 @@ public class TartanHomeService {
             Map<String, Object> userSettings = new Hashtable<String, Object>();
             if (h.getAlarmDelay()!=null) {
                 this.alarmDelay = h.getAlarmDelay();
-                userSettings.put(IoTValues.ALARM_DELAY, Integer.parseInt(this.alarmDelay)); 
+                userSettings.put(IoTValues.ALARM_DELAY, Integer.parseInt(this.alarmDelay));
 
             }
             if (h.getTargetTemp()!=null) {
                 this.targetTemp = h.getTargetTemp();
-                userSettings.put(IoTValues.TARGET_TEMP, Integer.parseInt(this.targetTemp)); 
-            }           
-            controller.updateSettings(userSettings);  
-            controller.processStateUpdate(toIotState(h));  
+                userSettings.put(IoTValues.TARGET_TEMP, Integer.parseInt(this.targetTemp));
+            }
+            controller.updateSettings(userSettings);
+            controller.processStateUpdate(toIotState(h));
         }
         return true;
     }
@@ -383,7 +393,7 @@ public class TartanHomeService {
 
         Map<String, Object> state = null;
         synchronized (controller) {
-            state = controller.getCurrentState();            
+            state = controller.getCurrentState();
             for (String l : controller.getLogMessages()) {
                 LOGGER.info(l);
             }
@@ -444,6 +454,27 @@ public class TartanHomeService {
                 } else {
                     tartanHome.setLight(TartanHomeValues.OFF);
                 }
+
+                // Reporting: track light usage duration
+                if (lightState) {
+                    if (this.prevLightState != lightState) {
+                        this.timeLightMinutesUpdated = java.time.LocalTime.now();
+                    } else {
+                        java.time.LocalTime now = java.time.LocalTime.now();
+                        Long diff = this.timeLightMinutesUpdated.until(now, java.time.temporal.ChronoUnit.MILLIS);
+                        this.timeLightMinutesUpdated = now;
+                        this.lightsOnDuration += diff;
+                    }
+                } else {
+                    if (this.prevLightState != lightState) {
+                        java.time.LocalTime now = java.time.LocalTime.now();
+                        Long diff = this.timeLightMinutesUpdated.until(now, java.time.temporal.ChronoUnit.MILLIS);
+                        this.timeLightMinutesUpdated = now;
+                        this.lightsOnDuration += diff;
+                    }
+                }
+                this.prevLightState = lightState;
+
             } else if (key.equals(IoTValues.PROXIMITY_STATE)) {
                 Boolean proxState = (Boolean)state.get(key);
                 if (proxState) {
@@ -524,7 +555,10 @@ public class TartanHomeService {
         if (tartanHome.getNightLockEnd() == null) {
             tartanHome.setNightLockEnd("6");
         }
-        
+
+        // Reporting: add cumulative light duration to the home object
+        tartanHome.setMinutesLightsOn(this.lightsOnDuration);
+
         return tartanHome;
     }
 
@@ -595,7 +629,7 @@ public class TartanHomeService {
                 }
             }
         }
-        
+
         if (tartanHome.getLockState() != null) {
             state.put(IoTValues.LOCK_STATE, toIoTLockState(tartanHome));
         }

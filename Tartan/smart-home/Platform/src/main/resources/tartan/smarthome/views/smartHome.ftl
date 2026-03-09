@@ -271,6 +271,25 @@ div {
         </strong>
     </p>
     <hr>
+    <h3>Energy Usage Report</h3>
+    <div id="reporting_wrapper">
+        <#assign totalMinutes = (tartanHome.minutesLightsOn / (60 * 1000))>
+        <#assign displayMinutes = totalMinutes?floor>
+        <#assign displaySeconds = ((tartanHome.minutesLightsOn / 1000) % 60)?floor>
+        <#assign costCAD = totalMinutes * 0.00025>
+
+        <p><strong>Lights Usage:</strong> ${displayMinutes} minutes, ${displaySeconds} seconds</p>
+        <p><strong>Estimated Electricity Cost:</strong>
+            <span style="color: #d9534f; font-weight: bold; font-size: 1.1em;">$${costCAD?string["0.0000"]} CAD</span>
+        </p>
+        <p style="font-size: 0.9em; color: #666;">
+            <em>  Based on 100W incandescent bulb @ $0.15/kWh Alberta electricity rate</em>
+        </p>
+        <p style="font-size: 0.85em; color: #888;">
+            <em>Report generated automatically every 5 seconds</em>
+        </p>
+    </div>
+    <hr>
     <h3> Event log</h3>
     <textarea id="log" rows="15" cols="150">
     <#list tartanHome.eventLog as i>

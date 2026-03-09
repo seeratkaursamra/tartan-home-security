@@ -105,6 +105,10 @@ public class TartanHome {
     @JsonProperty
     private String intruderDetected;
 
+    // Reporting feature: track light usage duration
+    @JsonProperty
+    private Long minutesLightsOn;
+
     /**
      * Empty constructor needed by Jackson deserialization
      */
@@ -402,6 +406,16 @@ public class TartanHome {
 
     public String getIntruderDetected() { return intruderDetected; }
     public void setIntruderDetected(String intruderDetected) { this.intruderDetected = intruderDetected; }
+
+    public Long getMinutesLightsOn() { return minutesLightsOn; }
+    public void setMinutesLightsOn(Long minutesLightsOn) { this.minutesLightsOn = minutesLightsOn; }
+
+    public void addMinutesLightsOn(Long duration) {
+        if (this.minutesLightsOn == null) {
+            this.minutesLightsOn = 0L;
+        }
+        this.minutesLightsOn += duration;
+    }
 
     @Override
     public boolean equals(Object o) {

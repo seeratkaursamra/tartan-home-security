@@ -56,7 +56,7 @@ public class TartanHomeData {
     private String proximity;
     // the heater state (true if on, false if off)
     @Column(name = "hvac_mode")
-    
+
     private String hvacMode;
     // The state of the HVAC system
     @Column(name = "hvac_state")
@@ -73,6 +73,10 @@ public class TartanHomeData {
     // the alarm enabled state
     @Column(name = "alarm_enabled_state")
     private String alarmArmed;
+
+    // Reporting feature: track light usage duration in milliseconds
+    @Column(name = "minutes_lights_on")
+    private Long minutesLightsOn;
 
     /**
      * Create a mew data set from a TartanHome model
@@ -93,6 +97,9 @@ public class TartanHomeData {
         this.alarmActive = h.getAlarmActive();
         this.alarmDelay = h.getAlarmDelay();
         this.alarmArmed = h.getAlarmArmed();
+
+        // Reporting: track light usage
+        this.minutesLightsOn = h.getMinutesLightsOn();
 
         // Remember when this record is created
         this.createTimeStamp = new Date();
@@ -320,6 +327,21 @@ public class TartanHomeData {
         this.hvacState = hvacState;
     }
 
+    /**
+     * Get the minutes lights on (in milliseconds)
+     * @return minutes lights on
+     */
+    public Long getMinutesLightsOn() {
+        return minutesLightsOn;
+    }
+
+    /**
+     * Set the minutes lights on
+     * @param minutesLightsOn the duration in milliseconds
+     */
+    public void setMinutesLightsOn(Long minutesLightsOn) {
+        this.minutesLightsOn = minutesLightsOn;
+    }
 
     /**
      * Get the ID
