@@ -33,6 +33,7 @@ dependencies {
     implementation 'mysql:mysql-connector-java:8.0.33'
     testImplementation platform('org.junit:junit-bom:5.10.2')
     testImplementation 'org.junit.jupiter:junit-jupiter'
+    errorprone 'com.google.errorprone:error_prone_core:2.28.0'
 }
 run {
     args = ['server', 'config.yml']
