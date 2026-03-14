@@ -2,6 +2,9 @@ plugins {
     id 'com.github.johnrengelman.shadow' version '8.1.1'
     id 'jacoco'
     id 'info.solidsoft.pitest' version '1.15.0'
+    id 'com.github.spotbugs' version '6.0.9'       // SpotBugs
+    id 'pmd'                                         // PMD (built into Gradle)
+    id 'net.ltgt.errorprone' version '4.0.1'         // Error Prone
 }
 group 'Tartan'
 version '1.0-SNAPSHOT'
