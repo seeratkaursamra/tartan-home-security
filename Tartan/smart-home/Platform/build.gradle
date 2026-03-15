@@ -140,7 +140,7 @@ spotbugsMain {
 
 pmd {
     consoleOutput = true
-    rulesets = [
+    ruleSets = [
         'category/java/bestpractices.xml',
         'category/java/codestyle.xml',
         'category/java/design.xml',
@@ -153,4 +153,6 @@ pmd {
 
 tasks.withType(JavaCompile).configureEach {
     options.errorprone.enabled = true
+    options.errorprone.warn('EqualsHashCode')
+    options.errorprone.warn('DoubleBraceInitialization')
 }
