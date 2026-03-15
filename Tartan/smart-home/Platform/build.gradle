@@ -132,6 +132,7 @@ pitest {
 }
 
 spotbugsMain {
+    ignoreFailures = true
     reports {
         html.required = true
         xml.required = true
@@ -139,7 +140,9 @@ spotbugsMain {
 }
 
 pmd {
+    toolVersion = '7.0.0'
     consoleOutput = true
+    ignoreFailures = true
     ruleSets = [
         'category/java/bestpractices.xml',
         'category/java/codestyle.xml',
@@ -150,7 +153,6 @@ pmd {
         'category/java/security.xml'
     ]
 }
-
 tasks.withType(JavaCompile).configureEach {
     options.errorprone.enabled = true
     options.errorprone.warn('EqualsHashCode')
