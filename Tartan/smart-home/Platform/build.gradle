@@ -138,6 +138,13 @@ spotbugsMain {
         xml.required = true
     }
 }
+spotbugsTest {
+    ignoreFailures = true
+    reports {
+        html.required = true
+        xml.required = true
+    }
+}
 
 pmd {
     toolVersion = '7.0.0'
