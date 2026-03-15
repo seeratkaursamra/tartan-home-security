@@ -1,0 +1,319 @@
+> Task :clean
+
+> Task :compileJava
+/Users/gunishsharma/Desktop/w26-tartan-m007/Tartan/smart-home/Platform/src/main/java/tartan/smarthome/core/TartanHomeData.java:402: warning: [InconsistentHashCode] hashCode includes the fields [id], which equals does not. Two instances of this class could compare equal, but have different hashCodes, which violates the hashCode contract.
+    public int hashCode() {
+               ^
+    (see https://errorprone.info/bugpattern/InconsistentHashCode)
+/Users/gunishsharma/Desktop/w26-tartan-m007/Tartan/smart-home/Platform/src/main/java/tartan/smarthome/core/TartanHomeData.java:118: warning: [JavaUtilDate] Date has a bad API that leads to bugs; prefer java.time.Instant or LocalDate.
+        this.createTimeStamp = new Date();
+                               ^
+    (see https://errorprone.info/bugpattern/JavaUtilDate)
+/Users/gunishsharma/Desktop/w26-tartan-m007/Tartan/smart-home/Platform/src/main/java/tartan/smarthome/core/TartanHome.java:428: warning: [EqualsHashCode] Classes that override equals should also override hashCode.
+    public boolean equals(Object o) {
+                   ^
+    (see https://errorprone.info/bugpattern/EqualsHashCode)
+/Users/gunishsharma/Desktop/w26-tartan-m007/Tartan/smart-home/Platform/src/main/java/tartan/smarthome/resources/iotcontroller/IoTConnection.java:89: warning: [EmptyCatch] Caught exceptions should not be ignored
+                } catch (IOException e) {
+                  ^
+    (see https://google.github.io/styleguide/javaguide.html#s6.2-caught-exceptions)
+/Users/gunishsharma/Desktop/w26-tartan-m007/Tartan/smart-home/Platform/src/main/java/tartan/smarthome/resources/iotcontroller/IoTConnection.java:106: warning: [DefaultCharset] Implicit use of the platform default charset, which can result in differing behaviour between JVM executions or incorrect behavior if the encoding of the data source doesn't match expectations.
+            out = new BufferedWriter(new OutputStreamWriter(houseSocket.getOutputStream()));
+                                     ^
+    (see https://errorprone.info/bugpattern/DefaultCharset)
+  Did you mean 'out = new BufferedWriter(new OutputStreamWriter(houseSocket.getOutputStream(), UTF_8));' or 'out = new BufferedWriter(new OutputStreamWriter(houseSocket.getOutputStream(), Charset.defaultCharset()));'?
+/Users/gunishsharma/Desktop/w26-tartan-m007/Tartan/smart-home/Platform/src/main/java/tartan/smarthome/resources/iotcontroller/IoTConnection.java:107: warning: [DefaultCharset] Implicit use of the platform default charset, which can result in differing behaviour between JVM executions or incorrect behavior if the encoding of the data source doesn't match expectations.
+            in = new BufferedReader(new InputStreamReader( houseSocket.getInputStream()));
+                                    ^
+    (see https://errorprone.info/bugpattern/DefaultCharset)
+  Did you mean 'in = new BufferedReader(new InputStreamReader( houseSocket.getInputStream(), UTF_8));' or 'in = new BufferedReader(new InputStreamReader( houseSocket.getInputStream(), Charset.defaultCharset()));'?
+/Users/gunishsharma/Desktop/w26-tartan-m007/Tartan/smart-home/Platform/src/main/java/tartan/smarthome/resources/iotcontroller/LoginHandler.java:39: warning: [EmptyBlockTag] A block tag (@param, @return, @throws, @deprecated) has an empty description. Block tags without descriptions don't add much value for future readers of the code; consider removing the tag entirely or adding a description.
+     * @throws LoginAttemptsExceededException
+       ^
+    (see https://google.github.io/styleguide/javaguide.html#s7.1.3-javadoc-block-tags)
+  Did you mean '*'?
+/Users/gunishsharma/Desktop/w26-tartan-m007/Tartan/smart-home/Platform/src/main/java/tartan/smarthome/resources/iotcontroller/UserLoginInfo.java:62: warning: [LoopOverCharArray] toCharArray allocates a new array, using charAt is more efficient
+        for (char c : password.toCharArray()) {
+        ^
+    (see https://errorprone.info/bugpattern/LoopOverCharArray)
+  Did you mean 'for (int i = 0; i < password.length(); i++) { char c = password.charAt(i);if (Character.isUpperCase(c)) hasUppercase = true;'?
+/Users/gunishsharma/Desktop/w26-tartan-m007/Tartan/smart-home/Platform/src/main/java/tartan/smarthome/resources/iotcontroller/UserLoginInfo.java:80: warning: [EmptyBlockTag] A block tag (@param, @return, @throws, @deprecated) has an empty description. Block tags without descriptions don't add much value for future readers of the code; consider removing the tag entirely or adding a description.
+     * @param userName
+       ^
+    (see https://google.github.io/styleguide/javaguide.html#s7.1.3-javadoc-block-tags)
+  Did you mean '*'?
+/Users/gunishsharma/Desktop/w26-tartan-m007/Tartan/smart-home/Platform/src/main/java/tartan/smarthome/resources/iotcontroller/UserLoginInfo.java:88: warning: [EmptyBlockTag] A block tag (@param, @return, @throws, @deprecated) has an empty description. Block tags without descriptions don't add much value for future readers of the code; consider removing the tag entirely or adding a description.
+     * @return
+       ^
+    (see https://google.github.io/styleguide/javaguide.html#s7.1.3-javadoc-block-tags)
+  Did you mean '*'?
+/Users/gunishsharma/Desktop/w26-tartan-m007/Tartan/smart-home/Platform/src/main/java/tartan/smarthome/resources/iotcontroller/UserLoginInfo.java:96: warning: [EmptyBlockTag] A block tag (@param, @return, @throws, @deprecated) has an empty description. Block tags without descriptions don't add much value for future readers of the code; consider removing the tag entirely or adding a description.
+     * @param password
+       ^
+    (see https://google.github.io/styleguide/javaguide.html#s7.1.3-javadoc-block-tags)
+  Did you mean '*'?
+/Users/gunishsharma/Desktop/w26-tartan-m007/Tartan/smart-home/Platform/src/main/java/tartan/smarthome/resources/iotcontroller/IoTControlManager.java:27: warning: [JdkObsolete] Vector performs synchronization that is usually unnecessary; prefer ArrayList.
+    private Vector<UserLoginInfo> users = new Vector<UserLoginInfo>();
+                                          ^
+    (see https://errorprone.info/bugpattern/JdkObsolete)
+/Users/gunishsharma/Desktop/w26-tartan-m007/Tartan/smart-home/Platform/src/main/java/tartan/smarthome/resources/iotcontroller/IoTControlManager.java:53: warning: [JdkObsolete] Vector performs synchronization that is usually unnecessary; prefer ArrayList.
+        logMessages = new Vector<String>();
+                      ^
+    (see https://errorprone.info/bugpattern/JdkObsolete)
+/Users/gunishsharma/Desktop/w26-tartan-m007/Tartan/smart-home/Platform/src/main/java/tartan/smarthome/resources/iotcontroller/IoTControlManager.java:55: warning: [JdkObsolete] Hashtable performs synchronization this is usually unnecessary; prefer LinkedHashMap.
+        userSettings = new Hashtable<String, Object>();
+                       ^
+    (see https://errorprone.info/bugpattern/JdkObsolete)
+/Users/gunishsharma/Desktop/w26-tartan-m007/Tartan/smart-home/Platform/src/main/java/tartan/smarthome/resources/iotcontroller/IoTControlManager.java:69: warning: [JdkObsolete] Hashtable performs synchronization this is usually unnecessary; prefer LinkedHashMap.
+        lastState = new Hashtable<>();
+                    ^
+    (see https://errorprone.info/bugpattern/JdkObsolete)
+/Users/gunishsharma/Desktop/w26-tartan-m007/Tartan/smart-home/Platform/src/main/java/tartan/smarthome/resources/iotcontroller/IoTControlManager.java:78: warning: [JdkObsolete] Vector performs synchronization that is usually unnecessary; prefer ArrayList.
+        Vector<UserLoginInfo> users = new Vector<UserLoginInfo>();
+                                      ^
+    (see https://errorprone.info/bugpattern/JdkObsolete)
+/Users/gunishsharma/Desktop/w26-tartan-m007/Tartan/smart-home/Platform/src/main/java/tartan/smarthome/resources/iotcontroller/IoTControlManager.java:83: warning: [DefaultCharset] Implicit use of the platform default charset, which can result in differing behaviour between JVM executions or incorrect behavior if the encoding of the data source doesn't match expectations.
+            BufferedReader br = new BufferedReader(new FileReader(file));
+                                                   ^
+    (see https://errorprone.info/bugpattern/DefaultCharset)
+  Did you mean 'BufferedReader br = Files.newBufferedReader(file.toPath(), UTF_8);' or 'BufferedReader br = Files.newBufferedReader(file.toPath(), Charset.defaultCharset());'?
+/Users/gunishsharma/Desktop/w26-tartan-m007/Tartan/smart-home/Platform/src/main/java/tartan/smarthome/resources/iotcontroller/IoTControlManager.java:87: warning: [StringSplitter] String.split(String) has surprising behavior
+                String[] entry = line.split("=");
+                                           ^
+    (see https://errorprone.info/bugpattern/StringSplitter)
+  Did you mean 'List<String> entry = Splitter.on('=').splitToList(line);'?
+/Users/gunishsharma/Desktop/w26-tartan-m007/Tartan/smart-home/Platform/src/main/java/tartan/smarthome/resources/iotcontroller/IoTControlManager.java:91: warning: [CatchAndPrintStackTrace] Logging or rethrowing exceptions should usually be preferred to catching and calling printStackTrace
+            e.printStackTrace();
+            ^
+    (see https://errorprone.info/bugpattern/CatchAndPrintStackTrace)
+/Users/gunishsharma/Desktop/w26-tartan-m007/Tartan/smart-home/Platform/src/main/java/tartan/smarthome/resources/iotcontroller/IoTControlManager.java:109: warning: [CatchAndPrintStackTrace] Logging or rethrowing exceptions should usually be preferred to catching and calling printStackTrace
+            e.printStackTrace();
+            ^
+    (see https://errorprone.info/bugpattern/CatchAndPrintStackTrace)
+/Users/gunishsharma/Desktop/w26-tartan-m007/Tartan/smart-home/Platform/src/main/java/tartan/smarthome/resources/iotcontroller/IoTControlManager.java:115: warning: [JdkObsolete] Hashtable performs synchronization this is usually unnecessary; prefer LinkedHashMap.
+        Map<String, Object> initialSettings = new Hashtable<String, Object>();
+                                              ^
+    (see https://errorprone.info/bugpattern/JdkObsolete)
+/Users/gunishsharma/Desktop/w26-tartan-m007/Tartan/smart-home/Platform/src/main/java/tartan/smarthome/resources/iotcontroller/IoTControlManager.java:152: warning: [EmptyBlockTag] A block tag (@param, @return, @throws, @deprecated) has an empty description. Block tags without descriptions don't add much value for future readers of the code; consider removing the tag entirely or adding a description.
+     * @param stateUpdate
+       ^
+    (see https://google.github.io/styleguide/javaguide.html#s7.1.3-javadoc-block-tags)
+  Did you mean '*'?
+/Users/gunishsharma/Desktop/w26-tartan-m007/Tartan/smart-home/Platform/src/main/java/tartan/smarthome/resources/iotcontroller/IoTControlManager.java:156: warning: [JdkObsolete] StringBuffer performs synchronization that is usually unnecessary; prefer StringBuilder.
+        StringBuffer log = new StringBuffer();
+                           ^
+    (see https://errorprone.info/bugpattern/JdkObsolete)
+/Users/gunishsharma/Desktop/w26-tartan-m007/Tartan/smart-home/Platform/src/main/java/tartan/smarthome/resources/iotcontroller/IoTControlManager.java:159: warning: [JdkObsolete] Hashtable performs synchronization this is usually unnecessary; prefer LinkedHashMap.
+        Map<String, Object> completeState = new Hashtable<>();
+                                            ^
+    (see https://errorprone.info/bugpattern/JdkObsolete)
+/Users/gunishsharma/Desktop/w26-tartan-m007/Tartan/smart-home/Platform/src/main/java/tartan/smarthome/resources/iotcontroller/IoTControlManager.java:164: warning: [SynchronizeOnNonFinalField] Synchronizing on non-final fields is not safe: if the field is ever updated, different threads may end up locking on different objects.
+        synchronized(connMgr) {
+                    ^
+    (see https://errorprone.info/bugpattern/SynchronizeOnNonFinalField)
+/Users/gunishsharma/Desktop/w26-tartan-m007/Tartan/smart-home/Platform/src/main/java/tartan/smarthome/resources/iotcontroller/IoTControlManager.java:192: warning: [EmptyBlockTag] A block tag (@param, @return, @throws, @deprecated) has an empty description. Block tags without descriptions don't add much value for future readers of the code; consider removing the tag entirely or adding a description.
+     * @return
+       ^
+    (see https://google.github.io/styleguide/javaguide.html#s7.1.3-javadoc-block-tags)
+  Did you mean '*'?
+/Users/gunishsharma/Desktop/w26-tartan-m007/Tartan/smart-home/Platform/src/main/java/tartan/smarthome/resources/iotcontroller/IoTControlManager.java:196: warning: [SynchronizeOnNonFinalField] Synchronizing on non-final fields is not safe: if the field is ever updated, different threads may end up locking on different objects.
+        synchronized (connMgr) {
+                     ^
+    (see https://errorprone.info/bugpattern/SynchronizeOnNonFinalField)
+/Users/gunishsharma/Desktop/w26-tartan-m007/Tartan/smart-home/Platform/src/main/java/tartan/smarthome/resources/iotcontroller/IoTControlManager.java:213: warning: [JavaTimeDefaultTimeZone] LocalTime.now() is not allowed because it silently uses the system default time-zone. You must pass an explicit time-zone (e.g., ZoneId.of("America/Los_Angeles")) to this method.
+        lastState.put(IoTValues.CURRENT_HOUR, LocalTime.now().getHour());
+                                                           ^
+    (see https://errorprone.info/bugpattern/JavaTimeDefaultTimeZone)
+  Did you mean 'lastState.put(IoTValues.CURRENT_HOUR, LocalTime.now(ZoneId.systemDefault()).getHour());'?
+/Users/gunishsharma/Desktop/w26-tartan-m007/Tartan/smart-home/Platform/src/main/java/tartan/smarthome/resources/iotcontroller/IoTControlManager.java:233: warning: [JdkObsolete] StringBuffer performs synchronization that is usually unnecessary; prefer StringBuilder.
+                        StringBuffer log = new StringBuffer();
+                                           ^
+    (see https://errorprone.info/bugpattern/JdkObsolete)
+/Users/gunishsharma/Desktop/w26-tartan-m007/Tartan/smart-home/Platform/src/main/java/tartan/smarthome/resources/iotcontroller/IoTControlManager.java:240: warning: [SynchronizeOnNonFinalField] Synchronizing on non-final fields is not safe: if the field is ever updated, different threads may end up locking on different objects.
+                        synchronized (connMgr) {
+                                     ^
+    (see https://errorprone.info/bugpattern/SynchronizeOnNonFinalField)
+/Users/gunishsharma/Desktop/w26-tartan-m007/Tartan/smart-home/Platform/src/main/java/tartan/smarthome/resources/iotcontroller/IoTControlManager.java:262: warning: [EmptyCatch] Caught exceptions should not be ignored
+                    } catch (InterruptedException ie) {
+                      ^
+    (see https://google.github.io/styleguide/javaguide.html#s6.2-caught-exceptions)
+/Users/gunishsharma/Desktop/w26-tartan-m007/Tartan/smart-home/Platform/src/main/java/tartan/smarthome/resources/iotcontroller/IoTControlManager.java:272: warning: [SynchronizeOnNonFinalField] Synchronizing on non-final fields is not safe: if the field is ever updated, different threads may end up locking on different objects.
+        synchronized (connMgr) {
+                     ^
+    (see https://errorprone.info/bugpattern/SynchronizeOnNonFinalField)
+/Users/gunishsharma/Desktop/w26-tartan-m007/Tartan/smart-home/Platform/src/main/java/tartan/smarthome/resources/iotcontroller/IoTControlManager.java:321: warning: [JavaUtilDate] Date has a bad API that leads to bugs; prefer java.time.Instant or LocalDate.
+        logMessages.add("[" + sdf.format(new Date(timeStamp)) + "]: " + logEntry + "\n");
+                                         ^
+    (see https://errorprone.info/bugpattern/JavaUtilDate)
+/Users/gunishsharma/Desktop/w26-tartan-m007/Tartan/smart-home/Platform/src/main/java/tartan/smarthome/resources/iotcontroller/IoTControlManager.java:348: warning: [SynchronizeOnNonFinalField] Synchronizing on non-final fields is not safe: if the field is ever updated, different threads may end up locking on different objects.
+                synchronized (connMgr) {
+                             ^
+    (see https://errorprone.info/bugpattern/SynchronizeOnNonFinalField)
+/Users/gunishsharma/Desktop/w26-tartan-m007/Tartan/smart-home/Platform/src/main/java/tartan/smarthome/resources/iotcontroller/IoTControlManager.java:350: warning: [JdkObsolete] StringBuffer performs synchronization that is usually unnecessary; prefer StringBuilder.
+                    StringBuffer log = new StringBuffer();
+                                       ^
+    (see https://errorprone.info/bugpattern/JdkObsolete)
+/Users/gunishsharma/Desktop/w26-tartan-m007/Tartan/smart-home/Platform/src/main/java/tartan/smarthome/resources/iotcontroller/IoTConnectManager.java:94: warning: [AlreadyChecked] This condition (on key.equals(LIGHT_STATE)) is known to be false here. It (or its complement) has already been checked.
+            } else if (key.equals(IoTValues.LIGHT_STATE)) {
+                                 ^
+    (see https://errorprone.info/bugpattern/AlreadyChecked)
+/Users/gunishsharma/Desktop/w26-tartan-m007/Tartan/smart-home/Platform/src/main/java/tartan/smarthome/resources/iotcontroller/IoTConnectManager.java:43: warning: [SynchronizeOnNonFinalField] Synchronizing on non-final fields is not safe: if the field is ever updated, different threads may end up locking on different objects.
+        synchronized (connection) {
+                     ^
+    (see https://errorprone.info/bugpattern/SynchronizeOnNonFinalField)
+/Users/gunishsharma/Desktop/w26-tartan-m007/Tartan/smart-home/Platform/src/main/java/tartan/smarthome/resources/iotcontroller/IoTConnectManager.java:62: warning: [JdkObsolete] StringBuffer performs synchronization that is usually unnecessary; prefer StringBuilder.
+        StringBuffer newState = new StringBuffer();
+                                ^
+    (see https://errorprone.info/bugpattern/JdkObsolete)
+  Did you mean 'StringBuilder newState = new StringBuilder();'?
+/Users/gunishsharma/Desktop/w26-tartan-m007/Tartan/smart-home/Platform/src/main/java/tartan/smarthome/resources/iotcontroller/IoTConnectManager.java:177: warning: [JdkObsolete] StringBuffer performs synchronization that is usually unnecessary; prefer StringBuilder.
+                = new StringBuffer(IoTValues.SET_STATE + IoTValues.MSG_DELIM + newState.toString() + IoTValues.MSG_END);
+                  ^
+    (see https://errorprone.info/bugpattern/JdkObsolete)
+  Did you mean 'StringBuilder msg'?
+/Users/gunishsharma/Desktop/w26-tartan-m007/Tartan/smart-home/Platform/src/main/java/tartan/smarthome/resources/iotcontroller/IoTConnectManager.java:181: warning: [SynchronizeOnNonFinalField] Synchronizing on non-final fields is not safe: if the field is ever updated, different threads may end up locking on different objects.
+        synchronized (connection) {
+                     ^
+    (see https://errorprone.info/bugpattern/SynchronizeOnNonFinalField)
+/Users/gunishsharma/Desktop/w26-tartan-m007/Tartan/smart-home/Platform/src/main/java/tartan/smarthome/resources/iotcontroller/IoTConnectManager.java:208: warning: [JdkObsolete] Hashtable performs synchronization this is usually unnecessary; prefer LinkedHashMap.
+        Hashtable<String,Object> state = new Hashtable<String, Object>();
+                                         ^
+    (see https://errorprone.info/bugpattern/JdkObsolete)
+/Users/gunishsharma/Desktop/w26-tartan-m007/Tartan/smart-home/Platform/src/main/java/tartan/smarthome/resources/iotcontroller/IoTConnectManager.java:210: warning: [StringSplitter] String.split(String) has surprising behavior
+        String[] req = stateUpdateMsg.split(IoTValues.MSG_DELIM);
+                                           ^
+    (see https://errorprone.info/bugpattern/StringSplitter)
+  Did you mean 'List<String> req = Splitter.onPattern(IoTValues.MSG_DELIM).splitToList(stateUpdateMsg);'?
+/Users/gunishsharma/Desktop/w26-tartan-m007/Tartan/smart-home/Platform/src/main/java/tartan/smarthome/resources/iotcontroller/IoTConnectManager.java:235: warning: [StringSplitter] String.split(String) has surprising behavior
+            String data[] = param.split(IoTValues.PARAM_EQ);
+                                       ^
+    (see https://errorprone.info/bugpattern/StringSplitter)
+  Did you mean 'List<String> = Splitter.onPattern(IoTValues.PARAM_EQ).splitToList(param);'?
+/Users/gunishsharma/Desktop/w26-tartan-m007/Tartan/smart-home/Platform/src/main/java/tartan/smarthome/resources/TartanHomeService.java:325: warning: [UnusedMethod] Method 'toIoTHvacModeState' is never used.
+    private String toIoTHvacModeState(TartanHome tartanHome) {
+                   ^
+    (see https://errorprone.info/bugpattern/UnusedMethod)
+  Did you mean to remove this line?
+/Users/gunishsharma/Desktop/w26-tartan-m007/Tartan/smart-home/Platform/src/main/java/tartan/smarthome/resources/TartanHomeService.java:316: warning: [UnusedMethod] Method 'toIoTTargetTempState' is never used.
+    private Integer toIoTTargetTempState(TartanHome tartanHome) {
+                    ^
+    (see https://errorprone.info/bugpattern/UnusedMethod)
+  Did you mean to remove this line?
+/Users/gunishsharma/Desktop/w26-tartan-m007/Tartan/smart-home/Platform/src/main/java/tartan/smarthome/resources/TartanHomeService.java:223: warning: [UnusedMethod] Method 'toIoTAlarmDelay' is never used.
+    private Integer toIoTAlarmDelay(TartanHome tartanHome) {
+                    ^
+    (see https://errorprone.info/bugpattern/UnusedMethod)
+  Did you mean to remove this line?
+/Users/gunishsharma/Desktop/w26-tartan-m007/Tartan/smart-home/Platform/src/main/java/tartan/smarthome/resources/TartanHomeService.java:105: warning: [JdkObsolete] Hashtable performs synchronization this is usually unnecessary; prefer LinkedHashMap.
+        Map<String, Object> userSettings = new Hashtable<String, Object>();
+                                           ^
+    (see https://errorprone.info/bugpattern/JdkObsolete)
+/Users/gunishsharma/Desktop/w26-tartan-m007/Tartan/smart-home/Platform/src/main/java/tartan/smarthome/resources/TartanHomeService.java:337: warning: [SynchronizeOnNonFinalField] Synchronizing on non-final fields is not safe: if the field is ever updated, different threads may end up locking on different objects.
+        synchronized (controller) {
+                     ^
+    (see https://errorprone.info/bugpattern/SynchronizeOnNonFinalField)
+/Users/gunishsharma/Desktop/w26-tartan-m007/Tartan/smart-home/Platform/src/main/java/tartan/smarthome/resources/TartanHomeService.java:366: warning: [JdkObsolete] Hashtable performs synchronization this is usually unnecessary; prefer LinkedHashMap.
+            Map<String, Object> userSettings = new Hashtable<String, Object>();
+                                               ^
+    (see https://errorprone.info/bugpattern/JdkObsolete)
+/Users/gunishsharma/Desktop/w26-tartan-m007/Tartan/smart-home/Platform/src/main/java/tartan/smarthome/resources/TartanHomeService.java:400: warning: [SynchronizeOnNonFinalField] Synchronizing on non-final fields is not safe: if the field is ever updated, different threads may end up locking on different objects.
+        synchronized (controller) {
+                     ^
+    (see https://errorprone.info/bugpattern/SynchronizeOnNonFinalField)
+/Users/gunishsharma/Desktop/w26-tartan-m007/Tartan/smart-home/Platform/src/main/java/tartan/smarthome/resources/TartanHomeService.java:467: warning: [JavaTimeDefaultTimeZone] LocalTime.now() is not allowed because it silently uses the system default time-zone. You must pass an explicit time-zone (e.g., ZoneId.of("America/Los_Angeles")) to this method.
+                        this.timeLightMinutesUpdated = java.time.LocalTime.now();
+                                                                              ^
+    (see https://errorprone.info/bugpattern/JavaTimeDefaultTimeZone)
+  Did you mean 'this.timeLightMinutesUpdated = java.time.LocalTime.now(ZoneId.systemDefault());'?
+/Users/gunishsharma/Desktop/w26-tartan-m007/Tartan/smart-home/Platform/src/main/java/tartan/smarthome/resources/TartanHomeService.java:469: warning: [JavaTimeDefaultTimeZone] LocalTime.now() is not allowed because it silently uses the system default time-zone. You must pass an explicit time-zone (e.g., ZoneId.of("America/Los_Angeles")) to this method.
+                        java.time.LocalTime now = java.time.LocalTime.now();
+                                                                         ^
+    (see https://errorprone.info/bugpattern/JavaTimeDefaultTimeZone)
+  Did you mean 'java.time.LocalTime now = java.time.LocalTime.now(ZoneId.systemDefault());'?
+/Users/gunishsharma/Desktop/w26-tartan-m007/Tartan/smart-home/Platform/src/main/java/tartan/smarthome/resources/TartanHomeService.java:476: warning: [JavaTimeDefaultTimeZone] LocalTime.now() is not allowed because it silently uses the system default time-zone. You must pass an explicit time-zone (e.g., ZoneId.of("America/Los_Angeles")) to this method.
+                        java.time.LocalTime now = java.time.LocalTime.now();
+                                                                         ^
+    (see https://errorprone.info/bugpattern/JavaTimeDefaultTimeZone)
+  Did you mean 'java.time.LocalTime now = java.time.LocalTime.now(ZoneId.systemDefault());'?
+/Users/gunishsharma/Desktop/w26-tartan-m007/Tartan/smart-home/Platform/src/main/java/tartan/smarthome/resources/TartanHomeService.java:584: warning: [JdkObsolete] Hashtable performs synchronization this is usually unnecessary; prefer LinkedHashMap.
+        Map<String, Object> state = new Hashtable<>();
+                                    ^
+    (see https://errorprone.info/bugpattern/JdkObsolete)
+/Users/gunishsharma/Desktop/w26-tartan-m007/Tartan/smart-home/Platform/src/main/java/tartan/smarthome/resources/TartanHomeService.java:616: warning: [DoubleBraceInitialization] Prefer collection factory methods or builders to the double-brace initialization pattern.
+            Hashtable<String, Object> ht = new Hashtable<String, Object>(){
+                                           ^
+    (see https://errorprone.info/bugpattern/DoubleBraceInitialization)
+  Did you mean 'Hashtable<String, Object> ht = new Hashtable<String, Object>(ImmutableMap.of('?
+/Users/gunishsharma/Desktop/w26-tartan-m007/Tartan/smart-home/Platform/src/main/java/tartan/smarthome/resources/TartanHomeService.java:616: warning: [JdkObsolete] Hashtable performs synchronization this is usually unnecessary; prefer LinkedHashMap.
+            Hashtable<String, Object> ht = new Hashtable<String, Object>(){
+                                           ^
+    (see https://errorprone.info/bugpattern/JdkObsolete)
+/Users/gunishsharma/Desktop/w26-tartan-m007/Tartan/smart-home/Platform/src/main/java/tartan/smarthome/resources/ElectronicOperation.java:30: warning: [MissingSummary] A summary fragment is required; consider using the value of the @return block as a summary fragment instead.
+     * @return true if the lock is currently locked
+       ^
+    (see https://google.github.io/styleguide/javaguide.html#s7.2-summary-fragment)
+  Did you mean '*Returns true if the lock is currently locked.'?
+/Users/gunishsharma/Desktop/w26-tartan-m007/Tartan/smart-home/Platform/src/main/java/tartan/smarthome/resources/TartanResource.java:158: warning: [JavaUtilDate] Date has a bad API that leads to bugs; prefer java.time.Instant or LocalDate.
+        Date baselineFrom = new Date(now - 2 * REPORT_PERIOD_MS);
+                            ^
+    (see https://errorprone.info/bugpattern/JavaUtilDate)
+/Users/gunishsharma/Desktop/w26-tartan-m007/Tartan/smart-home/Platform/src/main/java/tartan/smarthome/resources/TartanResource.java:159: warning: [JavaUtilDate] Date has a bad API that leads to bugs; prefer java.time.Instant or LocalDate.
+        Date baselineTo = new Date(now - REPORT_PERIOD_MS);
+                          ^
+    (see https://errorprone.info/bugpattern/JavaUtilDate)
+/Users/gunishsharma/Desktop/w26-tartan-m007/Tartan/smart-home/Platform/src/main/java/tartan/smarthome/resources/TartanResource.java:160: warning: [JavaUtilDate] Date has a bad API that leads to bugs; prefer java.time.Instant or LocalDate.
+        Date treatmentFrom = new Date(now - REPORT_PERIOD_MS);
+                             ^
+    (see https://errorprone.info/bugpattern/JavaUtilDate)
+/Users/gunishsharma/Desktop/w26-tartan-m007/Tartan/smart-home/Platform/src/main/java/tartan/smarthome/resources/TartanResource.java:161: warning: [JavaUtilDate] Date has a bad API that leads to bugs; prefer java.time.Instant or LocalDate.
+        Date treatmentTo = new Date(now);
+                           ^
+    (see https://errorprone.info/bugpattern/JavaUtilDate)
+/Users/gunishsharma/Desktop/w26-tartan-m007/Tartan/smart-home/Platform/src/main/java/tartan/smarthome/resources/StaticTartanStateEvaluator.java:47: warning: [UnusedVariable] The local variable 'humidityReading' is never read.
+        Integer humidityReading = null; // the current humidity
+                ^
+    (see https://errorprone.info/bugpattern/UnusedVariable)
+  Did you mean to remove this line or to remove this line?
+/Users/gunishsharma/Desktop/w26-tartan-m007/Tartan/smart-home/Platform/src/main/java/tartan/smarthome/resources/StaticTartanStateEvaluator.java:57: warning: [UnusedVariable] The local variable 'awayTimerAlreadySet' is never read.
+        Boolean awayTimerAlreadySet = false;
+                ^
+    (see https://errorprone.info/bugpattern/UnusedVariable)
+  Did you mean to remove this line?
+/Users/gunishsharma/Desktop/w26-tartan-m007/Tartan/smart-home/Platform/src/main/java/tartan/smarthome/resources/StaticTartanStateEvaluator.java:66: warning: [UnusedVariable] The local variable 'authorizedApproach' is never read.
+        Boolean authorizedApproach = (Boolean) inState.getOrDefault(IoTValues.AUTHORIZED_APPROACH, false);
+                ^
+    (see https://errorprone.info/bugpattern/UnusedVariable)
+  Did you mean to remove this line?
+/Users/gunishsharma/Desktop/w26-tartan-m007/Tartan/smart-home/Platform/src/main/java/tartan/smarthome/resources/StaticTartanStateEvaluator.java:65: warning: [UnusedVariable] The local variable 'keylessEnabled' is never read.
+        Boolean keylessEnabled = (Boolean) inState.getOrDefault(IoTValues.KEYLESS_ENABLED, false);
+                ^
+    (see https://errorprone.info/bugpattern/UnusedVariable)
+  Did you mean to remove this line?
+/Users/gunishsharma/Desktop/w26-tartan-m007/Tartan/smart-home/Platform/src/main/java/tartan/smarthome/resources/StaticTartanStateEvaluator.java:36: warning: [InvalidParam] Parameter name `state` is unknown. Did you mean inState?
+     * @param state The new state to evaluate
+       ^
+    (see https://errorprone.info/bugpattern/InvalidParam)
+  Did you mean '* @param inState The new state to evaluate'?
+/Users/gunishsharma/Desktop/w26-tartan-m007/Tartan/smart-home/Platform/src/main/java/tartan/smarthome/resources/StaticTartanStateEvaluator.java:76: warning: [JavaTimeDefaultTimeZone] LocalTime.now() is not allowed because it silently uses the system default time-zone. You must pass an explicit time-zone (e.g., ZoneId.of("America/Los_Angeles")) to this method.
+            int currentHour = inState.containsKey(IoTValues.CURRENT_HOUR) ? ((Number) inState.get(IoTValues.CURRENT_HOUR)).intValue() : java.time.LocalTime.now().getHour();  // ← USE REAL TIME AS DEFAULT
+                                                                                                                                                               ^
+    (see https://errorprone.info/bugpattern/JavaTimeDefaultTimeZone)
+  Did you mean 'int currentHour = inState.containsKey(IoTValues.CURRENT_HOUR) ? ((Number) inState.get(IoTValues.CURRENT_HOUR)).intValue() : java.time.LocalTime.now(ZoneId.systemDefault()).getHour();'?
+/Users/gunishsharma/Desktop/w26-tartan-m007/Tartan/smart-home/Platform/src/main/java/tartan/smarthome/resources/StaticTartanStateEvaluator.java:333: warning: [JdkObsolete] Hashtable performs synchronization this is usually unnecessary; prefer LinkedHashMap.
+        Map<String, Object> newState = new Hashtable<>();
+                                       ^
+    (see https://errorprone.info/bugpattern/JdkObsolete)
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+Note: /Users/gunishsharma/Desktop/w26-tartan-m007/Tartan/smart-home/Platform/src/main/java/tartan/smarthome/TartanHomeApplication.java uses unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
+68 warnings
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.6/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD SUCCESSFUL in 2s
+2 actionable tasks: 2 executed

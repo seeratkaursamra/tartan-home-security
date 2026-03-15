@@ -159,6 +159,17 @@ jobs:
           rm -rf .git
         shell: bash
 
+
+      - name: Clean temp files on server #We had 29GB of temp files this should fix that.
+        uses: appleboy/ssh-action@master #This will clean up the docker images on the server, should help prevent disk space issue
+        with:
+            host: ${{ secrets.HOST }}
+            username: ${{ secrets.USERNAME }}
+            key: ${{ secrets.KEY }}
+            script: |
+              sudo find /tmp/snap-private-tmp/snap.docker/tmp/ -name "*.tar" -delete
+              docker system prune -f
+
       - name: Copy project to Cybera
         uses: appleboy/scp-action@master
         with:

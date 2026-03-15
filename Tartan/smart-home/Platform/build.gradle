@@ -2,6 +2,9 @@ plugins {
     id 'com.github.johnrengelman.shadow' version '8.1.1'
     id 'jacoco'
     id 'info.solidsoft.pitest' version '1.15.0'
+    id 'com.github.spotbugs' version '6.0.9'       // SpotBugs
+    id 'pmd'                                         // PMD (built into Gradle)
+    id 'net.ltgt.errorprone' version '4.0.1'         // Error Prone
 }
 group 'Tartan'
 version '1.0-SNAPSHOT'
@@ -30,6 +33,7 @@ dependencies {
     implementation 'mysql:mysql-connector-java:8.0.33'
     testImplementation platform('org.junit:junit-bom:5.10.2')
     testImplementation 'org.junit.jupiter:junit-jupiter'
+    errorprone 'com.google.errorprone:error_prone_core:2.28.0'
 }
 run {
     args = ['server', 'config.yml']
@@ -127,3 +131,37 @@ pitest {
     timestampedReports = false
 }
 
+spotbugsMain {
+    ignoreFailures = true
+    reports {
+        html.required = true
+        xml.required = true
+    }
+}
+spotbugsTest {
+    ignoreFailures = true
+    reports {
+        html.required = true
+        xml.required = true
+    }
+}
+
+pmd {
+    toolVersion = '7.0.0'
+    consoleOutput = true
+    ignoreFailures = true
+    ruleSets = [
+        'category/java/bestpractices.xml',
+        'category/java/codestyle.xml',
+        'category/java/design.xml',
+        'category/java/errorprone.xml',
+        'category/java/multithreading.xml',
+        'category/java/performance.xml',
+        'category/java/security.xml'
+    ]
+}
+tasks.withType(JavaCompile).configureEach {
+    options.errorprone.enabled = true
+    options.errorprone.warn('EqualsHashCode')
+    options.errorprone.warn('DoubleBraceInitialization')
+}
