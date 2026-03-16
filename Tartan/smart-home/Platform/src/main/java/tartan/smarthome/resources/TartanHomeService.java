@@ -268,12 +268,12 @@ public class TartanHomeService {
     /**
      * Convert alarm active state
      * @param tartanHome the home
-     * @return true if active; false if inactive; otherwise null
+     * @return true if active; false if inactive or unknown
      */
     private Boolean toIoTAlarmActiveState(TartanHome tartanHome) {
         if (tartanHome.getAlarmActive().equals(TartanHomeValues.ACTIVE)) return true;
         else if (tartanHome.getAlarmActive().equals(TartanHomeValues.INACTIVE)) return false;
-        return null;
+        return false; // unknown treated as inactive
     }
 
     /**
