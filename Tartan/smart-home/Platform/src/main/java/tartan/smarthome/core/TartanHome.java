@@ -424,6 +424,7 @@ public class TartanHome {
         this.minutesLightsOn += duration;
     }
 
+    // Bad practice - need tofix - Done by adding the method hashCode
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -434,6 +435,11 @@ public class TartanHome {
         }
         final TartanHome that = (TartanHome) o;
         return Objects.equals(this.name, that.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name);
     }
 
 }

@@ -76,16 +76,14 @@ public class IoTControlManager {
      */
     public Vector<UserLoginInfo> loadUsers() {
         Vector<UserLoginInfo> users = new Vector<UserLoginInfo>();
+        //bug 3 - fix the load users, this was giving may fail to close stream
+        File file = new File(settingsPath + File.separator + IoTValues.USERS_DB);
 
-        try {
-            File file = new File(settingsPath + File.separator + IoTValues.USERS_DB);
-
-            BufferedReader br = new BufferedReader(new FileReader(file));
-
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
             String line;
             while ((line = br.readLine()) != null) {
                 String[] entry = line.split("=");
-                users.add(new UserLoginInfo(entry[0], entry[1], false)); //bypass validation for file loaded users
+                users.add(new UserLoginInfo(entry[0], entry[1], false));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -193,6 +191,7 @@ public class IoTControlManager {
      */
     private Map<String, Object> fetchState() {
         // Map<String, Object> state = null;
+
         synchronized (connMgr) {
             if (connMgr.isConnected() == false) {
                 return null;

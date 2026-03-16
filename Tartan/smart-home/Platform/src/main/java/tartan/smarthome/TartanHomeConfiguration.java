@@ -7,6 +7,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Configuration settings read from YAML file config.yml. See that file for field definitions
@@ -27,9 +28,10 @@ public class TartanHomeConfiguration extends Configuration {
     @NotNull
     private DataSourceFactory database = new DataSourceFactory();
 
+    //bug 4 fix
     @JsonProperty
     public List<TartanHomeSettings> getHouses() {
-        return houses;
+        return new ArrayList<>(houses);
     }
 
     @JsonProperty

@@ -3,7 +3,9 @@ package tartan.smarthome.auth;
 import io.dropwizard.auth.AuthenticationException;
 import io.dropwizard.auth.Authenticator;
 import io.dropwizard.auth.basic.BasicCredentials;
-import java.util.HashMap;
+//bug 6 - can technically remove the hashmap
+import java.util.concurrent.ConcurrentHashMap;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -16,8 +18,8 @@ import tartan.smarthome.TartanHomeSettings;
  */
 public class TartanAuthenticator implements Authenticator<BasicCredentials, TartanUser> {
 
-
-    private  Map<Map.Entry<String, String>, String> VALID_USERS = new HashMap<>();
+    //bug 6
+    private Map<Map.Entry<String, String>, String> VALID_USERS = new ConcurrentHashMap<>();
 
     /**
      * Empty constructor
