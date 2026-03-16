@@ -88,7 +88,7 @@ public class IoTConnection {
                 try {
                     houseSocket.close();
                 } catch (IOException e) {
-
+                    System.err.println("Error closing house socket: " + e.getMessage());
                 }
             }
         }

@@ -230,14 +230,11 @@ public class StaticTartanStateEvaluator implements TartanStateEvaluator {
         // determine if the alarm should sound. There are two cases
         // 1. the door is opened when no one is home
         // 2. the house is suddenly occupied
-        try {
-            if ((alarmState && !doorState && proximityState) || (alarmState && doorState && !proximityState)) {
-                log.append(formatLogEntry("Activating alarm"));
-                alarmActiveState = true;
-            }
-        } catch (NullPointerException npe) {
-            // Not enough information to evaluate alarm
+        if (alarmState == null || doorState == null || proximityState == null) {
             log.append(formatLogEntry("Warning: Not enough information to evaluate alarm"));
+        } else if ((alarmState && !doorState && proximityState) || (alarmState && doorState && !proximityState)) {
+            log.append(formatLogEntry("Activating alarm"));
+            alarmActiveState = true;
         }
 
         // Is the heater needed?
