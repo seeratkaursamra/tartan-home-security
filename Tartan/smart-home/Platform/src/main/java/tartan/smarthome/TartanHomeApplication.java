@@ -35,7 +35,7 @@ public class TartanHomeApplication extends Application<TartanHomeConfiguration> 
      * @throws Exception a catch all exception
      */
     public static void main(final String[] args) throws Exception {
-        new TartanHomeApplication().run(args);
+        new TartanHomeApplication().run(args); //bug 5 - this is a False positive
     }
 
     /**
