@@ -91,19 +91,6 @@ public class IoTConnectManager {
                 if (count<keys.size()) {
                     newState.append(IoTValues.PARAM_DELIM);
                 }
-            } else if (key.equals(IoTValues.LIGHT_STATE)) {
-                Boolean newLightState = (Boolean) state.get(key);
-                newState.append(IoTValues.LIGHT_STATE);
-                newState.append(IoTValues.PARAM_EQ);
-                if (newLightState) {
-                    newState.append(IoTValues.LIGHT_ON);
-                } else {
-                    newState.append(IoTValues.LIGHT_OFF);
-                }
-                count++;
-                if (count<keys.size()) {
-                    newState.append(IoTValues.PARAM_DELIM);
-                }
             } else if (key.equals(IoTValues.ALARM_STATE)) {
                 Boolean newAlarmState = (Boolean) state.get(key);
                 newState.append(IoTValues.ALARM_STATE);
