@@ -3,6 +3,7 @@ package tartan.smarthome.resources.iotcontroller;
 import java.io.*;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
 
 /**
  * A connection to an IoT-enabled house. This class handles the network connection to the house
@@ -103,8 +104,9 @@ public class IoTConnection {
         try {
             houseSocket = new Socket(this.address, this.port);
 
-            out = new BufferedWriter(new OutputStreamWriter(houseSocket.getOutputStream()));
-            in = new BufferedReader(new InputStreamReader( houseSocket.getInputStream()));
+            //bug fix 2, this technically fixes two bugs related to the input and output stream writer
+            out = new BufferedWriter(new OutputStreamWriter(houseSocket.getOutputStream(), StandardCharsets.UTF_8));
+            in  = new BufferedReader(new InputStreamReader(houseSocket.getInputStream(),  StandardCharsets.UTF_8));
 
         } catch (UnknownHostException uhe) {
             System.err.println("Unknown host: " + address);
